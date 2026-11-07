@@ -1,0 +1,20 @@
+<aside class="quote" id="contact">
+  <span class="small">با تیم فروش و فنی در ارتباط باشید</span>
+  <h2>درخواست مشاوره و استعلام</h2>
+  <p>مشخصات اولیه را ثبت کنید تا برای پیگیری درخواست با شما تماس بگیریم.</p>
+  <form class="formgrid" id="quoteForm" data-email="{{ site.contact.email }}" data-phone="{{ site.contact.phone }}" novalidate>
+    <input required name="name" autocomplete="name" placeholder="نام و نام خانوادگی" aria-label="نام و نام خانوادگی">
+    <input required name="phone" type="tel" inputmode="tel" autocomplete="tel" dir="ltr" placeholder="شماره تماس" aria-label="شماره تماس">
+    <select class="wide" name="category" aria-label="گروه محصول موردنظر">
+      <option value="">گروه محصول موردنظر</option>
+      {%- for p in products %}
+      <option>{{ p.title }}</option>
+      {%- endfor %}
+      <option>تأمین پروژه</option>
+    </select>
+    <textarea class="wide" rows="3" name="details" placeholder="استاندارد، سایز، گرید یا توضیح پروژه (اختیاری)" aria-label="توضیحات پروژه"></textarea>
+    <button class="btn" type="submit">ثبت درخواست ↗</button>
+  </form>
+  <div class="formnote">اطلاعات شما فقط برای پیگیری همین درخواست استفاده می‌شود.</div>
+  <div class="status" id="formStatus" role="status" aria-live="polite" hidden></div>
+</aside>

@@ -1,0 +1,40 @@
+{%- set c = site.contact -%}
+<footer class="footer">
+  <div class="wrap">
+    <div class="footgrid">
+      <div>
+        <a class="brand" href="#home"><i class="brand-mark"></i>PIPE<span>O</span>X</a>
+        <p>{{ site.tagline }}</p>
+      </div>
+      <div>
+        <h4>دسترسی سریع</h4>
+        <ul>
+          {%- for item in site.nav %}{% if not loop.first and not loop.last %}
+          <li><a href="{{ item.href }}">{{ item.label }}</a></li>
+          {%- endif %}{% endfor %}
+        </ul>
+      </div>
+      <div>
+        <h4>گروه محصولات</h4>
+        <ul>
+          {%- for p in products %}
+          <li>{{ p.title }}</li>
+          {%- endfor %}
+        </ul>
+      </div>
+      <div>
+        <h4>ارتباط با ما</h4>
+        <ul class="contact-list">
+          {%- if c.phone %}<li><a href="tel:{{ c.phone | telHref }}" dir="ltr">{{ c.phone }}</a></li>{% endif %}
+          {%- if c.email %}<li><a href="mailto:{{ c.email }}" dir="ltr">{{ c.email }}</a></li>{% endif %}
+          {%- if c.whatsapp %}<li><a href="https://wa.me/{{ c.whatsapp }}" rel="noopener">واتساپ</a></li>{% endif %}
+          {%- if c.address %}<li>{{ c.address }}</li>{% endif %}
+        </ul>
+        <a class="footer-cta" href="#contact">ثبت درخواست استعلام ←</a>
+      </div>
+    </div>
+    <div class="copyright">
+      <span>© {{ "" | year }} {{ site.name }} · تمامی حقوق محفوظ است.</span>
+    </div>
+  </div>
+</footer>

@@ -1,0 +1,42 @@
+[
+  {
+    "slug": "steel-pipes",
+    "title": "لوله‌های فولادی",
+    "code": "STEEL PIPES",
+    "summary": "لوله‌های بدون درز و درزدار برای خطوط انتقال و کاربردهای صنعتی.",
+    "image": "product-pipes.jpg",
+    "alt": "لوله فولادی صنعتی",
+    "keywords": "لوله فولادی steel pipe seamless welded کربن استیل",
+    "orbit": "a"
+  },
+  {
+    "slug": "fittings",
+    "title": "اتصالات صنعتی",
+    "code": "PIPE FITTINGS",
+    "summary": "زانویی، سه‌راهی، تبدیل و اتصالات موردنیاز خطوط لوله.",
+    "image": "product-elbow.jpg",
+    "alt": "اتصالات فولادی صنعتی",
+    "keywords": "اتصالات صنعتی زانویی سه راهی تبدیل fittings elbow tee reducer",
+    "orbit": "c"
+  },
+  {
+    "slug": "flanges",
+    "title": "فلنج و متعلقات",
+    "code": "FLANGES",
+    "summary": "فلنج‌ها و اقلام اتصال با توجه به کلاس، متریال و استاندارد درخواستی.",
+    "image": "product-flange.jpg",
+    "alt": "فلنج فولادی",
+    "keywords": "فلنج flange فولادی کلاس اتصال",
+    "orbit": "b"
+  },
+  {
+    "slug": "valves",
+    "title": "شیرآلات و تجهیزات",
+    "code": "VALVES & EQUIPMENT",
+    "summary": "تأمین تجهیزات کنترلی و اقلام تکمیلی خطوط انتقال.",
+    "image": "product-valve.jpg",
+    "alt": "شیرآلات صنعتی",
+    "keywords": "شیرآلات valve تجهیزات ابزار دقیق",
+    "orbit": "d"
+  }
+]

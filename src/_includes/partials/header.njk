@@ -1,0 +1,21 @@
+<div class="top">
+  <div class="wrap">
+    <span>تأمین و راهکارهای مهندسی لوله و اتصالات صنعتی</span>
+    <span>پاسخ‌گویی به پروژه‌ها <b>· با هماهنگی کارشناسان فروش</b></span>
+  </div>
+</div>
+<header>
+  <div class="wrap nav">
+    <a class="brand" href="#home" aria-label="{{ site.name }} home"><i class="brand-mark"></i>PIPE<span>O</span>X</a>
+    <nav class="links" id="navlinks">
+      {%- for item in site.nav %}
+      <a{% if loop.first %} class="active"{% endif %} href="{{ item.href }}">{{ item.label }}</a>
+      {%- endfor %}
+    </nav>
+    <div class="nav-actions">
+      <input class="search" id="search" type="search" placeholder="جستجو در محصولات..." aria-label="جستجو در محصولات">
+      <a class="btn" href="#contact">درخواست استعلام ←</a>
+      <button class="hamb" id="hamb" type="button" aria-label="باز کردن منو" aria-controls="navlinks" aria-expanded="false">☰</button>
+    </div>
+  </div>
+</header>

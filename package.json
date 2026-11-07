@@ -1,0 +1,19 @@
+{
+  "name": "pipeox-full-website",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "start": "eleventy --serve",
+    "build": "eleventy",
+    "format": "prettier --write src/_includes/styles src/assets/js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "devDependencies": {
+    "@11ty/eleventy": "^3.1.2",
+    "@fontsource-variable/vazirmatn": "^5.2.5",
+    "prettier": "^3.6.2"
+  }
+}

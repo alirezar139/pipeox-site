@@ -1,0 +1,22 @@
+{
+  "name": "PIPEOX",
+  "nameFa": "پایپ‌اکس",
+  "url": "",
+  "title": "PIPEOX | راهکارهای مهندسی خطوط انتقال",
+  "description": "PIPEOX؛ راهکارهای تخصصی تأمین لوله‌های فولادی، اتصالات و تجهیزات خطوط انتقال برای پروژه‌های صنعتی و زیرساختی.",
+  "tagline": "راهکارهای تخصصی تأمین لوله، اتصالات و تجهیزات خطوط انتقال برای پروژه‌های صنعتی و زیرساختی.",
+  "contact": {
+    "email": "",
+    "phone": "",
+    "whatsapp": "",
+    "address": ""
+  },
+  "nav": [
+    { "label": "خانه", "href": "#home" },
+    { "label": "محصولات", "href": "#products" },
+    { "label": "صنایع هدف", "href": "#markets" },
+    { "label": "توانمندی‌ها", "href": "#capabilities" },
+    { "label": "دانش فنی", "href": "#resources" },
+    { "label": "تماس با ما", "href": "#contact" }
+  ]
+}

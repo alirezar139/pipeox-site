@@ -1,0 +1,160 @@
+---
+layout: layouts/base.njk
+---
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div class="hero-copy">
+      <div class="eyebrow">ENGINEERED FLOW · INDUSTRIAL SOLUTIONS</div>
+      <h1>زیرساخت مطمئن،<br><span class="accent">با انتخابی مهندسی‌شده.</span></h1>
+      <p>تأمین تخصصی لوله‌های فولادی، اتصالات و تجهیزات خطوط انتقال برای پروژه‌های انرژی، نفت و گاز، پتروشیمی و صنایع سنگین؛ با تمرکز بر مشخصات فنی، کیفیت و پاسخ‌گویی حرفه‌ای.</p>
+      <div class="actions">
+        <a class="btn" href="#products">کاوش محصولات <span>←</span></a>
+        <a class="btn outline" href="#capabilities">آشنایی با پایپ‌اکس</a>
+      </div>
+      <div class="hero-proof">
+        <div class="proof"><strong>01</strong><span>انتخاب بر اساس نیاز پروژه</span></div>
+        <div class="proof"><strong>02</strong><span>تطبیق مشخصات فنی</span></div>
+        <div class="proof"><strong>03</strong><span>پشتیبانی در مسیر تأمین</span></div>
+      </div>
+    </div>
+    {% include "partials/quote-form.njk" %}
+  </div>
+</section>
+
+<section class="trust">
+  <div class="wrap">
+    <div class="trustitem"><span class="trusticon" aria-hidden="true">◇</span><div><b>تطبیق فنی</b><small>انتخاب بر اساس شرایط سرویس</small></div></div>
+    <div class="trustitem"><span class="trusticon" aria-hidden="true">⌁</span><div><b>سبد کالای تخصصی</b><small>لوله، اتصالات و متعلقات</small></div></div>
+    <div class="trustitem"><span class="trusticon" aria-hidden="true">◎</span><div><b>پشتیبانی پروژه</b><small>از استعلام تا تأمین</small></div></div>
+    <div class="trustitem"><span class="trusticon" aria-hidden="true">✓</span><div><b>توجه به استانداردها</b><small>بررسی مدارک و الزامات فنی</small></div></div>
+  </div>
+</section>
+
+<section class="orbit-showcase" aria-label="نمایش محصولات {{ site.name }}">
+  <div class="wrap orbit-layout">
+    <div class="orbit-intro">
+      <div class="eyebrow">ENGINEERED PRODUCT RANGE</div>
+      <h2>اجزای مطمئن،<br><span class="accent">برای جریان بی‌وقفه</span></h2>
+      <p>چهار گروه اصلی محصولات پایپ‌اکس را در یک نمای تعاملی ببینید. برای مشاهده جزئیات و ثبت درخواست، هر محصول را انتخاب کنید.</p>
+      <a class="btn outline" href="#products">مشاهده کاتالوگ محصولات ←</a>
+    </div>
+    <div class="orbit-stage">
+      <div class="orbit-glow"></div><div class="orbit-ring ring-one"></div><div class="orbit-ring ring-two"></div>
+      <div class="orbit-center"><i class="brand-mark"></i><strong>PIPEOX</strong><small>STEEL PIPELINE SOLUTIONS</small></div>
+      {%- for p in products %}
+      <a class="orbit-product orbit-{{ p.orbit }}" href="#contact" data-category="{{ p.title }}" aria-label="استعلام {{ p.title }}"><img src="/assets/img/{{ p.image }}" alt="" loading="lazy"><span>{{ p.title }}</span></a>
+      {%- endfor %}
+      <div class="orbit-pulse pulse-a"></div><div class="orbit-pulse pulse-b"></div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="products">
+  <div class="wrap">
+    <div class="section-head">
+      <div><div class="eyebrow">PRODUCT PORTFOLIO</div><h2>محصولات و راهکارها</h2></div>
+      <p>برای انتخاب درست، فقط نام محصول کافی نیست. جنس، گرید، ابعاد، ضخامت، فشار و استاندارد باید با شرایط واقعی پروژه هم‌خوانی داشته باشند.</p>
+    </div>
+    <div class="products" id="productGrid">
+      {%- for p in products %}
+      <article class="product" data-search="{{ p.keywords }}">
+        <div class="visual"><img src="/assets/img/{{ p.image }}" alt="{{ p.alt }}" loading="lazy"></div>
+        <small>0{{ loop.index }} / {{ p.code }}</small>
+        <h3>{{ p.title }}</h3>
+        <p>{{ p.summary }}</p>
+        <a class="more" href="#contact" data-category="{{ p.title }}">مشخصات و استعلام <span>↙</span></a>
+      </article>
+      {%- endfor %}
+    </div>
+    <p id="noResults" class="no-results" hidden>محصولی با این عبارت پیدا نشد.</p>
+  </div>
+</section>
+
+<section class="section capabilities" id="capabilities">
+  <div class="wrap capgrid">
+    <div class="capimage"><img src="/assets/img/pipes.jpg" alt="انبار و خطوط لوله فولادی" loading="lazy"></div>
+    <div class="capcopy">
+      <div class="eyebrow">WHY PIPEOX</div>
+      <h2>تأمین صنعتی، فراتر از فروش کالا</h2>
+      <p>در پروژه‌های صنعتی، انتخاب نادرست متریال یا مغایرت مشخصات می‌تواند هزینه و زمان اجرا را افزایش دهد. رویکرد پایپ‌اکس بر دریافت نیاز فنی، بررسی مشخصات و پیگیری تأمین متناسب با کاربرد پروژه متمرکز است.</p>
+      <div class="caplist">
+        <div class="cap"><b>بررسی مشخصات فنی</b><span>استاندارد، گرید، سایز و ضخامت</span></div>
+        <div class="cap"><b>تأمین چندگروهی</b><span>تجمیع اقلام مرتبط در یک درخواست</span></div>
+        <div class="cap"><b>مستندسازی درخواست</b><span>شفاف‌سازی نیاز و مدارک مورد انتظار</span></div>
+        <div class="cap"><b>ارتباط تخصصی</b><span>پیگیری درخواست با تیم مرتبط</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="markets">
+  <div class="wrap">
+    <div class="section-head">
+      <div><div class="eyebrow">MARKETS WE SERVE</div><h2>صنایع و کاربردها</h2></div>
+      <p>راهکارهای لوله و اتصالات با توجه به شرایط کاری هر صنعت انتخاب می‌شوند. گروه‌های زیر نمونه‌هایی از بازارهای هدف این سبد تأمین هستند.</p>
+    </div>
+    <div class="markets">
+      <article class="market" data-num="01"><span class="num">01 / ENERGY</span><h3>نفت، گاز و انرژی</h3><p>خطوط انتقال، تجهیزات جانبی و اقلام موردنیاز تأسیسات انرژی.</p></article>
+      <article class="market" data-num="02"><span class="num">02 / PROCESS</span><h3>پتروشیمی و پالایش</h3><p>تأمین اقلام خطوط فرایندی با توجه به فشار، دما و سازگاری متریال.</p></article>
+      <article class="market" data-num="03"><span class="num">03 / INFRASTRUCTURE</span><h3>زیرساخت و صنایع سنگین</h3><p>شبکه‌های انتقال، تأسیسات صنعتی و پروژه‌های عمرانی بزرگ.</p></article>
+    </div>
+  </div>
+</section>
+
+<section class="section workflow">
+  <div class="wrap">
+    <div class="section-head">
+      <div><div class="eyebrow">HOW WE WORK</div><h2>مسیر همکاری با پایپ‌اکس</h2></div>
+      <p>فرآیند شفاف کمک می‌کند نیاز پروژه از ابتدا درست تعریف شود و استعلام قابل بررسی باشد.</p>
+    </div>
+    <div class="steps">
+      <div class="step"><span class="n">01</span><h3>ثبت درخواست</h3><p>ارسال گروه کالا و اطلاعات اولیه پروژه.</p></div>
+      <div class="step"><span class="n">02</span><h3>بررسی فنی</h3><p>بررسی مشخصات، استاندارد و شرایط سرویس.</p></div>
+      <div class="step"><span class="n">03</span><h3>ارائه پیشنهاد</h3><p>پیگیری موجودی، زمان و پیشنهاد تأمین.</p></div>
+      <div class="step"><span class="n">04</span><h3>هماهنگی تأمین</h3><p>هماهنگی مراحل بعدی بر اساس توافق طرفین.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="section technical" id="resources">
+  <div class="wrap techgrid">
+    <div class="techcopy">
+      <div class="eyebrow">TECHNICAL FIRST</div>
+      <h2>استعلام دقیق‌تر، با اطلاعات فنی کامل‌تر</h2>
+      <p>برای دریافت پیشنهاد دقیق، تا حد امکان استاندارد مرجع، متریال یا گرید، قطر اسمی، ضخامت یا رده، نوع اتصال، مقدار و محل تحویل را مشخص کنید. اگر دیتاشیت یا لیست متریال دارید، آن را در درخواست خود ذکر کنید.</p>
+      <a class="btn" href="#contact">ارسال درخواست فنی ←</a>
+    </div>
+    <div class="specs">
+      <div class="spec"><span>استاندارد مرجع</span><b>API / ASTM / ASME / EN*</b></div>
+      <div class="spec"><span>متریال / گرید</span><b>مطابق مشخصات پروژه</b></div>
+      <div class="spec"><span>ابعاد و ضخامت</span><b>NPS / OD / WT / SCH</b></div>
+      <div class="spec"><span>شرایط کاری</span><b>فشار، دما و سیال</b></div>
+      <div class="spec"><span>مدارک موردنیاز</span><b>MTC / Test / Inspection*</b></div>
+      <div class="spec"><span>*</span><b>بسته به نوع کالا و سفارش</b></div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap">
+    <div class="section-head">
+      <div><div class="eyebrow">INSIGHTS & UPDATES</div><h2>دانش فنی و تازه‌ها</h2></div>
+      <p>بخش محتوایی برای انتشار خبرهای تأمین، راهنماهای انتخاب محصول، استانداردها و تجربه پروژه‌ها.</p>
+    </div>
+    <div class="news">
+      <article class="story"><img src="/assets/img/industrial-bg.jpg" alt="محیط صنعتی" loading="lazy"><div class="storybody"><small>راهنمای فنی</small><h3>پیش از استعلام لوله فولادی چه اطلاعاتی لازم است؟</h3><p>چک‌لیستی از مشخصات پایه برای تعریف دقیق نیاز پروژه.</p></div></article>
+      <article class="story"><img src="/assets/img/product-flange.jpg" alt="فلنج صنعتی" loading="lazy"><div class="storybody"><small>محصولات</small><h3>تفاوت کلاس فلنج و فشار کاری</h3><p>چرا انتخاب کلاس باید با شرایط طراحی هماهنگ باشد.</p></div></article>
+      <article class="story"><img src="/assets/img/product-elbow.jpg" alt="اتصالات لوله" loading="lazy"><div class="storybody"><small>مهندسی خطوط</small><h3>نقش اتصالات در طراحی مسیر لوله‌کشی</h3><p>مروری بر انتخاب زانویی، سه‌راهی و تبدیل.</p></div></article>
+    </div>
+  </div>
+</section>
+
+<section class="cta">
+  <div class="wrap">
+    <div>
+      <h2>برای پروژه بعدی خود، از همین‌جا شروع کنید.</h2>
+      <p>نیاز فنی و اقلام موردنظر را ارسال کنید تا درخواست شما بررسی شود.</p>
+    </div>
+    <a class="btn" href="#contact">درخواست مشاوره و استعلام ←</a>
+  </div>
+</section>
