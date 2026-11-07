@@ -1,9 +1,11 @@
 ---
-permalink: /robots.txt
+permalink: /robots.php
 eleventyExcludeFromCollections: true
 ---
-User-agent: *
-Disallow: /api/
-{%- if site.url %}
-Sitemap: {{ site.url }}/sitemap.xml
-{%- endif %}
+<?php
+require_once {{ page.outputPath | phpRoot | safe }} . '/api/lib/site.php';
+header('Content-Type: text/plain; charset=utf-8');
+echo "User-agent: *\nDisallow: /api/\nDisallow: /account/\n";
+if (abs_url('/')) {
+    echo 'Sitemap: ', abs_url('/sitemap.xml'), "\n";
+}

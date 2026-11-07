@@ -1,6 +1,0 @@
-{
-  "layout": "layouts/article.njk",
-  "tags": ["insights"],
-  "ogType": "article",
-  "permalink": "/insights/{{ page.fileSlug }}/"
-}

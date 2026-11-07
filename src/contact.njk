@@ -1,29 +1,28 @@
 ---
 layout: layouts/page.njk
-permalink: /contact/
+permalink: /contact/index.php
 title: تماس و درخواست استعلام
 description: درخواست استعلام قیمت و مشاوره فنی لوله، اتصالات، فلنج و شیرآلات صنعتی از PIPEOX. لیست متریال یا دیتاشیت خود را پیوست کنید.
 eyebrow: CONTACT & INQUIRY
 lead: مشخصات اولیه را ثبت کنید و در صورت امکان لیست متریال یا دیتاشیت را پیوست کنید تا کارشناسان ما با اطلاعات کامل‌تری با شما تماس بگیرند.
-hasForm: true
 breadcrumbs:
   - { label: "خانه", url: "/" }
   - { label: "تماس با ما", url: "/contact/" }
 ---
-{%- set c = site.contact -%}
+<?php $c = s('contact', []); $has = fn($k) => !empty($c[$k]); ?>
 <section class="section section-tight">
   <div class="wrap detail-grid contact-grid">
     <div class="detail-main">
-      {%- if c.phone or c.email or c.whatsapp or c.address %}
+      <?php if ($has('phone') || $has('email') || $has('whatsapp') || $has('address')): ?>
       <h2 class="sub-title">راه‌های ارتباطی</h2>
       <div class="type-grid">
-        {%- if c.phone %}<a class="type-card" href="tel:{{ c.phone | telHref }}"><b>تلفن</b><span dir="ltr">{{ c.phone }}</span></a>{% endif %}
-        {%- if c.whatsapp %}<a class="type-card" href="https://wa.me/{{ c.whatsapp }}" rel="noopener"><b>واتساپ</b><span>گفت‌وگو با کارشناس فروش</span></a>{% endif %}
-        {%- if c.email %}<a class="type-card" href="mailto:{{ c.email }}"><b>ایمیل</b><span dir="ltr">{{ c.email }}</span></a>{% endif %}
-        {%- if c.address %}<div class="type-card"><b>نشانی</b><span>{{ c.address }}</span></div>{% endif %}
-        {%- if c.hours %}<div class="type-card"><b>ساعات پاسخ‌گویی</b><span>{{ c.hours }}</span></div>{% endif %}
+        <?php if ($has('phone')): ?><a class="type-card" href="tel:<?= e(tel_href($c['phone'])) ?>"><b>تلفن</b><span dir="ltr"><?= e($c['phone']) ?></span></a><?php endif ?>
+        <?php if ($has('whatsapp')): ?><a class="type-card" href="https://wa.me/<?= e(tel_href($c['whatsapp'])) ?>" rel="noopener"><b>واتساپ</b><span>گفت‌وگو با کارشناس فروش</span></a><?php endif ?>
+        <?php if ($has('email')): ?><a class="type-card" href="mailto:<?= e($c['email']) ?>"><b>ایمیل</b><span dir="ltr"><?= e($c['email']) ?></span></a><?php endif ?>
+        <?php if ($has('address')): ?><div class="type-card"><b>نشانی</b><span><?= e($c['address']) ?></span></div><?php endif ?>
+        <?php if ($has('hours')): ?><div class="type-card"><b>ساعات پاسخ‌گویی</b><span><?= e($c['hours']) ?></span></div><?php endif ?>
       </div>
-      {%- endif %}
+      <?php endif ?>
 
       <h2 class="sub-title">برای استعلام دقیق‌تر این موارد را مشخص کنید</h2>
       <div class="specs">

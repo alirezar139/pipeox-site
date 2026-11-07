@@ -1,8 +1,8 @@
-# Only the two entry points are reachable from the web
+# Only the public entry points are reachable from the web
 <FilesMatch "\.php$">
   Require all denied
 </FilesMatch>
-<FilesMatch "^(inquiry|admin|subscribe)\.php$">
+<FilesMatch "^(inquiry|admin|subscribe|media)\.php$">
   Require all granted
 </FilesMatch>
 

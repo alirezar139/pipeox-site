@@ -1,4 +1,3 @@
-{%- set c = site.contact -%}
 <footer class="site-footer">
   <div class="footer-glow" aria-hidden="true"></div>
   <div class="wrap-footer footer-main">
@@ -14,22 +13,22 @@
         <button type="submit">عضویت</button>
       </div>
       <div class="newsletter-copy">
-        <b>{{ home.newsletter.title }}</b>
-        <span>{{ home.newsletter.text }}</span>
+        <b><?= se('newsletter.title') ?></b>
+        <span><?= se('newsletter.text') ?></span>
       </div>
       <p class="newsletter-status" role="status" aria-live="polite" hidden></p>
     </form>
     {% include "partials/logo.njk" %}
   </div>
-  {%- if c.phone or c.email or c.address %}
+  <?php $c = s('contact', []); if (!empty($c['phone']) || !empty($c['email']) || !empty($c['address'])): ?>
   <div class="wrap-footer footer-contact">
-    {%- if c.phone %}<a href="tel:{{ c.phone | telHref }}" dir="ltr">{{ c.phone }}</a>{% endif %}
-    {%- if c.email %}<a href="mailto:{{ c.email }}" dir="ltr">{{ c.email }}</a>{% endif %}
-    {%- if c.whatsapp %}<a href="https://wa.me/{{ c.whatsapp }}" rel="noopener">واتساپ</a>{% endif %}
-    {%- if c.address %}<span>{{ c.address }}</span>{% endif %}
+    <?php if (!empty($c['phone'])): ?><a href="tel:<?= e(tel_href($c['phone'])) ?>" dir="ltr"><?= e($c['phone']) ?></a><?php endif ?>
+    <?php if (!empty($c['email'])): ?><a href="mailto:<?= e($c['email']) ?>" dir="ltr"><?= e($c['email']) ?></a><?php endif ?>
+    <?php if (!empty($c['whatsapp'])): ?><a href="https://wa.me/<?= e(tel_href($c['whatsapp'])) ?>" rel="noopener">واتساپ</a><?php endif ?>
+    <?php if (!empty($c['address'])): ?><span><?= e($c['address']) ?></span><?php endif ?>
   </div>
-  {%- endif %}
+  <?php endif ?>
   <div class="copyright">
-    <div class="wrap-footer"><span dir="ltr">© {{ "" | year }} Pipeox. All rights reserved.</span></div>
+    <div class="wrap-footer"><span dir="ltr">© <?= date('Y') ?> Pipeox. All rights reserved.</span></div>
   </div>
 </footer>

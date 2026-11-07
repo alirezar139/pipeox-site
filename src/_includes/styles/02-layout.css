@@ -417,3 +417,33 @@
     font-size: 22px;
   }
 }
+
+/* Header account button — same pill as the hero's "درباره ما" */
+.nav-account {
+  height: calc(var(--u) * 37);
+  padding: 0 calc(var(--u) * 14);
+  border-color: rgba(255, 255, 255, 0.4);
+  font-size: calc(var(--u) * 11.6);
+}
+.nav-account .ico {
+  width: calc(var(--u) * 15);
+  height: calc(var(--u) * 15);
+}
+.nav-account.is-active {
+  border-color: var(--orange);
+  color: var(--orange);
+}
+@media (max-width: 1180px) {
+  .nav-account {
+    height: 40px;
+  }
+}
+@media (max-width: 700px) {
+  .nav-account span {
+    display: none;
+  }
+  .nav-account {
+    width: 40px;
+    padding: 0;
+  }
+}

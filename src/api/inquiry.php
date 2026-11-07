@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 require __DIR__ . '/lib/bootstrap.php';
 require __DIR__ . '/lib/notify.php';
+require __DIR__ . '/lib/auth.php';
 
 header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: no-store');
@@ -109,12 +110,13 @@ if ($file && $file['error'] !== UPLOAD_ERR_NO_FILE) {
 
 // ---- Save, then notify ----
 $stmt = $pdo->prepare(
-    'INSERT INTO inquiries (name, phone, category, details, attachment_path, attachment_name, page, ip, user_agent)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
+    'INSERT INTO inquiries (name, phone, category, details, attachment_path, attachment_name, page, ip, user_agent, user_id)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
 );
 $stmt->execute([
     $name, $phone, $category, $details, $attachmentPath, $attachmentName, $page,
     $ip, mb_substr((string)($_SERVER['HTTP_USER_AGENT'] ?? ''), 0, 300),
+    current_user()['id'] ?? null, // logged-in customers see it in their account
 ]);
 $id = (int)$pdo->lastInsertId();
 

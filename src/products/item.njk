@@ -1,0 +1,59 @@
+---
+layout: layouts/page.njk
+permalink: /products/item.php
+controller: product
+---
+{#- /products/<slug>/ is rewritten here (.htaccess). $product is set by api/pages/product.php -#}
+<?php $product = $P['product']; ?>
+<section class="section section-tight">
+  <div class="wrap detail-grid">
+    <div class="detail-main">
+      <div class="detail-intro">
+        <?php if ($product['image']): ?><div class="detail-image"><img src="<?= e($product['image']) ?>" alt="<?= e($product['alt']) ?>" decoding="async"></div><?php endif ?>
+        <p><?= nl2br(e($product['intro'])) ?></p>
+      </div>
+
+      <?php if ($product['types']): ?>
+      <h2 class="sub-title">انواع رایج</h2>
+      <div class="type-grid">
+        <?php foreach ($product['types'] as $t): ?>
+        <div class="type-card"><b><?= e($t['name']) ?></b><span><?= e($t['desc']) ?></span></div>
+        <?php endforeach ?>
+      </div>
+      <?php endif ?>
+
+      <h2 class="sub-title">مشخصات فنی قابل استعلام</h2>
+      <div class="specs">
+        <?php foreach ($product['specs'] as $row): ?>
+        <div class="spec"><span><?= e($row[0]) ?></span><b dir="auto"><?= e($row[1]) ?></b></div>
+        <?php endforeach ?>
+        <div class="spec"><span>مدارک</span><b>MTC طبق EN 10204 (3.1 / 3.2) · بازرسی شخص ثالث در صورت نیاز</b></div>
+      </div>
+      <p class="spec-note">موجودی، برند و محدوده دقیق هر قلم در زمان استعلام اعلام می‌شود.</p>
+
+      <?php if ($product['applications']): ?>
+      <h2 class="sub-title">کاربردها</h2>
+      <ul class="chips">
+        <?php foreach ($product['applications'] as $a): ?><li><?= e($a) ?></li><?php endforeach ?>
+      </ul>
+      <?php endif ?>
+    </div>
+    <div class="detail-side">
+      {% include "partials/quote-form.njk" %}
+    </div>
+  </div>
+</section>
+
+<?php $others = array_values(array_filter(products(), fn($x) => $x['slug'] !== $product['slug'])); ?>
+<?php if ($others): ?>
+<section class="section section-tight related">
+  <div class="wrap">
+    <h2 class="sub-title">سایر گروه‌های محصول</h2>
+    <div class="products products-3">
+      <?php foreach (products() as $i => $p): if ($p['slug'] === $product['slug']) continue; $idx = $i + 1; ?>
+      {% include "partials/product-card.njk" %}
+      <?php endforeach ?>
+    </div>
+  </div>
+</section>
+<?php endif ?>

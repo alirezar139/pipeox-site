@@ -1,6 +1,6 @@
 ---
 layout: layouts/page.njk
-permalink: /about/
+permalink: /about/index.php
 title: درباره پایپ‌اکس
 description: پایپ‌اکس؛ تأمین تخصصی لوله، اتصالات، فلنج و شیرآلات صنعتی با تمرکز بر تطبیق فنی، کیفیت و پشتیبانی پروژه از استعلام تا تأمین.
 eyebrow: WHY PIPEOX
@@ -12,7 +12,7 @@ breadcrumbs:
 {%- from "partials/icons.njk" import icon -%}
 <section class="section">
   <div class="wrap capgrid">
-    <div class="capimage reveal"><img src="/assets/img/steel-pipes-stack.jpg" alt="لوله‌های فولادی صنعتی" loading="lazy" eleventy:widths="600,1100"></div>
+    <div class="capimage reveal"><img src="/assets/img/steel-pipes-stack.jpg" alt="لوله‌های فولادی صنعتی" loading="lazy"></div>
     <div class="capcopy reveal">
       <div class="eyebrow">OUR APPROACH</div>
       <h2>تأمین صنعتی، فراتر از فروش کالا</h2>
@@ -50,13 +50,13 @@ breadcrumbs:
       <div><div class="eyebrow">OUR VALUES</div><h2>آنچه برای ما مهم است</h2></div>
     </div>
     <div class="tile-features tile features-wide reveal">
-      {%- for f in home.features %}
+      <?php foreach (s('features', []) as $f): ?>
       <div class="feature">
-        <span class="feature-icon">{{ icon(f.icon) }}</span>
-        <b>{{ f.title }}</b>
-        <small>{{ f.text }}</small>
+        <span class="feature-icon"><?= icon($f['icon'] ?? 'shield') ?></span>
+        <b><?= e($f['title']) ?></b>
+        <small><?= e($f['text']) ?></small>
       </div>
-      {%- endfor %}
+      <?php endforeach ?>
     </div>
   </div>
 </section>

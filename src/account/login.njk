@@ -1,0 +1,31 @@
+---
+layout: layouts/page.njk
+permalink: /account/login/index.php
+controller: account-login
+private: true
+title: ورود به حساب کاربری
+eyebrow: CUSTOMER ACCOUNT
+lead: درخواست‌های استعلام خود را یک‌جا ببینید و وضعیت آن‌ها را پیگیری کنید.
+breadcrumbs:
+  - { label: "خانه", url: "/" }
+  - { label: "ورود", url: "/account/login/" }
+---
+{%- from "partials/icons.njk" import icon -%}
+<section class="section section-tight">
+  <div class="wrap auth-wrap">
+    <form class="auth-card glass" method="post" novalidate>
+      <h2>ورود</h2>
+      <?php if ($P['flash']): ?><p class="notice notice-<?= e($P['flash'][1]) ?>"><?= e($P['flash'][0]) ?></p><?php endif ?>
+      <?php if ($P['error']): ?><p class="notice notice-error" role="alert"><?= e($P['error']) ?></p><?php endif ?>
+      <?= csrf_field() ?>
+      <input type="hidden" name="next" value="<?= e($P['next']) ?>">
+      <label class="field">{{ icon("mail") }}<input type="email" name="email" dir="ltr" placeholder="ایمیل" aria-label="ایمیل" autocomplete="email" required value="<?= e($P['old']['email']) ?>"></label>
+      <label class="field">{{ icon("shield") }}<input type="password" name="password" placeholder="رمز عبور" aria-label="رمز عبور" autocomplete="current-password" required></label>
+      <button class="btn btn-block" type="submit"><span>ورود</span></button>
+      <div class="auth-links">
+        <a href="/account/forgot/">رمز عبور را فراموش کرده‌ام</a>
+        <span>حساب ندارید؟ <a href="/account/register/">ثبت‌نام کنید</a></span>
+      </div>
+    </form>
+  </div>
+</section>

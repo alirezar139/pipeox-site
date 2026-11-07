@@ -1,34 +1,29 @@
 // Eleventy build config — source in src/, deployable output in dist/
-import { eleventyImageTransformPlugin } from "@11ty/eleventy-img";
+//
+// Pages are built as .php files: Eleventy supplies the design (layouts, partials, CSS, icons)
+// and PHP fills in the content from the SQLite database at request time, so edits made in
+// the admin panel go live immediately without a rebuild. See README-FA.md.
 import sharp from "sharp";
 import fs from "node:fs";
+import path from "node:path";
+import { exportSeed } from "./scripts/export-seed.mjs";
 
 export default function (eleventyConfig) {
   // ---- Static files copied verbatim ----
   eleventyConfig.addPassthroughCopy("src/assets/fonts");
   eleventyConfig.addPassthroughCopy("src/assets/js");
-  eleventyConfig.addPassthroughCopy("src/assets/img/home"); // artwork cut from the mockup, used as-is
+  eleventyConfig.addPassthroughCopy("src/assets/img");
   eleventyConfig.addPassthroughCopy("src/favicon.svg");
   eleventyConfig.addPassthroughCopy("src/.htaccess");
   eleventyConfig.addPassthroughCopy("src/api"); // PHP backend (includes config.php if present)
 
   eleventyConfig.addWatchTarget("src/_includes/styles/");
+  eleventyConfig.addWatchTarget("seed/");
 
-  // ---- Images: every <img> becomes a responsive <picture> (WebP + JPEG) with width/height ----
-  eleventyConfig.addPlugin(eleventyImageTransformPlugin, {
-    formats: ["webp", "jpeg"],
-    widths: [480, 960, 1600],
-    urlPath: "/assets/img/opt/",
-    outputDir: "./dist/assets/img/opt/",
-    htmlOptions: {
-      imgAttributes: { loading: "lazy", decoding: "async", sizes: "(max-width: 700px) 100vw, 50vw" },
-    },
-    sharpJpegOptions: { quality: 78, mozjpeg: true },
-    sharpWebpOptions: { quality: 75 },
-  });
-
-  // ---- Social share image (1200×630), generated once from the hero photo ----
   eleventyConfig.on("eleventy.before", async () => {
+    // Starter content for a fresh database (api/seed/seed.json)
+    exportSeed();
+    // Social share image (1200×630), generated once from the hero photo
     const out = "dist/assets/img/og.jpg";
     if (fs.existsSync(out)) return;
     fs.mkdirSync("dist/assets/img", { recursive: true });
@@ -36,33 +31,17 @@ export default function (eleventyConfig) {
   });
 
   // ---- Filters ----
-  eleventyConfig.addFilter("year", () => new Date().getFullYear());
-  eleventyConfig.addFilter("telHref", (value = "") => value.replace(/[^\d+]/g, ""));
-  eleventyConfig.addFilter("head", (arr = [], n) => arr.slice(0, n));
-  eleventyConfig.addFilter("isoDate", (d) => new Date(d).toISOString().slice(0, 10));
-  // Solar Hijri date with Persian digits, e.g. «۲۱ مهر ۱۴۰۵»
-  eleventyConfig.addFilter("faDate", (d) =>
-    new Intl.DateTimeFormat("fa-IR-u-ca-persian", { day: "numeric", month: "long", year: "numeric", timeZone: "Asia/Tehran" }).format(new Date(d)),
-  );
-  // «۱۴۰۵/۰۸/۱۱» — compact Solar Hijri date as in the homepage mockup
-  eleventyConfig.addFilter("faDateShort", (d) =>
-    new Intl.DateTimeFormat("fa-IR-u-ca-persian", { year: "numeric", month: "2-digit", day: "2-digit", timeZone: "Asia/Tehran" }).format(new Date(d)),
-  );
-  eleventyConfig.addFilter("faNum", (n) => new Intl.NumberFormat("fa-IR").format(n));
-  eleventyConfig.addFilter("readingTime", (html = "") => {
-    const words = html.replace(/<[^>]+>/g, " ").split(/\s+/).filter(Boolean).length;
-    return new Intl.NumberFormat("fa-IR").format(Math.max(1, Math.round(words / 200)));
+  // PHP expression for the web root, relative to the built file: __DIR__ . '/..'
+  eleventyConfig.addFilter("phpRoot", (outputPath = "") => {
+    const rel = path.relative(path.dirname(outputPath), "dist").replace(/\\/g, "/");
+    return rel ? `__DIR__ . '/${rel}'` : "__DIR__";
   });
-  eleventyConfig.addFilter("breadcrumbJsonLd", (crumbs, base) => ({
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    itemListElement: crumbs.map((c, i) => ({ "@type": "ListItem", position: i + 1, name: c.label, item: base + c.url })),
-  }));
+  // "/about/index.php" → "/about/"
+  eleventyConfig.addFilter("cleanUrl", (url = "") => url.replace(/index\.php$/, ""));
 
   return {
     dir: { input: "src", output: "dist", includes: "_includes", data: "_data" },
-    templateFormats: ["njk", "md", "html"],
+    templateFormats: ["njk"],
     htmlTemplateEngine: "njk",
-    markdownTemplateEngine: "njk",
   };
 }

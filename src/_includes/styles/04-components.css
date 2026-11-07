@@ -658,3 +658,7 @@
 html:has(.quote-modal[open]) {
   overflow: hidden;
 }
+/* LTR inputs (email, URL) keep their Persian placeholder right-aligned until typed in */
+.field input[dir="ltr"]:placeholder-shown {
+  direction: rtl;
+}

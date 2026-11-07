@@ -1,9 +1,9 @@
-{#- expects: post (collection item) -#}
+{#- PHP: expects $post (article row) -#}
 <article class="story">
-  <a href="{{ post.url }}" tabindex="-1" aria-hidden="true"><img src="/assets/img/{{ post.data.image }}" alt="{{ post.data.imageAlt }}" loading="lazy" decoding="async"></a>
+  <a href="/insights/<?= e($post['slug']) ?>/" tabindex="-1" aria-hidden="true"><?php if ($post['image']): ?><img src="<?= e($post['image']) ?>" alt="<?= e($post['image_alt']) ?>" loading="lazy" decoding="async"><?php endif ?></a>
   <div class="storybody">
-    <small>{{ post.data.category }} · <time datetime="{{ post.date | isoDate }}">{{ post.date | faDate }}</time></small>
-    <h3><a href="{{ post.url }}">{{ post.data.title }}</a></h3>
-    <p>{{ post.data.description | truncate(110) }}</p>
+    <small><?= e($post['category']) ?> · <time datetime="<?= e($post['published_at']) ?>"><?= fa_date($post['published_at']) ?></time></small>
+    <h3><a href="/insights/<?= e($post['slug']) ?>/"><?= e($post['title']) ?></a></h3>
+    <p><?= e(excerpt($post['description'], 110)) ?></p>
   </div>
 </article>

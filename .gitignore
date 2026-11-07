@@ -2,3 +2,4 @@ node_modules/
 dist/
 pipeox-data/
 src/api/config.php
+src/api/seed/seed.json

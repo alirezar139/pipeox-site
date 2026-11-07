@@ -1,5 +1,6 @@
 ---
 layout: layouts/page.njk
+permalink: /products/index.php
 title: محصولات و راهکارها
 description: کاتالوگ PIPEOX — لوله‌های فولادی، اتصالات صنعتی، فلنج و متعلقات، شیرآلات و تجهیزات خطوط انتقال؛ همراه با استانداردها و مشخصات فنی هر گروه.
 eyebrow: PRODUCT PORTFOLIO
@@ -11,9 +12,9 @@ breadcrumbs:
 <section class="section section-tight">
   <div class="wrap">
     <div class="products" id="productGrid">
-      {%- for p in products %}{% set idx = loop.index %}
+      <?php foreach (products() as $i => $p): $idx = $i + 1; ?>
       {% include "partials/product-card.njk" %}
-      {%- endfor %}
+      <?php endforeach ?>
     </div>
     <p id="noResults" class="no-results" hidden>محصولی با این عبارت پیدا نشد. <a href="/contact/">درخواست خود را مستقیم ثبت کنید ←</a></p>
   </div>

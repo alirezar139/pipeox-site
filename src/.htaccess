@@ -27,4 +27,15 @@ AddType image/webp .webp
   Header set X-Frame-Options "SAMEORIGIN"
 </IfModule>
 
-ErrorDocument 404 /404.html
+DirectoryIndex index.php index.html
+ErrorDocument 404 /404.php
+
+# Pretty URLs for content stored in the database
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteRule ^products/([a-z0-9-]+)/?$ products/item.php?slug=$1 [L,QSA]
+  RewriteRule ^insights/([a-z0-9-]+)/?$ insights/item.php?slug=$1 [L,QSA]
+  RewriteRule ^media/([A-Za-z0-9._-]+)$ api/media.php?f=$1 [L]
+  RewriteRule ^sitemap.xml$ sitemap.php [L]
+  RewriteRule ^robots.txt$ robots.php [L]
+</IfModule>

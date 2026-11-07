@@ -5,6 +5,7 @@
   "scripts": {
     "start": "eleventy --serve",
     "build": "eleventy",
+    "serve": "php -S localhost:8090 -t dist scripts/dev-router.php",
     "format": "prettier --write src/_includes/styles src/assets/js"
   },
   "keywords": [],

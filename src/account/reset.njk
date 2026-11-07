@@ -1,0 +1,26 @@
+---
+layout: layouts/page.njk
+permalink: /account/reset/index.php
+controller: account-reset
+private: true
+title: تعیین رمز عبور جدید
+eyebrow: CUSTOMER ACCOUNT
+---
+{%- from "partials/icons.njk" import icon -%}
+<section class="section section-tight">
+  <div class="wrap auth-wrap">
+    <form class="auth-card glass" method="post" novalidate>
+      <h2>رمز عبور جدید</h2>
+      <?php if (!$P['valid']): ?>
+        <p class="notice notice-error">این پیوند نامعتبر است یا منقضی شده است.</p>
+        <div class="auth-links"><a href="/account/forgot/">درخواست پیوند جدید</a></div>
+      <?php else: ?>
+        <?php if ($P['error']): ?><p class="notice notice-error" role="alert"><?= e($P['error']) ?></p><?php endif ?>
+        <?= csrf_field() ?>
+        <input type="hidden" name="token" value="<?= e($P['token']) ?>">
+        <label class="field">{{ icon("shield") }}<input type="password" name="password" placeholder="رمز عبور جدید (حداقل ۸ کاراکتر)" aria-label="رمز عبور جدید" autocomplete="new-password" minlength="8" required></label>
+        <button class="btn btn-block" type="submit"><span>ذخیره رمز</span></button>
+      <?php endif ?>
+    </form>
+  </div>
+</section>

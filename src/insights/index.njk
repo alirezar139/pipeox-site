@@ -1,7 +1,6 @@
 ---
 layout: layouts/page.njk
-permalink: /insights/
-tags: []
+permalink: /insights/index.php
 title: دانش فنی و تازه‌ها
 description: راهنماهای فنی PIPEOX درباره انتخاب لوله، اتصالات، فلنج و شیرآلات صنعتی، استانداردها و نکات استعلام.
 eyebrow: INSIGHTS & UPDATES
@@ -9,14 +8,15 @@ lead: راهنماهای انتخاب محصول، استانداردها و ن�
 breadcrumbs:
   - { label: "خانه", url: "/" }
   - { label: "دانش فنی", url: "/insights/" }
-eleventyExcludeFromCollections: true
 ---
 <section class="section section-tight">
   <div class="wrap">
+    <?php $posts = articles(); ?>
+    <?php if (!$posts): ?><p class="no-results">هنوز مطلبی منتشر نشده است.</p><?php endif ?>
     <div class="news news-list">
-      {%- for post in collections.insights | reverse %}
+      <?php foreach ($posts as $post): ?>
       {% include "partials/story-card.njk" %}
-      {%- endfor %}
+      <?php endforeach ?>
     </div>
   </div>
 </section>

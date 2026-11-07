@@ -1,21 +1,24 @@
 {#-
   Inquiry form card. Posts to /api/inquiry.php.
-  Set `compactForm = true` before including for the short homepage version (name, phone, details).
+  Nunjucks: set `compactForm = true` for the short homepage version (name, phone, details);
+            `quoteInModal = true` inside the popup. Logged-in customers get name/phone prefilled.
+  PHP: $P['formTitle'] / $P['selectedProduct'] may be set by a page controller (product pages).
 -#}
 {%- from "partials/icons.njk" import icon -%}
+<?php $me = current_user(); ?>
 <aside class="quote glass"{% if not quoteInModal %} id="contact"{% endif %}>
-  <h2{% if quoteInModal %} id="quoteModalTitle"{% endif %}>{{ formTitle or "درخواست مشاوره و استعلام" }}</h2>
+  <h2{% if quoteInModal %} id="quoteModalTitle"{% endif %}><?= e($P['formTitle'] ?? '{{ "درخواست استعلام قیمت" if quoteInModal else "درخواست مشاوره و استعلام" }}') ?></h2>
   <p>برای دریافت اطلاعات بیشتر با ما در ارتباط باشید.</p>
-  <form class="formgrid" data-quote-form action="/api/inquiry.php" method="post" enctype="multipart/form-data" data-phone="{{ site.contact.phone }}" novalidate>
-    <label class="field">{{ icon("user") }}<input required name="name" autocomplete="name" placeholder="نام و نام خانوادگی" aria-label="نام و نام خانوادگی" maxlength="100"></label>
-    <label class="field">{{ icon("phone") }}<input required name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="شماره تماس" aria-label="شماره تماس" maxlength="30"></label>
+  <form class="formgrid" data-quote-form action="/api/inquiry.php" method="post" enctype="multipart/form-data" data-phone="<?= se('contact.phone') ?>" novalidate>
+    <label class="field">{{ icon("user") }}<input required name="name" autocomplete="name" placeholder="نام و نام خانوادگی" aria-label="نام و نام خانوادگی" maxlength="100" value="<?= e($me['name'] ?? '') ?>"></label>
+    <label class="field">{{ icon("phone") }}<input required name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="شماره تماس" aria-label="شماره تماس" maxlength="30" value="<?= e($me['phone'] ?? '') ?>"></label>
     {%- if not compactForm %}
     <label class="field">{{ icon("list") }}
       <select name="category" aria-label="گروه محصول موردنظر">
         <option value="">گروه محصول موردنظر</option>
-        {%- for p in products %}
-        <option{% if selectedProduct == p.title %} selected{% endif %}>{{ p.title }}</option>
-        {%- endfor %}
+        <?php foreach (products() as $opt): ?>
+        <option<?= ($P['selectedProduct'] ?? '') === $opt['title'] ? ' selected' : '' ?>><?= e($opt['title']) ?></option>
+        <?php endforeach ?>
         <option>تأمین پروژه</option>
       </select>
     </label>
@@ -30,6 +33,6 @@
     <div class="hp" aria-hidden="true"><label>Website <input name="website" tabindex="-1" autocomplete="off"></label></div>
     <button class="btn btn-block" type="submit">{{ icon("send") }}<span>ارسال درخواست</span></button>
   </form>
-  {%- if not compactForm %}<div class="formnote">PDF، Excel، Word یا تصویر تا ۸ مگابایت</div>{% endif %}
+  {%- if not compactForm %}<div class="formnote">PDF، Excel، Word یا تصویر تا ۸ مگابایت<?php if ($me): ?> · پیگیری در <a href="/account/">حساب من</a><?php endif ?></div>{% endif %}
   <div class="status" role="status" aria-live="polite" hidden></div>
 </aside>
