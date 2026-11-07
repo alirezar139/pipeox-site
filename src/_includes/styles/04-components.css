@@ -606,3 +606,55 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* ---- Price-inquiry popup ---- */
+.quote-modal {
+  width: min(460px, calc(100% - 32px));
+  max-height: calc(100dvh - 32px);
+  padding: 0;
+  margin: auto;
+  border: 0;
+  background: none;
+  color: inherit;
+  overflow: visible;
+}
+.quote-modal .quote {
+  max-height: calc(100dvh - 32px);
+  overflow-y: auto;
+  background: rgba(19, 21, 23, 0.97);
+}
+.quote-modal::backdrop {
+  background: rgba(4, 5, 6, 0.72);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+.quote-modal[open] {
+  animation: modal-in 0.3s var(--ease);
+}
+@keyframes modal-in {
+  from { opacity: 0; transform: translateY(14px) scale(0.98); }
+}
+.modal-close {
+  position: absolute;
+  z-index: 2;
+  top: 14px;
+  left: 14px;
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line-2);
+  border-radius: 50%;
+  background: #1b1d20;
+  color: #ddd;
+  font-size: 14px;
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s;
+}
+.modal-close:hover {
+  color: var(--orange);
+  border-color: var(--orange);
+}
+html:has(.quote-modal[open]) {
+  overflow: hidden;
+}

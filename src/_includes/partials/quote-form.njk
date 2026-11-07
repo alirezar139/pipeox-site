@@ -3,10 +3,10 @@
   Set `compactForm = true` before including for the short homepage version (name, phone, details).
 -#}
 {%- from "partials/icons.njk" import icon -%}
-<aside class="quote glass" id="contact">
-  <h2>{{ formTitle or "درخواست مشاوره و استعلام" }}</h2>
+<aside class="quote glass"{% if not quoteInModal %} id="contact"{% endif %}>
+  <h2{% if quoteInModal %} id="quoteModalTitle"{% endif %}>{{ formTitle or "درخواست مشاوره و استعلام" }}</h2>
   <p>برای دریافت اطلاعات بیشتر با ما در ارتباط باشید.</p>
-  <form class="formgrid" id="quoteForm" action="/api/inquiry.php" method="post" enctype="multipart/form-data" data-phone="{{ site.contact.phone }}" novalidate>
+  <form class="formgrid" data-quote-form action="/api/inquiry.php" method="post" enctype="multipart/form-data" data-phone="{{ site.contact.phone }}" novalidate>
     <label class="field">{{ icon("user") }}<input required name="name" autocomplete="name" placeholder="نام و نام خانوادگی" aria-label="نام و نام خانوادگی" maxlength="100"></label>
     <label class="field">{{ icon("phone") }}<input required name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="شماره تماس" aria-label="شماره تماس" maxlength="30"></label>
     {%- if not compactForm %}
@@ -31,5 +31,5 @@
     <button class="btn btn-block" type="submit">{{ icon("send") }}<span>ارسال درخواست</span></button>
   </form>
   {%- if not compactForm %}<div class="formnote">PDF، Excel، Word یا تصویر تا ۸ مگابایت</div>{% endif %}
-  <div class="status" id="formStatus" role="status" aria-live="polite" hidden></div>
+  <div class="status" role="status" aria-live="polite" hidden></div>
 </aside>

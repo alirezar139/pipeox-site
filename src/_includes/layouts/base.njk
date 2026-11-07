@@ -59,6 +59,9 @@
 {{ content | safe }}
 </main>
 {% include "partials/footer.njk" %}
+{%- if page.url != "/contact/" %}
+{% include "partials/quote-modal.njk" %}
+{%- endif %}
 <script src="/assets/js/main.js" defer></script>
 </body>
 </html>

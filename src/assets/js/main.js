@@ -105,10 +105,25 @@ async function postForm(form, data) {
 }
 const networkMessage = (err) => (err instanceof TypeError ? "ارتباط با سرور برقرار نشد." : err.message);
 
-// ---- Inquiry form ----
-const form = document.getElementById("quoteForm");
-if (form) {
-  const status = document.getElementById("formStatus");
+// ---- Price-inquiry popup (every page except /contact/, which links to its own form) ----
+const modal = document.getElementById("quoteModal");
+if (modal && typeof modal.showModal === "function") {
+  document.addEventListener("click", (e) => {
+    const open = e.target.closest("[data-quote-open]");
+    if (open) {
+      e.preventDefault();
+      setMenu(false);
+      modal.showModal();
+      modal.querySelector("input:not([type=hidden]):not([tabindex='-1'])")?.focus();
+    } else if (e.target.closest("[data-quote-close]") || e.target === modal) {
+      modal.close(); // close button or backdrop click
+    }
+  });
+}
+
+// ---- Inquiry forms (page form + popup form) ----
+document.querySelectorAll("form[data-quote-form]").forEach((form) => {
+  const status = form.parentElement.querySelector(".status");
   const submitBtn = form.querySelector('button[type="submit"]');
   const fileInput = form.elements.attachment;
   const fileLabel = form.querySelector(".file-label");
@@ -170,7 +185,7 @@ if (form) {
       submitBtn.disabled = false;
     }
   });
-}
+});
 
 // ---- Newsletter ----
 const news = document.getElementById("newsletterForm");
