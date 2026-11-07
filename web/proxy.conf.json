@@ -1,0 +1,5 @@
+{
+  "/api": { "target": "http://127.0.0.1:3000", "secure": false },
+  "/sitemap.xml": { "target": "http://127.0.0.1:3000", "secure": false },
+  "/robots.txt": { "target": "http://127.0.0.1:3000", "secure": false }
+}

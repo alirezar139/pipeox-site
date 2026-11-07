@@ -1,7 +1,0 @@
-{#- Price-inquiry popup — opened by any [data-quote-open] link (falls back to /contact/ without JS). -#}
-{%- set quoteInModal = true -%}
-{%- set compactForm = false -%}
-<dialog class="quote-modal" id="quoteModal" aria-labelledby="quoteModalTitle">
-  <button class="modal-close" type="button" data-quote-close aria-label="بستن">✕</button>
-  {% include "partials/quote-form.njk" %}
-</dialog>

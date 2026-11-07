@@ -1,8 +1,0 @@
-{#- PHP: expects $p (product row) and $idx (1-based) -#}
-<article class="product" data-search="<?= e($p['keywords'] . ' ' . $p['title']) ?>">
-  <a class="visual" href="/products/<?= e($p['slug']) ?>/" tabindex="-1" aria-hidden="true"><?php if ($p['image']): ?><img src="<?= e($p['image']) ?>" alt="<?= e($p['alt']) ?>" loading="lazy" decoding="async"><?php endif ?></a>
-  <small><?= sprintf('%02d', $idx) ?> / <?= e($p['code']) ?></small>
-  <h3><a href="/products/<?= e($p['slug']) ?>/"><?= e($p['title']) ?></a></h3>
-  <p><?= e($p['summary']) ?></p>
-  <a class="more" href="/products/<?= e($p['slug']) ?>/">مشخصات و استعلام <span>←</span></a>
-</article>

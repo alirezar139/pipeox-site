@@ -1,0 +1,8 @@
+/* Global design system — bundled into one stylesheet by the Angular build.
+   Sizes on the public pages are in mockup pixels (var(--u)), see styles/01-base.css. */
+@import "./styles/01-base.css";
+@import "./styles/02-layout.css";
+@import "./styles/03-home.css";
+@import "./styles/04-components.css";
+@import "./styles/05-pages.css";
+@import "./styles/06-admin.css";

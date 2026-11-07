@@ -1,5 +1,15 @@
+# Dependencies & builds
 node_modules/
 dist/
+*.tsbuildinfo
+.angular/
+
+# Secrets & runtime data (never commit)
+.env
 pipeox-data/
-src/api/config.php
-src/api/seed/seed.json
+
+# Tooling
+coverage/
+.vscode/*
+!.vscode/extensions.json
+*.log

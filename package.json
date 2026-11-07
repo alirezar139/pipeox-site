@@ -1,22 +1,24 @@
 {
-  "name": "pipeox-full-website",
-  "version": "1.0.0",
-  "description": "",
-  "scripts": {
-    "start": "eleventy --serve",
-    "build": "eleventy",
-    "serve": "php -S localhost:8090 -t dist scripts/dev-router.php",
-    "format": "prettier --write src/_includes/styles src/assets/js"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "name": "pipeox",
+  "version": "2.0.0",
+  "private": true,
+  "description": "PIPEOX — industrial steel pipe supplier website: Angular (SSR) + NestJS + MongoDB",
   "type": "module",
-  "devDependencies": {
-    "@11ty/eleventy": "^3.1.2",
-    "@11ty/eleventy-img": "^6.0.4",
-    "@fontsource-variable/vazirmatn": "^5.2.5",
-    "@fontsource/montserrat": "^5.2.5",
-    "prettier": "^3.6.2"
+  "engines": {
+    "node": ">=22.12"
+  },
+  "scripts": {
+    "postinstall": "npm --prefix api install && npm --prefix web install",
+    "setup": "node scripts/setup.mjs",
+    "admin:password": "node scripts/setup.mjs --admin-password",
+    "dev": "node scripts/dev.mjs",
+    "build": "npm --prefix api run build && npm --prefix web run build",
+    "start": "node server.mjs",
+    "test": "npm --prefix api run test:e2e"
+  },
+  "dependencies": {
+    "compression": "^1.8.1",
+    "express": "^5.1.0",
+    "helmet": "^8.1.0"
   }
 }
