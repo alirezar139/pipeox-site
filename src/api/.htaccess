@@ -1,0 +1,13 @@
+# Only the two entry points are reachable from the web
+<FilesMatch "\.php$">
+  Require all denied
+</FilesMatch>
+<FilesMatch "^(inquiry|admin)\.php$">
+  Require all granted
+</FilesMatch>
+
+# Upload size for the inquiry attachment (works on mod_php hosts; on PHP-FPM set it in .user.ini)
+<IfModule mod_php.c>
+  php_value upload_max_filesize 10M
+  php_value post_max_size 12M
+</IfModule>

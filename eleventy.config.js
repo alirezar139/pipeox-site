@@ -5,6 +5,7 @@ export default function (eleventyConfig) {
   eleventyConfig.addPassthroughCopy("src/assets/fonts");
   eleventyConfig.addPassthroughCopy("src/assets/js");
   eleventyConfig.addPassthroughCopy("src/.htaccess");
+  eleventyConfig.addPassthroughCopy("src/api"); // PHP backend (includes config.php if present)
 
   // Rebuild when CSS partials change (they live in _includes, which is watched for templates only)
   eleventyConfig.addWatchTarget("src/_includes/styles/");

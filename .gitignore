@@ -1,2 +1,4 @@
 node_modules/
 dist/
+pipeox-data/
+src/api/config.php

@@ -159,3 +159,49 @@
 .status[data-type="ok"] {
   color: #8fd6a5;
 }
+.file-field {
+  position: relative;
+  display: block;
+  cursor: pointer;
+}
+.file-field input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.file-label {
+  display: block;
+  padding: 10px 12px;
+  border: 1px dashed #ffffff35;
+  color: var(--muted);
+  font-size: 13px;
+  border-radius: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.file-field:hover .file-label,
+.file-field input:focus-visible + .file-label {
+  border-color: var(--orange);
+  color: var(--ink);
+}
+.file-field.has-file .file-label {
+  border-style: solid;
+  color: var(--ink);
+}
+.hp {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+.formgrid [aria-invalid="true"] {
+  border-color: #ff8a5c;
+}
+.btn[disabled] {
+  opacity: 0.6;
+  cursor: wait;
+  transform: none;
+}
