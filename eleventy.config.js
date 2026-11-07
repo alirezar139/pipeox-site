@@ -7,7 +7,7 @@ export default function (eleventyConfig) {
   // ---- Static files copied verbatim ----
   eleventyConfig.addPassthroughCopy("src/assets/fonts");
   eleventyConfig.addPassthroughCopy("src/assets/js");
-  eleventyConfig.addPassthroughCopy("src/assets/img/industrial-hero.webp"); // CSS background, not an <img>
+  eleventyConfig.addPassthroughCopy("src/assets/img/home"); // artwork cut from the mockup, used as-is
   eleventyConfig.addPassthroughCopy("src/favicon.svg");
   eleventyConfig.addPassthroughCopy("src/.htaccess");
   eleventyConfig.addPassthroughCopy("src/api"); // PHP backend (includes config.php if present)
@@ -32,7 +32,7 @@ export default function (eleventyConfig) {
     const out = "dist/assets/img/og.jpg";
     if (fs.existsSync(out)) return;
     fs.mkdirSync("dist/assets/img", { recursive: true });
-    await sharp("src/assets/img/industrial-hero.webp").resize(1200, 630, { fit: "cover", position: "left" }).jpeg({ quality: 80 }).toFile(out);
+    await sharp("src/assets/img/home/hero-pipes.jpg").resize(1200, 630, { fit: "cover", position: "left" }).jpeg({ quality: 80 }).toFile(out);
   });
 
   // ---- Filters ----
@@ -43,6 +43,10 @@ export default function (eleventyConfig) {
   // Solar Hijri date with Persian digits, e.g. «۲۱ مهر ۱۴۰۵»
   eleventyConfig.addFilter("faDate", (d) =>
     new Intl.DateTimeFormat("fa-IR-u-ca-persian", { day: "numeric", month: "long", year: "numeric", timeZone: "Asia/Tehran" }).format(new Date(d)),
+  );
+  // «۱۴۰۵/۰۸/۱۱» — compact Solar Hijri date as in the homepage mockup
+  eleventyConfig.addFilter("faDateShort", (d) =>
+    new Intl.DateTimeFormat("fa-IR-u-ca-persian", { year: "numeric", month: "2-digit", day: "2-digit", timeZone: "Asia/Tehran" }).format(new Date(d)),
   );
   eleventyConfig.addFilter("faNum", (n) => new Intl.NumberFormat("fa-IR").format(n));
   eleventyConfig.addFilter("readingTime", (html = "") => {

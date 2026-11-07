@@ -21,7 +21,24 @@
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
+@font-face {
+  font-family: "Montserrat";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 500;
+  src: url("../fonts/montserrat-latin-500-normal.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Montserrat";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 600;
+  src: url("../fonts/montserrat-latin-600-normal.woff2") format("woff2");
+}
+
 :root {
+  /* 1 design pixel of the 1536px mockup; scales down on narrower desktops */
+  --u: min(1px, calc(100vw / 1536));
   --bg: #0b0c0d;
   --bg-2: #101113;
   --surface: #15171a;
@@ -93,6 +110,70 @@ h3 {
 .wrap {
   width: min(var(--max), calc(100% - 64px));
   margin-inline: auto;
+}
+/* Mockup grids: header/hero content 1330, wide bands 1480, footer 1427 (design px) */
+.wrap-header,
+.wrap-wide,
+.wrap-footer {
+  margin-inline: auto;
+}
+.wrap-header {
+  width: calc(var(--u) * 1330);
+}
+.wrap-wide {
+  width: calc(var(--u) * 1480);
+}
+.wrap-footer {
+  width: calc(var(--u) * 1427);
+  margin-left: calc(50% - var(--u) * 705); /* mockup: 63 → 1490 */
+  margin-right: auto;
+}
+
+/* Pills used on the homepage (exact mockup sizes) */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: calc(var(--u) * 8);
+  height: calc(var(--u) * 39);
+  padding: 0 calc(var(--u) * 15);
+  border-radius: 999px;
+  font-size: calc(var(--u) * 11.6);
+  font-weight: 800;
+  white-space: nowrap;
+  transition: transform 0.25s var(--ease), box-shadow 0.25s, border-color 0.25s, color 0.25s;
+}
+.pill .ico {
+  width: calc(var(--u) * 16);
+  height: calc(var(--u) * 16);
+}
+.pill:hover {
+  transform: translateY(-2px);
+}
+.pill-orange {
+  background: #f7801c;
+  color: #111;
+  box-shadow: 0 6px 22px -6px rgba(247, 128, 28, 0.6);
+}
+.pill-orange:hover {
+  box-shadow: 0 12px 30px -8px rgba(247, 128, 28, 0.75);
+}
+.pill-ghost {
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  color: #fff;
+  font-weight: 700;
+}
+.pill-ghost:hover,
+.pill-outline:hover {
+  border-color: var(--orange);
+  color: var(--orange);
+}
+.pill-outline {
+  border: 1px solid rgba(247, 128, 28, 0.85);
+  color: #fff;
+  font-weight: 700;
+  height: calc(var(--u) * 38);
+  padding: 0 calc(var(--u) * 34);
 }
 .accent {
   color: var(--orange);

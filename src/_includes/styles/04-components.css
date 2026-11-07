@@ -70,6 +70,12 @@
   font-size: 14px;
   padding: 12px 0;
 }
+.field input[type="tel"] {
+  text-align: right;
+}
+.field input[type="tel"]:not(:placeholder-shown) {
+  direction: ltr;
+}
 .field select {
   appearance: none;
   cursor: pointer;

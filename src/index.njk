@@ -3,32 +3,32 @@ layout: layouts/base.njk
 hasForm: true
 bodyClass: is-home
 ---
+{#- Homepage — built 1:1 from design/mockup-home.png (1536px reference).
+    Photographic artwork is cut from the mockup by scripts/extract-mockup-assets.mjs. -#}
 {%- from "partials/icons.njk" import icon -%}
 {%- set compactForm = true -%}
 
 {#- ═════════ HERO ═════════ -#}
 <section class="hero">
-  <div class="hero-media" aria-hidden="true">
-    <img src="/assets/img/refinery-pipeline.webp" alt="" loading="eager" fetchpriority="high" eleventy:widths="960,1640" sizes="100vw">
-  </div>
-  <div class="hero-stripes" aria-hidden="true"><i></i><i></i></div>
-  <div class="wrap hero-grid">
+  <div class="hero-photo" aria-hidden="true"><img src="/assets/img/home/hero-pipes.jpg" alt="" width="1490" height="856" fetchpriority="high" eleventy:ignore></div>
+  <div class="hero-stripes" aria-hidden="true"><i></i><i></i><i></i></div>
+  <div class="wrap-header hero-grid">
     {% include "partials/quote-form.njk" %}
     <div class="hero-copy">
       <p class="kicker">{{ home.hero.kicker }}</p>
       <h1>{{ home.hero.title }}<br><span class="accent">{{ home.hero.titleAccent }}</span></h1>
       <p class="hero-text">{{ home.hero.text }}</p>
       <div class="actions">
-        <a class="btn btn-pill" href="/products/">{{ icon("arrow") }}<span>مشاهده محصولات</span></a>
-        <a class="btn btn-pill btn-ghost" href="/about/">{{ icon("play") }}<span>درباره ما</span></a>
+        <a class="pill pill-orange" href="/products/">{{ icon("arrow") }}<span>مشاهده محصولات</span></a>
+        <a class="pill pill-ghost" href="/about/">{{ icon("play") }}<span>درباره ما</span></a>
       </div>
     </div>
   </div>
 </section>
 
-{#- ═════════ PRODUCT SHOWCASE + STATS ═════════ -#}
-<section class="showcase" aria-label="محصولات و آمار">
-  <div class="wrap showcase-grid">
+{#- ═════════ BAND: stats · product orbit · intro ═════════ -#}
+<section class="band" aria-label="محصولات و آمار">
+  <div class="wrap-wide band-grid">
     <ul class="stats reveal">
       {%- for s in home.stats %}
       <li>
@@ -38,49 +38,40 @@ bodyClass: is-home
       {%- endfor %}
     </ul>
 
-    <div class="orbit" id="orbit">
-      <div class="orbit-ring ring-a" aria-hidden="true"></div>
-      <div class="orbit-ring ring-b" aria-hidden="true"></div>
-      <div class="orbit-spark" aria-hidden="true"></div>
-      <div class="orbit-core" aria-hidden="true">
-        <div class="core-disc">
-          <svg class="logo-mark" viewBox="0 0 48 40"><path fill="currentColor" fill-rule="evenodd" d="M10 2h24a12 12 0 0 1 0 24H22l-5.5 12H4l5.5-12H6l4-10h22a2.5 2.5 0 0 0 0-5H8.3z"/></svg>
-          <strong>PIPEOX</strong>
-        </div>
-      </div>
+    <div class="orbit-art">
+      <img src="/assets/img/home/orbit-art.jpg" alt="" width="1720" height="596" loading="lazy" eleventy:ignore>
+      <div class="orbit-glint" aria-hidden="true"></div>
       {%- for p in products %}
-      <a class="orbit-node node-{{ p.orbit }}" href="/products/{{ p.slug }}/">
-        <span class="node-img"><img src="/assets/img/{{ p.image }}" alt="" loading="lazy" eleventy:widths="320"></span>
-        <span class="node-label"><b>{{ p.shortTitle }}</b><small>مشاهده بیشتر {{ icon("chevron") }}</small></span>
+      <a class="orbit-label label-{{ p.orbit }}" href="/products/{{ p.slug }}/">
+        <b>{{ p.shortTitle }}</b>
+        <small>مشاهده بیشتر {{ icon("chevron") }}</small>
       </a>
       {%- endfor %}
     </div>
 
-    <div class="showcase-intro reveal">
+    <div class="band-intro reveal">
       <h2>{{ home.showcase.title }}</h2>
       <p>{{ home.showcase.text }}</p>
-      <a class="btn btn-pill btn-ghost btn-ghost-orange" href="/products/">{{ icon("doc") }}<span>مشاهده کاتالوگ کامل</span></a>
+      <a class="pill pill-outline" href="/products/">{{ icon("doc") }}<span>مشاهده کاتالوگ کامل</span></a>
     </div>
   </div>
 </section>
 
-<div class="flowline" aria-hidden="true"><i></i></div>
-
-{#- ═════════ NEWS · FEATURES · PROJECTS ═════════ -#}
+{#- ═════════ TILES: news · features · projects ═════════ -#}
 <section class="tiles">
-  <div class="wrap tiles-grid">
+  <div class="wrap-wide tiles-grid">
     {%- set latest = (collections.insights | reverse)[0] %}
     <article class="tile tile-news reveal">
       <header class="tile-head">
         <h2>آخرین اخبار و اطلاعیه‌ها</h2>
-        <a class="link-more" href="/insights/">مشاهده همه {{ icon("arrow") }}</a>
+        <a class="link-more" href="/insights/">{{ icon("arrow") }}مشاهده همه</a>
       </header>
       {%- if latest %}
       <a class="news-item" href="{{ latest.url }}">
-        <span class="news-thumb"><img src="/assets/img/{{ latest.data.image }}" alt="" loading="lazy" eleventy:widths="240"></span>
+        <span class="news-thumb"><img src="/assets/img/home/news.jpg" alt="" width="208" height="184" loading="lazy" eleventy:ignore></span>
         <span class="news-body">
           <b>{{ latest.data.title }}</b>
-          <small>{{ icon("calendar") }}<time datetime="{{ latest.date | isoDate }}">{{ latest.date | faDate }}</time></small>
+          <small><time datetime="{{ latest.date | isoDate }}">{{ latest.date | faDateShort }}</time>{{ icon("calendar") }}</small>
         </span>
       </a>
       {%- endif %}
@@ -100,11 +91,10 @@ bodyClass: is-home
       <div class="projects-copy">
         <h2>{{ home.projects.title }}</h2>
         <p>{{ home.projects.text }}</p>
-        <a class="link-more" href="/projects/">مشاهده پروژه‌ها {{ icon("arrow") }}</a>
+        <a class="link-more link-underline" href="/projects/">{{ icon("arrow-right") }}مشاهده پروژه‌ها</a>
       </div>
-      <a class="projects-media" href="{{ home.projects.video or '/projects/' }}"{% if home.projects.video %} target="_blank" rel="noopener"{% endif %}>
-        <img src="/assets/img/{{ home.projects.image }}" alt="پالایشگاه و خطوط انتقال" loading="lazy" eleventy:widths="640">
-        {%- if home.projects.video %}<span class="play-btn" aria-label="پخش ویدیو">{{ icon("play-solid") }}</span>{% endif %}
+      <a class="projects-media" href="{{ home.projects.video or '/projects/' }}"{% if home.projects.video %} target="_blank" rel="noopener"{% endif %} aria-label="{{ home.projects.title }}">
+        <img src="/assets/img/home/projects.jpg" alt="" width="654" height="258" loading="lazy" eleventy:ignore>
       </a>
     </article>
   </div>

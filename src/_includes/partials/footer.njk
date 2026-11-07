@@ -1,35 +1,35 @@
 {%- set c = site.contact -%}
-<div class="flowline" aria-hidden="true"><i></i></div>
 <footer class="site-footer">
-  <div class="wrap footer-main">
+  <div class="footer-glow" aria-hidden="true"></div>
+  <div class="wrap-footer footer-main">
     <nav class="footer-links" aria-label="پیوندهای پایین صفحه">
-      {%- for item in site.footerNav %}
+      {%- for item in site.nav %}
       <a href="{{ item.href }}">{{ item.label }}</a>
       {%- endfor %}
     </nav>
     <form class="newsletter" id="newsletterForm" action="/api/subscribe.php" method="post" novalidate>
-      <div class="newsletter-copy">
-        <b>{{ home.newsletter.title }}</b>
-        <span>{{ home.newsletter.text }}</span>
-      </div>
       <div class="newsletter-field">
         <input type="email" name="email" dir="ltr" placeholder="ایمیل شما" aria-label="ایمیل شما" required autocomplete="email">
         <input class="hp-input" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
-        <button class="btn" type="submit">عضویت</button>
+        <button type="submit">عضویت</button>
+      </div>
+      <div class="newsletter-copy">
+        <b>{{ home.newsletter.title }}</b>
+        <span>{{ home.newsletter.text }}</span>
       </div>
       <p class="newsletter-status" role="status" aria-live="polite" hidden></p>
     </form>
     {% include "partials/logo.njk" %}
   </div>
   {%- if c.phone or c.email or c.address %}
-  <div class="wrap footer-contact">
+  <div class="wrap-footer footer-contact">
     {%- if c.phone %}<a href="tel:{{ c.phone | telHref }}" dir="ltr">{{ c.phone }}</a>{% endif %}
     {%- if c.email %}<a href="mailto:{{ c.email }}" dir="ltr">{{ c.email }}</a>{% endif %}
     {%- if c.whatsapp %}<a href="https://wa.me/{{ c.whatsapp }}" rel="noopener">واتساپ</a>{% endif %}
     {%- if c.address %}<span>{{ c.address }}</span>{% endif %}
   </div>
   {%- endif %}
-  <div class="wrap copyright">
-    <span dir="ltr">© {{ "" | year }} Pipeox. All rights reserved.</span>
+  <div class="copyright">
+    <div class="wrap-footer"><span dir="ltr">© {{ "" | year }} Pipeox. All rights reserved.</span></div>
   </div>
 </footer>

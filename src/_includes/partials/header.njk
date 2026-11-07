@@ -1,7 +1,7 @@
 {%- from "partials/icons.njk" import icon -%}
 {%- set ctaHref = "#contact" if hasForm else "/contact/" -%}
 <header class="site-header" id="siteHeader">
-  <div class="wrap nav">
+  <div class="wrap-header nav">
     {% include "partials/logo.njk" %}
     <nav class="links" id="navlinks" aria-label="منوی اصلی">
       {%- for item in site.nav %}
@@ -11,10 +11,10 @@
     </nav>
     <div class="nav-actions">
       <label class="search">
-        <input id="search" type="search" placeholder="جستجو در محصولات..." aria-label="جستجو در محصولات">
         {{ icon("search") }}
+        <input id="search" type="search" placeholder="جستجو در محصولات..." aria-label="جستجو در محصولات">
       </label>
-      <a class="btn btn-pill btn-cta" href="{{ ctaHref }}"><span>درخواست استعلام قیمت</span><i class="btn-dot">{{ icon("arrow") }}</i></a>
+      <a class="btn-cta" href="{{ ctaHref }}"><span>درخواست استعلام قیمت</span><i class="btn-dot">{{ icon("arrow") }}</i></a>
       <button class="hamb" id="hamb" type="button" aria-label="باز کردن منو" aria-controls="navlinks" aria-expanded="false">{{ icon("menu") }}</button>
     </div>
   </div>

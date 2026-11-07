@@ -15,6 +15,7 @@
     "@11ty/eleventy": "^3.1.2",
     "@11ty/eleventy-img": "^6.0.4",
     "@fontsource-variable/vazirmatn": "^5.2.5",
+    "@fontsource/montserrat": "^5.2.5",
     "prettier": "^3.6.2"
   }
 }
