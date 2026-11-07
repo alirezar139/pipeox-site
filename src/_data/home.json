@@ -1,0 +1,33 @@
+{
+  "_note": "Homepage copy. Stats and claims below come from the design mockup — replace with verified company figures before launch.",
+  "hero": {
+    "kicker": "کیفیت، استحکام، اعتماد",
+    "title": "راهکارهای پایدار",
+    "titleAccent": "برای آینده‌ای مطمئن",
+    "text": "تولید و تأمین انواع لوله و اتصالات صنعتی با بالاترین استانداردهای جهانی برای صنایع نفت، گاز، پتروشیمی و پروژه‌های عمرانی"
+  },
+  "showcase": {
+    "title": "دنیایی از محصولات صنعتی",
+    "text": "تنوع محصولات ما پاسخگوی تمامی نیازهای صنعتی شما در بالاترین کیفیت است."
+  },
+  "stats": [
+    { "value": "25", "label": "سال تجربه و تخصص", "icon": "trophy" },
+    { "value": "500", "label": "پروژه موفق", "icon": "check-circle" },
+    { "value": "100", "label": "مشتری سازمانی", "icon": "users" }
+  ],
+  "features": [
+    { "title": "پشتیبانی تخصصی", "text": "در تمام مراحل", "icon": "headset" },
+    { "title": "تولید پیشرفته", "text": "با فناوری روز دنیا", "icon": "gear" },
+    { "title": "تضمین کیفیت", "text": "مطابق استانداردهای جهانی", "icon": "shield" }
+  ],
+  "projects": {
+    "title": "پروژه‌های شاخص ما",
+    "text": "اجرای پروژه‌های بزرگ صنعتی در سراسر کشور با کیفیتی متمایز و ماندگار",
+    "image": "refinery-pipeline.webp",
+    "video": ""
+  },
+  "newsletter": {
+    "title": "عضویت در خبرنامه",
+    "text": "برای دریافت جدیدترین اخبار و محصولات، ایمیل خود را وارد کنید."
+  }
+}

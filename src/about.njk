@@ -1,0 +1,63 @@
+---
+layout: layouts/page.njk
+permalink: /about/
+title: درباره پایپ‌اکس
+description: پایپ‌اکس؛ تأمین تخصصی لوله، اتصالات، فلنج و شیرآلات صنعتی با تمرکز بر تطبیق فنی، کیفیت و پشتیبانی پروژه از استعلام تا تأمین.
+eyebrow: WHY PIPEOX
+lead: در پروژه‌های صنعتی، انتخاب نادرست متریال یا مغایرت مشخصات می‌تواند هزینه و زمان اجرا را افزایش دهد. رویکرد پایپ‌اکس بر دریافت نیاز فنی، بررسی مشخصات و پیگیری تأمین متناسب با کاربرد پروژه متمرکز است.
+breadcrumbs:
+  - { label: "خانه", url: "/" }
+  - { label: "درباره ما", url: "/about/" }
+---
+{%- from "partials/icons.njk" import icon -%}
+<section class="section">
+  <div class="wrap capgrid">
+    <div class="capimage reveal"><img src="/assets/img/steel-pipes-stack.jpg" alt="لوله‌های فولادی صنعتی" loading="lazy" eleventy:widths="600,1100"></div>
+    <div class="capcopy reveal">
+      <div class="eyebrow">OUR APPROACH</div>
+      <h2>تأمین صنعتی، فراتر از فروش کالا</h2>
+      <p>تمرکز ما بر این است که هر قلم، پیش از تأمین، با مشخصات و شرایط واقعی پروژه تطبیق داده شود؛ از استاندارد و گرید تا ابعاد، کلاس فشاری و مدارک کیفیت.</p>
+      <div class="caplist">
+        <div class="cap"><span class="cap-icon">{{ icon("check-circle") }}</span><b>بررسی مشخصات فنی</b><span>استاندارد، گرید، سایز و ضخامت</span></div>
+        <div class="cap"><span class="cap-icon">{{ icon("list") }}</span><b>تأمین چندگروهی</b><span>تجمیع اقلام مرتبط در یک درخواست</span></div>
+        <div class="cap"><span class="cap-icon">{{ icon("doc") }}</span><b>مستندسازی درخواست</b><span>شفاف‌سازی نیاز و مدارک مورد انتظار</span></div>
+        <div class="cap"><span class="cap-icon">{{ icon("headset") }}</span><b>ارتباط تخصصی</b><span>پیگیری درخواست با تیم مرتبط</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="flowline" aria-hidden="true"><i></i></div>
+
+<section class="section">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div><div class="eyebrow">HOW WE WORK</div><h2>مسیر همکاری با پایپ‌اکس</h2></div>
+      <p>فرآیند شفاف کمک می‌کند نیاز پروژه از ابتدا درست تعریف شود و استعلام قابل بررسی باشد.</p>
+    </div>
+    <ol class="steps">
+      <li class="step reveal"><span class="n">01</span><h3>ثبت درخواست</h3><p>ارسال گروه کالا و اطلاعات اولیه پروژه.</p></li>
+      <li class="step reveal"><span class="n">02</span><h3>بررسی فنی</h3><p>بررسی مشخصات، استاندارد و شرایط سرویس.</p></li>
+      <li class="step reveal"><span class="n">03</span><h3>ارائه پیشنهاد</h3><p>پیگیری موجودی، زمان و پیشنهاد تأمین.</p></li>
+      <li class="step reveal"><span class="n">04</span><h3>هماهنگی تأمین</h3><p>هماهنگی مراحل بعدی بر اساس توافق طرفین.</p></li>
+    </ol>
+  </div>
+</section>
+
+<section class="section section-alt">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div><div class="eyebrow">OUR VALUES</div><h2>آنچه برای ما مهم است</h2></div>
+    </div>
+    <div class="tile-features tile features-wide reveal">
+      {%- for f in home.features %}
+      <div class="feature">
+        <span class="feature-icon">{{ icon(f.icon) }}</span>
+        <b>{{ f.title }}</b>
+        <small>{{ f.text }}</small>
+      </div>
+      {%- endfor %}
+    </div>
+  </div>
+</section>
+{% include "partials/cta.njk" %}

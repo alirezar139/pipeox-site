@@ -13,11 +13,51 @@
     "hours": ""
   },
   "nav": [
-    { "label": "خانه", "href": "/" },
-    { "label": "محصولات", "href": "/products/" },
-    { "label": "صنایع هدف", "href": "/#markets" },
-    { "label": "توانمندی‌ها", "href": "/#capabilities" },
-    { "label": "دانش فنی", "href": "/insights/" },
-    { "label": "تماس با ما", "href": "/contact/" }
+    {
+      "label": "خانه",
+      "href": "/"
+    },
+    {
+      "label": "محصولات",
+      "href": "/products/"
+    },
+    {
+      "label": "پروژه‌ها",
+      "href": "/projects/"
+    },
+    {
+      "label": "درباره ما",
+      "href": "/about/"
+    },
+    {
+      "label": "تماس با ما",
+      "href": "/contact/"
+    }
+  ],
+  "footerNav": [
+    {
+      "label": "خانه",
+      "href": "/"
+    },
+    {
+      "label": "محصولات",
+      "href": "/products/"
+    },
+    {
+      "label": "پروژه‌ها",
+      "href": "/projects/"
+    },
+    {
+      "label": "درباره ما",
+      "href": "/about/"
+    },
+    {
+      "label": "تماس با ما",
+      "href": "/contact/"
+    },
+    {
+      "label": "دانش فنی",
+      "href": "/insights/"
+    }
   ]
 }

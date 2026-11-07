@@ -1,40 +1,35 @@
 {%- set c = site.contact -%}
-<footer class="footer">
-  <div class="wrap">
-    <div class="footgrid">
-      <div>
-        <a class="brand" href="/"><i class="brand-mark"></i>PIPE<span>O</span>X</a>
-        <p>{{ site.tagline }}</p>
+<div class="flowline" aria-hidden="true"><i></i></div>
+<footer class="site-footer">
+  <div class="wrap footer-main">
+    <nav class="footer-links" aria-label="پیوندهای پایین صفحه">
+      {%- for item in site.footerNav %}
+      <a href="{{ item.href }}">{{ item.label }}</a>
+      {%- endfor %}
+    </nav>
+    <form class="newsletter" id="newsletterForm" action="/api/subscribe.php" method="post" novalidate>
+      <div class="newsletter-copy">
+        <b>{{ home.newsletter.title }}</b>
+        <span>{{ home.newsletter.text }}</span>
       </div>
-      <div>
-        <h4>دسترسی سریع</h4>
-        <ul>
-          {%- for item in site.nav %}{% if not loop.first and not loop.last %}
-          <li><a href="{{ item.href }}">{{ item.label }}</a></li>
-          {%- endif %}{% endfor %}
-        </ul>
+      <div class="newsletter-field">
+        <input type="email" name="email" dir="ltr" placeholder="ایمیل شما" aria-label="ایمیل شما" required autocomplete="email">
+        <input class="hp-input" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+        <button class="btn" type="submit">عضویت</button>
       </div>
-      <div>
-        <h4>گروه محصولات</h4>
-        <ul>
-          {%- for p in products %}
-          <li><a href="/products/{{ p.slug }}/">{{ p.title }}</a></li>
-          {%- endfor %}
-        </ul>
-      </div>
-      <div>
-        <h4>ارتباط با ما</h4>
-        <ul class="contact-list">
-          {%- if c.phone %}<li><a href="tel:{{ c.phone | telHref }}" dir="ltr">{{ c.phone }}</a></li>{% endif %}
-          {%- if c.email %}<li><a href="mailto:{{ c.email }}" dir="ltr">{{ c.email }}</a></li>{% endif %}
-          {%- if c.whatsapp %}<li><a href="https://wa.me/{{ c.whatsapp }}" rel="noopener">واتساپ</a></li>{% endif %}
-          {%- if c.address %}<li>{{ c.address }}</li>{% endif %}
-        </ul>
-        <a class="footer-cta" href="/contact/">ثبت درخواست استعلام ←</a>
-      </div>
-    </div>
-    <div class="copyright">
-      <span>© {{ "" | year }} {{ site.name }} · تمامی حقوق محفوظ است.</span>
-    </div>
+      <p class="newsletter-status" role="status" aria-live="polite" hidden></p>
+    </form>
+    {% include "partials/logo.njk" %}
+  </div>
+  {%- if c.phone or c.email or c.address %}
+  <div class="wrap footer-contact">
+    {%- if c.phone %}<a href="tel:{{ c.phone | telHref }}" dir="ltr">{{ c.phone }}</a>{% endif %}
+    {%- if c.email %}<a href="mailto:{{ c.email }}" dir="ltr">{{ c.email }}</a>{% endif %}
+    {%- if c.whatsapp %}<a href="https://wa.me/{{ c.whatsapp }}" rel="noopener">واتساپ</a>{% endif %}
+    {%- if c.address %}<span>{{ c.address }}</span>{% endif %}
+  </div>
+  {%- endif %}
+  <div class="wrap copyright">
+    <span dir="ltr">© {{ "" | year }} Pipeox. All rights reserved.</span>
   </div>
 </footer>

@@ -95,6 +95,18 @@ if (isset($_GET['file'])) {
     exit;
 }
 
+if (isset($_GET['subscribers'])) {
+    header('Content-Type: text/csv; charset=utf-8');
+    header('Content-Disposition: attachment; filename="pipeox-subscribers-' . date('Y-m-d') . '.csv"');
+    $out = fopen('php://output', 'w');
+    fwrite($out, "ï»¿");
+    fputcsv($out, ['ایمیل', 'تاریخ عضویت']);
+    foreach ($pdo->query('SELECT email, created_at FROM subscribers ORDER BY id DESC') as $r) {
+        fputcsv($out, [$r['email'], $r['created_at']]);
+    }
+    exit;
+}
+
 if (isset($_GET['export'])) {
     header('Content-Type: text/csv; charset=utf-8');
     header('Content-Disposition: attachment; filename="pipeox-inquiries-' . date('Y-m-d') . '.csv"');
@@ -116,12 +128,13 @@ $stmt = isset(STATUSES[$filter])
     : $pdo->prepare('SELECT * FROM inquiries ORDER BY id DESC LIMIT 300');
 $stmt->execute(isset(STATUSES[$filter]) ? [$filter] : []);
 $rows = $stmt->fetchAll();
+$subscriberCount = (int)$pdo->query('SELECT COUNT(*) FROM subscribers')->fetchColumn();
 $fmt = class_exists('IntlDateFormatter')
     ? new IntlDateFormatter('fa_IR@calendar=persian', IntlDateFormatter::MEDIUM, IntlDateFormatter::SHORT, 'Asia/Tehran', IntlDateFormatter::TRADITIONAL)
     : null;
 $date = fn(string $utc) => $fmt ? $fmt->format(new DateTime($utc . ' UTC')) : $utc . ' UTC';
 
-render_page('استعلام‌ها', function () use ($rows, $counts, $filter, $self, $date) { ?>
+render_page('استعلام‌ها', function () use ($rows, $counts, $filter, $self, $date, $subscriberCount) { ?>
     <header class="bar">
       <h1>استعلام‌ها</h1>
       <nav>
@@ -130,7 +143,7 @@ render_page('استعلام‌ها', function () use ($rows, $counts, $filter, $
           <a href="?status=<?= $k ?>" class="<?= $filter === $k ? 'on' : '' ?>"><?= $label ?> (<?= (int)($counts[$k] ?? 0) ?>)</a>
         <?php endforeach ?>
       </nav>
-      <div><a href="?export=1">خروجی Excel</a> · <a href="?logout=1">خروج</a></div>
+      <div><a href="?export=1">خروجی Excel</a> · <a href="?subscribers=1">مشترکین خبرنامه (<?= $subscriberCount ?>)</a> · <a href="?logout=1">خروج</a></div>
     </header>
     <?php if (!$rows): ?><p class="empty">درخواستی وجود ندارد.</p><?php endif ?>
     <?php foreach ($rows as $r): ?>

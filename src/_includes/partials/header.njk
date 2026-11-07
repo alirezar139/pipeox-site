@@ -1,23 +1,21 @@
+{%- from "partials/icons.njk" import icon -%}
 {%- set ctaHref = "#contact" if hasForm else "/contact/" -%}
-<div class="top">
-  <div class="wrap">
-    <span>تأمین و راهکارهای مهندسی لوله و اتصالات صنعتی</span>
-    <span>{% if site.contact.phone %}<a href="tel:{{ site.contact.phone | telHref }}" dir="ltr">{{ site.contact.phone }}</a>{% else %}پاسخ‌گویی به پروژه‌ها <b>· با هماهنگی کارشناسان فروش</b>{% endif %}</span>
-  </div>
-</div>
-<header>
+<header class="site-header" id="siteHeader">
   <div class="wrap nav">
-    <a class="brand" href="/" aria-label="{{ site.name }} — صفحه اصلی"><i class="brand-mark"></i>PIPE<span>O</span>X</a>
+    {% include "partials/logo.njk" %}
     <nav class="links" id="navlinks" aria-label="منوی اصلی">
       {%- for item in site.nav %}
-      {%- set isActive = (item.href == page.url) or (item.href != "/" and "#" not in item.href and page.url.startsWith(item.href)) %}
+      {%- set isActive = (item.href == page.url) or (item.href != "/" and page.url.startsWith(item.href)) %}
       <a{% if isActive %} class="active" aria-current="page"{% endif %} href="{{ item.href }}">{{ item.label }}</a>
       {%- endfor %}
     </nav>
     <div class="nav-actions">
-      <input class="search" id="search" type="search" placeholder="جستجو در محصولات..." aria-label="جستجو در محصولات">
-      <a class="btn" href="{{ ctaHref }}">درخواست استعلام ←</a>
-      <button class="hamb" id="hamb" type="button" aria-label="باز کردن منو" aria-controls="navlinks" aria-expanded="false">☰</button>
+      <label class="search">
+        <input id="search" type="search" placeholder="جستجو در محصولات..." aria-label="جستجو در محصولات">
+        {{ icon("search") }}
+      </label>
+      <a class="btn btn-pill btn-cta" href="{{ ctaHref }}"><span>درخواست استعلام قیمت</span><i class="btn-dot">{{ icon("arrow") }}</i></a>
+      <button class="hamb" id="hamb" type="button" aria-label="باز کردن منو" aria-controls="navlinks" aria-expanded="false">{{ icon("menu") }}</button>
     </div>
   </div>
 </header>

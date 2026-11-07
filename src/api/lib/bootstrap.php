@@ -53,6 +53,12 @@ function db(): PDO
             );
             CREATE INDEX IF NOT EXISTS idx_inquiries_ip_time ON inquiries (ip, created_at);
             CREATE INDEX IF NOT EXISTS idx_inquiries_status  ON inquiries (status);
+            CREATE TABLE IF NOT EXISTS subscribers (
+                id         INTEGER PRIMARY KEY AUTOINCREMENT,
+                created_at TEXT    NOT NULL DEFAULT (datetime('now')),
+                email      TEXT    NOT NULL UNIQUE COLLATE NOCASE,
+                ip         TEXT    NOT NULL DEFAULT ''
+            );
         SQL);
     }
     return $pdo;
