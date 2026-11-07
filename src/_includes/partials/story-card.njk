@@ -1,0 +1,9 @@
+{#- expects: post (collection item) -#}
+<article class="story">
+  <a href="{{ post.url }}" tabindex="-1" aria-hidden="true"><img src="/assets/img/{{ post.data.image }}" alt="{{ post.data.imageAlt }}" loading="lazy" decoding="async"></a>
+  <div class="storybody">
+    <small>{{ post.data.category }} · <time datetime="{{ post.date | isoDate }}">{{ post.date | faDate }}</time></small>
+    <h3><a href="{{ post.url }}">{{ post.data.title }}</a></h3>
+    <p>{{ post.data.description | truncate(110) }}</p>
+  </div>
+</article>

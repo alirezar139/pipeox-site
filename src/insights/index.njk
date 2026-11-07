@@ -1,0 +1,23 @@
+---
+layout: layouts/page.njk
+permalink: /insights/
+tags: []
+title: دانش فنی و تازه‌ها
+description: راهنماهای فنی PIPEOX درباره انتخاب لوله، اتصالات، فلنج و شیرآلات صنعتی، استانداردها و نکات استعلام.
+eyebrow: INSIGHTS & UPDATES
+lead: راهنماهای انتخاب محصول، استانداردها و نکاتی که به تعریف دقیق‌تر نیاز پروژه کمک می‌کند.
+breadcrumbs:
+  - { label: "خانه", url: "/" }
+  - { label: "دانش فنی", url: "/insights/" }
+eleventyExcludeFromCollections: true
+---
+<section class="section section-tight">
+  <div class="wrap">
+    <div class="news news-list">
+      {%- for post in collections.insights | reverse %}
+      {% include "partials/story-card.njk" %}
+      {%- endfor %}
+    </div>
+  </div>
+</section>
+{% include "partials/cta.njk" %}

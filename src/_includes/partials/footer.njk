@@ -3,7 +3,7 @@
   <div class="wrap">
     <div class="footgrid">
       <div>
-        <a class="brand" href="#home"><i class="brand-mark"></i>PIPE<span>O</span>X</a>
+        <a class="brand" href="/"><i class="brand-mark"></i>PIPE<span>O</span>X</a>
         <p>{{ site.tagline }}</p>
       </div>
       <div>
@@ -18,7 +18,7 @@
         <h4>گروه محصولات</h4>
         <ul>
           {%- for p in products %}
-          <li>{{ p.title }}</li>
+          <li><a href="/products/{{ p.slug }}/">{{ p.title }}</a></li>
           {%- endfor %}
         </ul>
       </div>
@@ -30,7 +30,7 @@
           {%- if c.whatsapp %}<li><a href="https://wa.me/{{ c.whatsapp }}" rel="noopener">واتساپ</a></li>{% endif %}
           {%- if c.address %}<li>{{ c.address }}</li>{% endif %}
         </ul>
-        <a class="footer-cta" href="#contact">ثبت درخواست استعلام ←</a>
+        <a class="footer-cta" href="/contact/">ثبت درخواست استعلام ←</a>
       </div>
     </div>
     <div class="copyright">

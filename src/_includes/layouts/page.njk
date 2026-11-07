@@ -1,0 +1,19 @@
+---
+layout: layouts/base.njk
+---
+{#- Inner page: compact hero with breadcrumb, then content -#}
+<section class="page-hero">
+  <div class="wrap">
+    {%- if breadcrumbs %}
+    <nav class="breadcrumb" aria-label="مسیر صفحه">
+      {%- for b in breadcrumbs %}
+      {%- if loop.last %}<span aria-current="page">{{ b.label }}</span>{% else %}<a href="{{ b.url }}">{{ b.label }}</a><i aria-hidden="true">/</i>{% endif %}
+      {%- endfor %}
+    </nav>
+    {%- endif %}
+    {%- if eyebrow %}<div class="eyebrow">{{ eyebrow }}</div>{% endif %}
+    <h1>{{ heading or title }}</h1>
+    {%- if lead %}<p class="lead">{{ lead }}</p>{% endif %}
+  </div>
+</section>
+{{ content | safe }}

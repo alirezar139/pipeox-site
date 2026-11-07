@@ -1,17 +1,60 @@
+{#-
+  Root layout. Page front matter may set:
+    title, description, ogType ("article"), hasForm (page contains the inquiry form),
+    breadcrumbs ([{label, url}]), jsonld (extra JSON-LD object)
+-#}
+{%- set pageTitle = (title + " | " + site.name) if title else site.title -%}
+{%- set pageDesc = description or site.description -%}
+{%- set absUrl = (site.url + page.url) if site.url else "" -%}
 <!doctype html>
 <html lang="fa" dir="rtl">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#101513">
-  <title>{{ title or site.title }}</title>
-  <meta name="description" content="{{ description or site.description }}">
+  <title>{{ pageTitle }}</title>
+  <meta name="description" content="{{ pageDesc }}">
+  {%- if absUrl %}
+  <link rel="canonical" href="{{ absUrl }}">
+  <meta property="og:url" content="{{ absUrl }}">
+  <meta property="og:image" content="{{ site.url }}/assets/img/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  {%- endif %}
+  <meta property="og:type" content="{{ ogType or 'website' }}">
+  <meta property="og:title" content="{{ pageTitle }}">
+  <meta property="og:description" content="{{ pageDesc }}">
+  <meta property="og:site_name" content="{{ site.name }}">
+  <meta property="og:locale" content="fa_IR">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="preload" href="/assets/fonts/vazirmatn-arabic-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/assets/css/style.css">
+  {%- if page.url == "/" %}
+  <script type="application/ld+json">{{ {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": site.name,
+    "alternateName": site.nameFa,
+    "description": site.description,
+    "url": site.url or undefined,
+    "logo": (site.url + "/favicon.svg") if site.url else undefined,
+    "email": site.contact.email or undefined,
+    "telephone": site.contact.phone or undefined,
+    "address": site.contact.address or undefined
+  } | dump | safe }}</script>
+  {%- endif %}
+  {%- if breadcrumbs and site.url %}
+  <script type="application/ld+json">{{ breadcrumbs | breadcrumbJsonLd(site.url) | dump | safe }}</script>
+  {%- endif %}
+  {%- if jsonld %}
+  <script type="application/ld+json">{{ jsonld | dump | safe }}</script>
+  {%- endif %}
 </head>
 <body>
+<a class="skip-link" href="#main">پرش به محتوای اصلی</a>
 {% include "partials/header.njk" %}
-<main id="home">
+<main id="main">
 {{ content | safe }}
 </main>
 {% include "partials/footer.njk" %}

@@ -1,0 +1,67 @@
+---js
+{
+  layout: "layouts/page.njk",
+  pagination: { data: "products", size: 1, alias: "product" },
+  permalink: (data) => `/products/${data.product.slug}/`,
+  hasForm: true,
+  // Functions (not template strings) so every paginated page gets its own values
+  eleventyComputed: {
+    title: (data) => data.product.title,
+    description: (data) => data.product.intro.slice(0, 155),
+    eyebrow: (data) => data.product.code,
+    lead: (data) => data.product.summary,
+    selectedProduct: (data) => data.product.title,
+    formTitle: (data) => `استعلام ${data.product.title}`,
+    breadcrumbs: (data) => [
+      { label: "خانه", url: "/" },
+      { label: "محصولات", url: "/products/" },
+      { label: data.product.title, url: `/products/${data.product.slug}/` },
+    ],
+  },
+}
+---
+<section class="section section-tight">
+  <div class="wrap detail-grid">
+    <div class="detail-main">
+      <div class="detail-intro">
+        <div class="detail-image"><img src="/assets/img/{{ product.image }}" alt="{{ product.alt }}" decoding="async"></div>
+        <p>{{ product.intro }}</p>
+      </div>
+
+      <h2 class="sub-title">انواع رایج</h2>
+      <div class="type-grid">
+        {%- for t in product.types %}
+        <div class="type-card"><b>{{ t.name }}</b><span>{{ t.desc }}</span></div>
+        {%- endfor %}
+      </div>
+
+      <h2 class="sub-title">مشخصات فنی قابل استعلام</h2>
+      <div class="specs">
+        {%- for row in product.specs %}
+        <div class="spec"><span>{{ row[0] }}</span><b dir="auto">{{ row[1] }}</b></div>
+        {%- endfor %}
+        <div class="spec"><span>مدارک</span><b>MTC طبق EN 10204 (3.1 / 3.2) · بازرسی شخص ثالث در صورت نیاز</b></div>
+      </div>
+      <p class="spec-note">موجودی، برند و محدوده دقیق هر قلم در زمان استعلام اعلام می‌شود.</p>
+
+      <h2 class="sub-title">کاربردها</h2>
+      <ul class="chips">
+        {%- for a in product.applications %}<li>{{ a }}</li>{% endfor %}
+      </ul>
+    </div>
+    <div class="detail-side">
+      {% include "partials/quote-form.njk" %}
+    </div>
+  </div>
+</section>
+
+<section class="section section-tight related">
+  <div class="wrap">
+    <h2 class="sub-title">سایر گروه‌های محصول</h2>
+    <div class="products products-3">
+      {%- for p in products %}{% if p.slug != product.slug %}{% set idx = loop.index %}
+      {% include "partials/product-card.njk" %}
+      {%- endif %}{% endfor %}
+    </div>
+  </div>
+</section>

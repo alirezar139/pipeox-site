@@ -1,0 +1,13 @@
+---
+permalink: /sitemap.xml
+eleventyExcludeFromCollections: true
+---
+{#- Needs site.url (absolute URLs). Lists every page except 404. -#}
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+{%- if site.url %}
+{%- for item in collections.all %}{% if item.url and item.url.endsWith("/") %}
+  <url><loc>{{ site.url }}{{ item.url }}</loc><lastmod>{{ item.date | isoDate }}</lastmod></url>
+{%- endif %}{% endfor %}
+{%- endif %}
+</urlset>

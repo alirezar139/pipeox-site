@@ -190,12 +190,17 @@
   border-style: solid;
   color: var(--ink);
 }
+/* Honeypot: visually hidden without off-screen offsets (left:-9999px creates
+   a huge horizontal scroll in RTL pages) */
 .hp {
   position: absolute;
-  left: -9999px;
   width: 1px;
   height: 1px;
   overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
 }
 .formgrid [aria-invalid="true"] {
   border-color: #ff8a5c;

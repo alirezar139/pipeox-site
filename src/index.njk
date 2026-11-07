@@ -1,5 +1,6 @@
 ---
 layout: layouts/base.njk
+hasForm: true
 ---
 <section class="hero">
   <div class="wrap hero-grid">
@@ -36,13 +37,13 @@ layout: layouts/base.njk
       <div class="eyebrow">ENGINEERED PRODUCT RANGE</div>
       <h2>اجزای مطمئن،<br><span class="accent">برای جریان بی‌وقفه</span></h2>
       <p>چهار گروه اصلی محصولات پایپ‌اکس را در یک نمای تعاملی ببینید. برای مشاهده جزئیات و ثبت درخواست، هر محصول را انتخاب کنید.</p>
-      <a class="btn outline" href="#products">مشاهده کاتالوگ محصولات ←</a>
+      <a class="btn outline" href="/products/">مشاهده کاتالوگ محصولات ←</a>
     </div>
     <div class="orbit-stage">
       <div class="orbit-glow"></div><div class="orbit-ring ring-one"></div><div class="orbit-ring ring-two"></div>
       <div class="orbit-center"><i class="brand-mark"></i><strong>PIPEOX</strong><small>STEEL PIPELINE SOLUTIONS</small></div>
       {%- for p in products %}
-      <a class="orbit-product orbit-{{ p.orbit }}" href="#contact" data-category="{{ p.title }}" aria-label="استعلام {{ p.title }}"><img src="/assets/img/{{ p.image }}" alt="" loading="lazy"><span>{{ p.title }}</span></a>
+      <a class="orbit-product orbit-{{ p.orbit }}" href="/products/{{ p.slug }}/" aria-label="{{ p.title }}"><img src="/assets/img/{{ p.image }}" alt="" loading="lazy"><span>{{ p.title }}</span></a>
       {%- endfor %}
       <div class="orbit-pulse pulse-a"></div><div class="orbit-pulse pulse-b"></div>
     </div>
@@ -56,14 +57,8 @@ layout: layouts/base.njk
       <p>برای انتخاب درست، فقط نام محصول کافی نیست. جنس، گرید، ابعاد، ضخامت، فشار و استاندارد باید با شرایط واقعی پروژه هم‌خوانی داشته باشند.</p>
     </div>
     <div class="products" id="productGrid">
-      {%- for p in products %}
-      <article class="product" data-search="{{ p.keywords }}">
-        <div class="visual"><img src="/assets/img/{{ p.image }}" alt="{{ p.alt }}" loading="lazy"></div>
-        <small>0{{ loop.index }} / {{ p.code }}</small>
-        <h3>{{ p.title }}</h3>
-        <p>{{ p.summary }}</p>
-        <a class="more" href="#contact" data-category="{{ p.title }}">مشخصات و استعلام <span>↙</span></a>
-      </article>
+      {%- for p in products %}{% set idx = loop.index %}
+      {% include "partials/product-card.njk" %}
       {%- endfor %}
     </div>
     <p id="noResults" class="no-results" hidden>محصولی با این عبارت پیدا نشد.</p>
@@ -116,7 +111,7 @@ layout: layouts/base.njk
   </div>
 </section>
 
-<section class="section technical" id="resources">
+<section class="section technical" id="technical">
   <div class="wrap techgrid">
     <div class="techcopy">
       <div class="eyebrow">TECHNICAL FIRST</div>
@@ -135,26 +130,19 @@ layout: layouts/base.njk
   </div>
 </section>
 
-<section class="section">
+<section class="section" id="resources">
   <div class="wrap">
     <div class="section-head">
       <div><div class="eyebrow">INSIGHTS & UPDATES</div><h2>دانش فنی و تازه‌ها</h2></div>
       <p>بخش محتوایی برای انتشار خبرهای تأمین، راهنماهای انتخاب محصول، استانداردها و تجربه پروژه‌ها.</p>
     </div>
     <div class="news">
-      <article class="story"><img src="/assets/img/industrial-bg.jpg" alt="محیط صنعتی" loading="lazy"><div class="storybody"><small>راهنمای فنی</small><h3>پیش از استعلام لوله فولادی چه اطلاعاتی لازم است؟</h3><p>چک‌لیستی از مشخصات پایه برای تعریف دقیق نیاز پروژه.</p></div></article>
-      <article class="story"><img src="/assets/img/product-flange.jpg" alt="فلنج صنعتی" loading="lazy"><div class="storybody"><small>محصولات</small><h3>تفاوت کلاس فلنج و فشار کاری</h3><p>چرا انتخاب کلاس باید با شرایط طراحی هماهنگ باشد.</p></div></article>
-      <article class="story"><img src="/assets/img/product-elbow.jpg" alt="اتصالات لوله" loading="lazy"><div class="storybody"><small>مهندسی خطوط</small><h3>نقش اتصالات در طراحی مسیر لوله‌کشی</h3><p>مروری بر انتخاب زانویی، سه‌راهی و تبدیل.</p></div></article>
+      {%- for post in collections.insights | reverse | head(3) %}
+      {% include "partials/story-card.njk" %}
+      {%- endfor %}
     </div>
+    <p class="section-more"><a href="/insights/">همه مطالب دانش فنی ←</a></p>
   </div>
 </section>
 
-<section class="cta">
-  <div class="wrap">
-    <div>
-      <h2>برای پروژه بعدی خود، از همین‌جا شروع کنید.</h2>
-      <p>نیاز فنی و اقلام موردنظر را ارسال کنید تا درخواست شما بررسی شود.</p>
-    </div>
-    <a class="btn" href="#contact">درخواست مشاوره و استعلام ←</a>
-  </div>
-</section>
+{% include "partials/cta.njk" %}
