@@ -1,4 +1,6 @@
-import { Body, Controller, Delete, Get, NotFoundException, Param, Post, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, NotFoundException, Param, Post, Put, Req, UseGuards } from '@nestjs/common';
+import type { Request } from 'express';
+import { langOf, localize } from '../../common/i18n.js';
 import { InjectModel } from '@nestjs/mongoose';
 import type { Model } from 'mongoose';
 import { objectId } from '../../common/utils/text.js';
@@ -10,8 +12,9 @@ export class ProjectsController {
   constructor(@InjectModel(Project.name) private readonly projects: Model<Project>) {}
 
   @Get('projects')
-  list() {
-    return this.projects.find({ published: true }).sort({ sort: 1, _id: 1 }).select('-__v -published').lean();
+  async list(@Req() req: Request) {
+    const lang = langOf(req);
+    return (await this.projects.find({ published: true }).sort({ sort: 1, _id: 1 }).select('-__v -published').lean()).map((p) => localize(p, lang));
   }
 
   @UseGuards(AdminGuard)

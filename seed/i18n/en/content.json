@@ -1,0 +1,124 @@
+{
+  "settings": {
+    "site": {
+      "name": "PIPEOX",
+      "title": "PIPEOX | Engineered Pipeline Solutions",
+      "description": "PIPEOX — specialist supply of steel pipes, fittings and pipeline equipment for industrial and infrastructure projects."
+    },
+    "hero": {
+      "kicker": "Quality, Strength, Trust",
+      "title": "Sustainable Solutions",
+      "titleAccent": "for a Secure Future",
+      "text": "Manufacturing and supply of industrial pipes and fittings to the highest international standards for the oil, gas, petrochemical and construction industries."
+    },
+    "showcase": {
+      "title": "A World of Industrial Products",
+      "text": "Our product range meets all your industrial needs at the highest quality."
+    },
+    "stats": [{ "label": "Years of experience" }, { "label": "Successful projects" }, { "label": "Corporate clients" }],
+    "features": [
+      { "title": "Expert support", "text": "At every stage" },
+      { "title": "Advanced production", "text": "With modern technology" },
+      { "title": "Quality assurance", "text": "To international standards" }
+    ],
+    "projects": {
+      "title": "Our Key Projects",
+      "text": "Delivering major industrial projects nationwide with distinctive, lasting quality."
+    },
+    "newsletter": {
+      "title": "Newsletter",
+      "text": "Enter your email to receive our latest news and products."
+    }
+  },
+  "products": {
+    "steel-pipes": {
+      "title": "Steel Pipes",
+      "shortTitle": "Pipes",
+      "summary": "Seamless and welded pipes for transmission lines and industrial applications.",
+      "alt": "Industrial steel pipe",
+      "keywords": "steel pipe seamless welded carbon steel API 5L A106 line pipe",
+      "intro": "Carbon, alloy and stainless steel pipes in two groups — seamless and welded — for transporting oil, gas, water and process fluids. The choice of pipe depends on design pressure, temperature, fluid, diameter and the project's standard requirements.",
+      "types": [
+        { "name": "Seamless", "desc": "Suited to high pressure and temperature and to critical process lines." },
+        { "name": "Electric resistance welded (ERW)", "desc": "Economical for small and medium diameters in transmission lines and structures." },
+        { "name": "Longitudinal seam (LSAW)", "desc": "Large diameters and heavy walls for main transmission lines." },
+        { "name": "Spiral seam (SSAW)", "desc": "Large diameters for water transmission and lower-pressure applications." }
+      ],
+      "specs": [
+        { "label": "Common standards", "value": "API 5L · ASTM A106 · ASTM A53 · ASTM A333 · ASTM A312" },
+        { "label": "Grade", "value": "API 5L Gr.B to X70 · A106 Gr.B/C · A333 Gr.6 · TP304/316L" },
+        { "label": "Diameter range", "value": "NPS ½ to 48 in (depending on manufacturing method)" },
+        { "label": "Wall thickness / schedule", "value": "SCH 10 to SCH 160 · STD · XS · XXS" },
+        { "label": "Pipe ends", "value": "Plain (PE) · Bevelled (BE) · Threaded (TE)" },
+        { "label": "Coating", "value": "Bare · Galvanized · 3LPE / FBE on request" }
+      ],
+      "applications": ["Oil and gas transmission lines", "Process unit piping", "Water and fire-fighting lines", "Structures and piling"]
+    },
+    "fittings": {
+      "title": "Industrial Fittings",
+      "shortTitle": "Fittings",
+      "summary": "Elbows, tees, reducers and the fittings a pipeline needs.",
+      "alt": "Industrial steel fittings",
+      "keywords": "industrial fittings elbow tee reducer cap butt weld socket weld threaded B16.9",
+      "intro": "Butt-weld and forged (socket-weld and threaded) fittings for changing direction, branching and changing diameter in pipelines. The material and wall thickness of a fitting must match the pipe it joins.",
+      "types": [
+        { "name": "Elbow", "desc": "45° and 90°, long radius (LR) and short radius (SR), and 180° returns." },
+        { "name": "Tee", "desc": "Equal and reducing, for branching off the main line." },
+        { "name": "Reducer", "desc": "Concentric and eccentric." },
+        { "name": "Caps and forged fittings", "desc": "End caps, couplings, nipples and Class 3000 and 6000 fittings." }
+      ],
+      "specs": [
+        { "label": "Common standards", "value": "ASME B16.9 · ASME B16.11 · MSS SP-75 · MSS SP-97" },
+        { "label": "Material", "value": "ASTM A234 WPB · A420 WPL6 · A403 WP304/316 · A105 (forged)" },
+        { "label": "Diameter range", "value": "Butt weld: ½ to 48 in · Forged: ⅛ to 4 in" },
+        { "label": "Wall thickness / class", "value": "To pipe schedule (SCH) · Forged Class 3000 / 6000 / 9000" },
+        { "label": "End connection", "value": "Butt weld (BW) · Socket weld (SW) · Threaded (NPT)" }
+      ],
+      "applications": ["Changing direction and branching lines", "Refinery and petrochemical piping", "Power plant installations", "High-pressure and high-temperature lines"]
+    },
+    "flanges": {
+      "title": "Flanges & Accessories",
+      "shortTitle": "Flanges",
+      "summary": "Flanges and joint components to the requested class, material and standard.",
+      "alt": "Steel flange",
+      "keywords": "flange steel class gasket stud bolt nut B16.5 weld neck slip-on blind",
+      "intro": "Flanges allow a line to be opened and closed for repair and inspection. The flange pressure class must be chosen according to design pressure, temperature and material; gaskets and bolting are part of the same assembly.",
+      "types": [
+        { "name": "Weld neck", "desc": "The most common type for high pressure, high temperature and cyclic loads." },
+        { "name": "Slip-on", "desc": "Simpler installation for lower-pressure services." },
+        { "name": "Blind", "desc": "Closing line ends or nozzles." },
+        { "name": "Socket weld, threaded and lap joint", "desc": "For small diameters or where rotation and easy dismantling are needed." }
+      ],
+      "specs": [
+        { "label": "Common standards", "value": "ASME B16.5 (up to 24 in) · ASME B16.47 Series A/B (26 to 60 in) · EN 1092-1" },
+        { "label": "Pressure class", "value": "150 · 300 · 600 · 900 · 1500 · 2500" },
+        { "label": "Material", "value": "ASTM A105 · A350 LF2 · A182 F304/F316 · A694 F52–F65" },
+        { "label": "Facing", "value": "Raised face (RF) · Flat face (FF) · Ring-type joint (RTJ)" },
+        { "label": "Accessories", "value": "Spiral-wound and ring gaskets (ASME B16.20) · A193 B7 stud bolts and A194 2H nuts" }
+      ],
+      "applications": ["Connecting pipe to valves and equipment", "Line repair and inspection points", "Tanks and nozzles", "High-pressure oil and gas lines"]
+    },
+    "valves": {
+      "title": "Valves & Equipment",
+      "shortTitle": "Valves",
+      "summary": "Supply of control equipment and complementary items for pipelines.",
+      "alt": "Industrial valves",
+      "keywords": "valves equipment instrumentation gate ball check butterfly globe API 6D",
+      "intro": "Industrial valves for isolation, flow control and preventing backflow. The valve type, pressure class, body and trim materials and actuator type must suit the fluid and operating conditions.",
+      "types": [
+        { "name": "Gate", "desc": "Full isolation with low pressure drop." },
+        { "name": "Ball", "desc": "Quick shut-off and reliable sealing; common on gas transmission lines." },
+        { "name": "Check", "desc": "Prevents backflow; swing, lift and dual-plate." },
+        { "name": "Globe / Butterfly", "desc": "Flow regulation, or isolation in large diameters." }
+      ],
+      "specs": [
+        { "label": "Common standards", "value": "API 6D · API 600 · API 602 · API 608 · API 609 · ASME B16.34" },
+        { "label": "Pressure class", "value": "150 to 2500 · Forged 800 / 1500" },
+        { "label": "Body material", "value": "ASTM A216 WCB · A105 · A352 LCB · A351 CF8M" },
+        { "label": "End connection", "value": "Flanged · Butt weld (BW) · Socket weld · Threaded" },
+        { "label": "Actuator", "value": "Manual (handwheel / lever) · Gearbox · Pneumatic · Electric" }
+      ],
+      "applications": ["Compressor and metering stations", "Process units", "Water and fire-fighting lines", "Tanks and storage facilities"]
+    }
+  }
+}

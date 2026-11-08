@@ -1,0 +1,124 @@
+{
+  "settings": {
+    "site": {
+      "name": "PIPEOX",
+      "title": "PIPEOX | Lösungen für Rohrleitungssysteme",
+      "description": "PIPEOX – spezialisierte Lieferung von Stahlrohren, Formstücken und Rohrleitungsausrüstung für Industrie- und Infrastrukturprojekte."
+    },
+    "hero": {
+      "kicker": "Qualität, Stabilität, Vertrauen",
+      "title": "Nachhaltige Lösungen",
+      "titleAccent": "für eine sichere Zukunft",
+      "text": "Herstellung und Lieferung von Industrierohren und Formstücken nach höchsten internationalen Standards für die Öl-, Gas-, Petrochemie- und Bauindustrie."
+    },
+    "showcase": {
+      "title": "Eine Welt industrieller Produkte",
+      "text": "Unser Sortiment erfüllt alle Ihre industriellen Anforderungen in höchster Qualität."
+    },
+    "stats": [{ "label": "Jahre Erfahrung" }, { "label": "Erfolgreiche Projekte" }, { "label": "Firmenkunden" }],
+    "features": [
+      { "title": "Fachkundiger Support", "text": "In jeder Phase" },
+      { "title": "Moderne Fertigung", "text": "Mit aktueller Technologie" },
+      { "title": "Qualitätssicherung", "text": "Nach internationalen Normen" }
+    ],
+    "projects": {
+      "title": "Unsere Referenzprojekte",
+      "text": "Umsetzung großer Industrieprojekte im ganzen Land mit herausragender, dauerhafter Qualität."
+    },
+    "newsletter": {
+      "title": "Newsletter",
+      "text": "Geben Sie Ihre E-Mail-Adresse ein, um unsere neuesten Nachrichten und Produkte zu erhalten."
+    }
+  },
+  "products": {
+    "steel-pipes": {
+      "title": "Stahlrohre",
+      "shortTitle": "Rohre",
+      "summary": "Nahtlose und geschweißte Rohre für Transportleitungen und industrielle Anwendungen.",
+      "alt": "Industrielles Stahlrohr",
+      "keywords": "Stahlrohr nahtlos geschweißt Kohlenstoffstahl API 5L A106 Leitungsrohr",
+      "intro": "Rohre aus Kohlenstoff-, legiertem und nichtrostendem Stahl in zwei Gruppen – nahtlos und geschweißt – für den Transport von Öl, Gas, Wasser und Prozessmedien. Die Wahl des Rohrs hängt von Auslegungsdruck, Temperatur, Medium, Durchmesser und den Normanforderungen des Projekts ab.",
+      "types": [
+        { "name": "Nahtlos (Seamless)", "desc": "Geeignet für hohe Drücke und Temperaturen sowie kritische Prozessleitungen." },
+        { "name": "Widerstandsgeschweißt (ERW)", "desc": "Wirtschaftlich für kleine und mittlere Durchmesser in Leitungen und Stahlbau." },
+        { "name": "Längsnaht (LSAW)", "desc": "Große Durchmesser und Wanddicken für Haupttransportleitungen." },
+        { "name": "Spiralnaht (SSAW)", "desc": "Große Durchmesser für Wassertransport und Anwendungen mit geringerem Druck." }
+      ],
+      "specs": [
+        { "label": "Gängige Normen", "value": "API 5L · ASTM A106 · ASTM A53 · ASTM A333 · ASTM A312" },
+        { "label": "Güte", "value": "API 5L Gr.B bis X70 · A106 Gr.B/C · A333 Gr.6 · TP304/316L" },
+        { "label": "Durchmesserbereich", "value": "NPS ½ bis 48 Zoll (je nach Herstellungsverfahren)" },
+        { "label": "Wanddicke / Rohrreihe", "value": "SCH 10 bis SCH 160 · STD · XS · XXS" },
+        { "label": "Rohrenden", "value": "Glatt (PE) · Mit Schweißfase (BE) · Gewinde (TE)" },
+        { "label": "Beschichtung", "value": "Unbeschichtet · Verzinkt · 3LPE / FBE auf Anfrage" }
+      ],
+      "applications": ["Öl- und Gastransportleitungen", "Rohrleitungen in Prozessanlagen", "Wasser- und Feuerlöschleitungen", "Stahlbau und Pfahlgründung"]
+    },
+    "fittings": {
+      "title": "Industrielle Formstücke",
+      "shortTitle": "Formstücke",
+      "summary": "Bögen, T-Stücke, Reduzierstücke und alle Formstücke für Rohrleitungen.",
+      "alt": "Industrielle Stahlformstücke",
+      "keywords": "Formstücke Bogen T-Stück Reduzierstück Kappe Schweißformstück Muffenschweiß Gewinde B16.9",
+      "intro": "Schweiß- und Schmiedeformstücke (Muffenschweiß- und Gewindeausführung) für Richtungsänderungen, Abzweige und Durchmesserwechsel in Rohrleitungen. Werkstoff und Wanddicke eines Formstücks müssen zum anzuschließenden Rohr passen.",
+      "types": [
+        { "name": "Bogen", "desc": "45° und 90°, langer Radius (LR) und kurzer Radius (SR) sowie 180°-Bögen." },
+        { "name": "T-Stück", "desc": "Gleich und reduziert, für Abzweige von der Hauptleitung." },
+        { "name": "Reduzierstück", "desc": "Konzentrisch und exzentrisch." },
+        { "name": "Kappen und Schmiedeformstücke", "desc": "Endkappen, Muffen, Nippel und Formstücke der Klassen 3000 und 6000." }
+      ],
+      "specs": [
+        { "label": "Gängige Normen", "value": "ASME B16.9 · ASME B16.11 · MSS SP-75 · MSS SP-97" },
+        { "label": "Werkstoff", "value": "ASTM A234 WPB · A420 WPL6 · A403 WP304/316 · A105 (geschmiedet)" },
+        { "label": "Durchmesserbereich", "value": "Schweißformstücke: ½ bis 48 Zoll · Geschmiedet: ⅛ bis 4 Zoll" },
+        { "label": "Wanddicke / Klasse", "value": "Entsprechend Rohrreihe (SCH) · Geschmiedet Klasse 3000 / 6000 / 9000" },
+        { "label": "Anschlussart", "value": "Stumpfschweißen (BW) · Muffenschweißen (SW) · Gewinde (NPT)" }
+      ],
+      "applications": ["Richtungsänderung und Abzweige", "Rohrleitungen in Raffinerien und Petrochemie", "Kraftwerksanlagen", "Hochdruck- und Hochtemperaturleitungen"]
+    },
+    "flanges": {
+      "title": "Flansche & Zubehör",
+      "shortTitle": "Flansche",
+      "summary": "Flansche und Verbindungselemente entsprechend der geforderten Klasse, dem Werkstoff und der Norm.",
+      "alt": "Stahlflansch",
+      "keywords": "Flansch Stahl Klasse Dichtung Stehbolzen Mutter B16.5 Vorschweißflansch Überschiebflansch Blindflansch",
+      "intro": "Flansche ermöglichen das Öffnen und Schließen einer Leitung für Reparatur und Prüfung. Die Druckklasse des Flansches ist nach Auslegungsdruck, Temperatur und Werkstoff zu wählen; Dichtungen und Schrauben gehören zur selben Verbindung.",
+      "types": [
+        { "name": "Vorschweißflansch (Weld Neck)", "desc": "Die häufigste Bauart für hohe Drücke, Temperaturen und Wechsellasten." },
+        { "name": "Überschiebflansch (Slip-On)", "desc": "Einfachere Montage für Anwendungen mit geringerem Druck." },
+        { "name": "Blindflansch", "desc": "Verschließen von Leitungsenden oder Stutzen." },
+        { "name": "Muffenschweiß-, Gewinde- und Losflansch", "desc": "Für kleine Durchmesser oder wenn Drehbarkeit und leichte Demontage nötig sind." }
+      ],
+      "specs": [
+        { "label": "Gängige Normen", "value": "ASME B16.5 (bis 24 Zoll) · ASME B16.47 Serie A/B (26 bis 60 Zoll) · EN 1092-1" },
+        { "label": "Druckklasse", "value": "150 · 300 · 600 · 900 · 1500 · 2500" },
+        { "label": "Werkstoff", "value": "ASTM A105 · A350 LF2 · A182 F304/F316 · A694 F52–F65" },
+        { "label": "Dichtfläche", "value": "Dichtleiste (RF) · Glatt (FF) · Ringnut (RTJ)" },
+        { "label": "Zubehör", "value": "Spiral- und Ringdichtungen (ASME B16.20) · Stehbolzen A193 B7 und Muttern A194 2H" }
+      ],
+      "applications": ["Verbindung von Rohren mit Armaturen und Apparaten", "Reparatur- und Prüfstellen", "Behälter und Stutzen", "Öl- und Gas-Hochdruckleitungen"]
+    },
+    "valves": {
+      "title": "Armaturen & Ausrüstung",
+      "shortTitle": "Armaturen",
+      "summary": "Lieferung von Regelarmaturen und ergänzender Ausrüstung für Rohrleitungen.",
+      "alt": "Industriearmaturen",
+      "keywords": "Armaturen Ausrüstung Messtechnik Schieber Kugelhahn Rückschlagventil Absperrklappe Ventil API 6D",
+      "intro": "Industriearmaturen zum Absperren, Regeln des Durchflusses und Verhindern von Rückfluss. Armaturentyp, Druckklasse, Gehäuse- und Innengarniturwerkstoff sowie Antriebsart müssen zum Medium und zu den Betriebsbedingungen passen.",
+      "types": [
+        { "name": "Schieber (Gate)", "desc": "Vollständiges Absperren bei geringem Druckverlust." },
+        { "name": "Kugelhahn (Ball)", "desc": "Schnelles Absperren und zuverlässige Abdichtung; üblich in Gastransportleitungen." },
+        { "name": "Rückschlagventil (Check)", "desc": "Verhindert Rückfluss; Klappen-, Hub- und Doppelflügelausführung." },
+        { "name": "Ventil / Absperrklappe (Globe / Butterfly)", "desc": "Durchflussregelung oder Absperren bei großen Durchmessern." }
+      ],
+      "specs": [
+        { "label": "Gängige Normen", "value": "API 6D · API 600 · API 602 · API 608 · API 609 · ASME B16.34" },
+        { "label": "Druckklasse", "value": "150 bis 2500 · Geschmiedet 800 / 1500" },
+        { "label": "Gehäusewerkstoff", "value": "ASTM A216 WCB · A105 · A352 LCB · A351 CF8M" },
+        { "label": "Anschlussart", "value": "Flansch · Stumpfschweißen (BW) · Muffenschweißen · Gewinde" },
+        { "label": "Antrieb", "value": "Manuell (Handrad / Hebel) · Getriebe · Pneumatisch · Elektrisch" }
+      ],
+      "applications": ["Verdichter- und Messstationen", "Prozessanlagen", "Wasser- und Feuerlöschleitungen", "Behälter und Lageranlagen"]
+    }
+  }
+}

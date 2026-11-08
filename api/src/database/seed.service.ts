@@ -2,15 +2,17 @@ import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import matter from 'gray-matter';
 import { marked } from 'marked';
-import type { Model } from 'mongoose';
+import { trusted, type Model } from 'mongoose';
 import { existsSync } from 'node:fs';
 import { readdir, readFile } from 'node:fs/promises';
 import path from 'node:path';
+import { TRANSLATIONS } from '../common/i18n.js';
 import { sanitizeArticleHtml } from '../common/utils/html.js';
 import { fromRoot } from '../config/env.js';
 import { Article } from '../modules/articles/article.schema.js';
 import { Product } from '../modules/products/product.schema.js';
 import { Project } from '../modules/projects/project.schema.js';
+import type { SiteSettings } from '../modules/settings/settings.schema.js';
 import { SettingsService } from '../modules/settings/settings.service.js';
 
 /**
@@ -29,7 +31,51 @@ export class SeedService implements OnApplicationBootstrap {
   ) {}
 
   async onApplicationBootstrap() {
-    if (await this.settings.exists()) return;
+    if (!(await this.settings.exists())) await this.seed();
+    await this.seedTranslations();
+  }
+
+  /**
+   * Starter translations from /seed/i18n/<lang>: fills a language only where a document has
+   * none yet, so translations edited in the panel are never overwritten.
+   */
+  private async seedTranslations() {
+    for (const lang of TRANSLATIONS) {
+      const dir = fromRoot(`seed/i18n/${lang}`);
+      if (!existsSync(path.join(dir, 'content.json'))) continue;
+      const content = JSON.parse(await readFile(path.join(dir, 'content.json'), 'utf8')) as {
+        settings?: Record<string, unknown>;
+        products?: Record<string, Record<string, unknown>>;
+      };
+      let filled = 0;
+
+      const site = (await this.settings.get()) as SiteSettings & { i18n?: Record<string, unknown> };
+      if (content.settings && !site.i18n?.[lang]) {
+        await this.settings.save({ ...site, i18n: { ...site.i18n, [lang]: content.settings } });
+        filled++;
+      }
+      for (const [slug, tr] of Object.entries(content.products ?? {})) {
+        const r = await this.products.updateOne({ slug, [`i18n.${lang}`]: trusted({ $exists: false }) }, { $set: { [`i18n.${lang}`]: tr } });
+        filled += r.modifiedCount;
+      }
+      const mdDir = path.join(dir, 'insights');
+      for (const f of existsSync(mdDir) ? (await readdir(mdDir)).filter((x) => x.endsWith('.md')) : []) {
+        const { data, content: md } = matter(await readFile(path.join(mdDir, f), 'utf8'));
+        const tr = {
+          title: data.title ?? '',
+          description: data.description ?? '',
+          category: data.category ?? '',
+          imageAlt: data.imageAlt ?? '',
+          body: sanitizeArticleHtml(await marked.parse(md)),
+        };
+        const r = await this.articles.updateOne({ slug: f.replace(/\.md$/, ''), [`i18n.${lang}`]: trusted({ $exists: false }) }, { $set: { [`i18n.${lang}`]: tr } });
+        filled += r.modifiedCount;
+      }
+      if (filled) this.log.log(`Seeded ${filled} ${lang} translation(s)`);
+    }
+  }
+
+  private async seed() {
     const dir = fromRoot('seed');
     if (!existsSync(path.join(dir, 'site.json'))) throw new Error(`Database is empty and ${dir}/site.json was not found.`);
 

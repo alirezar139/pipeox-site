@@ -1,4 +1,6 @@
-import { Body, Controller, Get, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Put, Req, UseGuards } from '@nestjs/common';
+import type { Request } from 'express';
+import { langOf, localize } from '../../common/i18n.js';
 import { AdminGuard } from '../auth/guards.js';
 import { settingsSchema, SETTINGS_ICONS } from './settings.schema.js';
 import { SettingsService } from './settings.service.js';
@@ -9,8 +11,8 @@ export class SettingsController {
 
   /** Public: everything the site renders (no secrets live in settings). */
   @Get('site')
-  site() {
-    return this.settings.get();
+  async site(@Req() req: Request) {
+    return localize(await this.settings.get(), langOf(req));
   }
 
   @UseGuards(AdminGuard)

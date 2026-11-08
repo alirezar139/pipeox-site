@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { z } from 'zod';
+import { i18nInput } from '../../common/i18n.js';
 import { imagePath, requiredText, text } from '../../common/utils/text.js';
 
 @Schema({ timestamps: true, collection: 'articles' })
@@ -16,6 +17,8 @@ export class Article {
   /** Future date = scheduled: hidden until then. */
   @Prop({ required: true, index: true }) publishedAt: Date;
   @Prop({ default: true, index: true }) published: boolean;
+  /** Translations: { en: { title, description, category, imageAlt, body }, de: {...} } (body sanitized). */
+  @Prop({ type: Object, default: {} }) i18n: Record<string, { body?: string } & Record<string, unknown>>;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -37,5 +40,8 @@ export const articleInput = z.object({
   body: z.string().max(400_000).default(''),
   publishedAt: z.coerce.date().default(() => new Date()),
   published: z.boolean().default(true),
+  i18n: i18nInput(
+    z.object({ title: text(200), description: text(400), category: text(60), imageAlt: text(150), body: z.string().max(400_000) }).partial(),
+  ),
 });
 export type ArticleInput = z.infer<typeof articleInput>;

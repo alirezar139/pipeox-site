@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { InjectConnection } from '@nestjs/mongoose';
 import type { Request } from 'express';
 import type { Connection } from 'mongoose';
+import { LANGS } from '../../common/i18n.js';
 import type { Env } from '../../config/env.js';
 import { SettingsService } from '../settings/settings.service.js';
 
@@ -41,15 +42,23 @@ export class SeoController {
       ...products.map((p) => ({ loc: `/products/${p.slug}`, mod: p.updatedAt as Date })),
       ...articles.map((a) => ({ loc: `/insights/${a.slug}`, mod: a.updatedAt as Date })),
     ];
+    // Every page exists in each language: / (Persian), /en/..., /de/... — linked as hreflang alternates
+    const at = (lang: string, loc: string) => base + (lang === 'fa' ? loc : `/${lang}${loc === '/' ? '' : loc}`);
     const body = urls
-      .map((u) => `  <url><loc>${xmlEscape(base + u.loc)}</loc>${u.mod ? `<lastmod>${u.mod.toISOString().slice(0, 10)}</lastmod>` : ''}</url>`)
+      .flatMap((u) => {
+        const alts =
+          LANGS.map((l) => `<xhtml:link rel="alternate" hreflang="${l}" href="${xmlEscape(at(l, u.loc))}"/>`).join('') +
+          `<xhtml:link rel="alternate" hreflang="x-default" href="${xmlEscape(at('fa', u.loc))}"/>`;
+        const mod = u.mod ? `<lastmod>${u.mod.toISOString().slice(0, 10)}</lastmod>` : '';
+        return LANGS.map((lang) => `  <url><loc>${xmlEscape(at(lang, u.loc))}</loc>${mod}${alts}</url>`);
+      })
       .join('\n');
-    return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${body}\n</urlset>\n`;
+    return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n${body}\n</urlset>\n`;
   }
 
   @Get('robots.txt')
   @Header('Content-Type', 'text/plain; charset=utf-8')
   async robots(@Req() req: Request) {
-    return `User-agent: *\nAllow: /api/media/\nDisallow: /api/\nDisallow: /account\nDisallow: /admin\n\nSitemap: ${await this.base(req)}/sitemap.xml\n`;
+    return `User-agent: *\nAllow: /api/media/\nDisallow: /api/\nDisallow: /account\nDisallow: /en/account\nDisallow: /de/account\nDisallow: /admin\n\nSitemap: ${await this.base(req)}/sitemap.xml\n`;
   }
 }

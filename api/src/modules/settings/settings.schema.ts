@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { i18nInput } from '../../common/i18n.js';
 import { text } from '../../common/utils/text.js';
 
 /**
@@ -33,6 +34,21 @@ export const settingsSchema = z.object({
     video: z.string().max(500).regex(/^$|^https:\/\//, 'لینک ویدیو باید با https:// شروع شود.'),
   }),
   newsletter: z.object({ title: text(80), text: text(300) }),
+  /** Translations of the text fields (numbers, icons, links and contact details are shared). */
+  i18n: i18nInput(
+    z
+      .object({
+        site: z.object({ name: text(60), title: text(150), description: text(300) }).partial(),
+        contact: z.object({ address: text(300), hours: text(150) }).partial(),
+        hero: z.object({ kicker: text(80), title: text(80), titleAccent: text(80), text: text(400) }).partial(),
+        showcase: z.object({ title: text(80), text: text(300) }).partial(),
+        stats: z.array(z.object({ label: text(60) }).partial()).max(3),
+        features: z.array(z.object({ title: text(60), text: text(80) }).partial()).max(3),
+        projects: z.object({ title: text(80), text: text(300) }).partial(),
+        newsletter: z.object({ title: text(80), text: text(300) }).partial(),
+      })
+      .partial(),
+  ),
 });
 
 export type SiteSettings = z.infer<typeof settingsSchema>;

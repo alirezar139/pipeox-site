@@ -1,6 +1,8 @@
-import { Body, ConflictException, Controller, Delete, Get, NotFoundException, Param, Post, Put, UseGuards } from '@nestjs/common';
+import { Body, ConflictException, Controller, Delete, Get, NotFoundException, Param, Post, Put, Req, UseGuards } from '@nestjs/common';
+import type { Request } from 'express';
 import { InjectModel } from '@nestjs/mongoose';
 import { trusted, type Model } from 'mongoose';
+import { langOf, localize } from '../../common/i18n.js';
 import { objectId, slug } from '../../common/utils/text.js';
 import { AdminGuard } from '../auth/guards.js';
 import { Product, productInput, type ProductInput } from './product.schema.js';
@@ -14,15 +16,16 @@ export class ProductsController {
   /* ───────── Public ───────── */
 
   @Get('products')
-  list() {
-    return this.products.find({ published: true }).sort({ sort: 1, _id: 1 }).select(PUBLIC_FIELDS).lean();
+  async list(@Req() req: Request) {
+    const lang = langOf(req);
+    return (await this.products.find({ published: true }).sort({ sort: 1, _id: 1 }).select(PUBLIC_FIELDS).lean()).map((p) => localize(p, lang));
   }
 
   @Get('products/:slug')
-  async one(@Param('slug', { schema: slug }) s: string) {
+  async one(@Param('slug', { schema: slug }) s: string, @Req() req: Request) {
     const p = await this.products.findOne({ slug: s, published: true }).select(PUBLIC_FIELDS).lean();
     if (!p) throw new NotFoundException('محصول پیدا نشد.');
-    return p;
+    return localize(p, langOf(req));
   }
 
   /* ───────── Admin ───────── */

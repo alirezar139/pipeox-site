@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { z } from 'zod';
+import { i18nInput } from '../../common/i18n.js';
 import { imagePath, requiredText, slug, text } from '../../common/utils/text.js';
 
 /** The homepage artwork has four fixed label slots: a (top right), b (top left), c (bottom left), d (bottom right). */
@@ -34,6 +35,8 @@ export class Product {
   @Prop({ type: [String], default: [] }) applications: string[];
   @Prop({ default: 0, index: true }) sort: number;
   @Prop({ default: true, index: true }) published: boolean;
+  /** Translations: { en: {...}, de: {...} } with the same text fields (see productTranslation). */
+  @Prop({ type: Object, default: {} }) i18n: Record<string, unknown>;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -55,5 +58,18 @@ export const productInput = z.object({
   applications: z.array(text(150).pipe(z.string().min(1))).max(40).default([]),
   sort: z.coerce.number().int().min(-9999).max(9999).default(0),
   published: z.boolean().default(true),
+  i18n: i18nInput(
+    z.object({
+      title: text(150),
+      shortTitle: text(40),
+      summary: text(400),
+      intro: text(3000),
+      alt: text(150),
+      keywords: text(500),
+      types: z.array(z.object({ name: text(120), desc: text(300) }).partial()).max(30),
+      specs: z.array(z.object({ label: text(120), value: text(400) }).partial()).max(40),
+      applications: z.array(text(150)).max(40),
+    }).partial(),
+  ),
 });
 export type ProductInput = z.infer<typeof productInput>;

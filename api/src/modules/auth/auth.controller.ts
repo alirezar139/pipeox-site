@@ -6,6 +6,7 @@ import type { Request, Response } from 'express';
 import { trusted, type Model } from 'mongoose';
 import { createHash, randomBytes } from 'node:crypto';
 import { z } from 'zod';
+import { type Lang, langOf } from '../../common/i18n.js';
 import { burnPasswordCheck, hashPassword, verifyPassword } from '../../common/security/password.js';
 import { email, password, phone, requiredText, text } from '../../common/utils/text.js';
 import type { Env } from '../../config/env.js';
@@ -26,6 +27,21 @@ const registerSchema = z.object({
 const loginSchema = z.object({ email: z.string().max(190), password: z.string().max(200) });
 const forgotSchema = z.object({ email });
 const resetSchema = z.object({ token: z.string().regex(/^[a-f0-9]{64}$/, 'پیوند نامعتبر است.'), password });
+
+const RESET_MAIL: Record<Lang, (name: string, link: string) => { subject: string; text: string }> = {
+  fa: (name, link) => ({
+    subject: 'بازیابی رمز عبور PIPEOX',
+    text: `سلام ${name}،\n\nبرای تعیین رمز عبور جدید روی پیوند زیر بزنید (تا یک ساعت معتبر است):\n${link}\n\nاگر این درخواست را شما نداده‌اید، این ایمیل را نادیده بگیرید.`,
+  }),
+  en: (name, link) => ({
+    subject: 'PIPEOX password reset',
+    text: `Hello ${name},\n\nTo set a new password, open the link below (valid for one hour):\n${link}\n\nIf you did not request this, you can ignore this email.`,
+  }),
+  de: (name, link) => ({
+    subject: 'PIPEOX – Passwort zurücksetzen',
+    text: `Hallo ${name},\n\num ein neues Passwort festzulegen, öffnen Sie den folgenden Link (eine Stunde gültig):\n${link}\n\nWenn Sie dies nicht angefordert haben, können Sie diese E-Mail ignorieren.`,
+  }),
+};
 
 /** Customer sign-up, sign-in, sign-out and password recovery. */
 @Controller('auth')
@@ -113,12 +129,11 @@ export class AuthController {
         expiresAt: new Date(Date.now() + 3600_000),
       });
       const base = this.config.get('SITE_URL', { infer: true }) || `${req.protocol}://${req.get('host')}`;
+      const lang = langOf(req);
+      const link = `${base}${lang === 'fa' ? '' : `/${lang}`}/account/reset?token=${token}`;
+      const mail = RESET_MAIL[lang](user.name, link);
       this.notify
-        .sendEmail(
-          user.email,
-          'بازیابی رمز عبور PIPEOX',
-          `سلام ${user.name}،\n\nبرای تعیین رمز عبور جدید روی پیوند زیر بزنید (تا یک ساعت معتبر است):\n${base}/account/reset?token=${token}\n\nاگر این درخواست را شما نداده‌اید، این ایمیل را نادیده بگیرید.`,
-        )
+        .sendEmail(user.email, mail.subject, mail.text)
         .catch((e) => this.log.warn(`Reset email failed: ${String(e)}`));
     }
     return { ok: true, emailEnabled: true };

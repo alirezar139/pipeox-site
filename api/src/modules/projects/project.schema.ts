@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { z } from 'zod';
+import { i18nInput } from '../../common/i18n.js';
 import { imagePath, normalizeDigits, requiredText, text } from '../../common/utils/text.js';
 
 /** Reference projects shown on /projects (the "featured" section appears once there is one). */
@@ -13,6 +14,8 @@ export class Project {
   @Prop({ default: '' }) image: string;
   @Prop({ default: 0 }) sort: number;
   @Prop({ default: true }) published: boolean;
+  /** Translations: { en: { title, client, industry, scope }, de: {...} }. */
+  @Prop({ type: Object, default: {} }) i18n: Record<string, unknown>;
 }
 export const ProjectSchema = SchemaFactory.createForClass(Project);
 
@@ -25,5 +28,6 @@ export const projectInput = z.object({
   image: imagePath,
   sort: z.coerce.number().int().min(-9999).max(9999).default(0),
   published: z.boolean().default(true),
+  i18n: i18nInput(z.object({ title: text(200), client: text(150), industry: text(100), scope: text(2000) }).partial()),
 });
 export type ProjectInput = z.infer<typeof projectInput>;
