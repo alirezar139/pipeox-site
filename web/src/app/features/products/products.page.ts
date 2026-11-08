@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, inject, input } from '@an
 import { RouterLink } from '@angular/router';
 import type { Product } from '../../core/models';
 import { SeoService } from '../../core/seo.service';
-import { CtaBandComponent, ProductCardComponent } from '../../shared/cards';
+import { ProductCardComponent } from '../../shared/cards';
 import { PageHeroComponent } from '../../shared/page-hero.component';
 
 const CRUMBS = [
@@ -13,7 +13,7 @@ const CRUMBS = [
 @Component({
   selector: 'app-products-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [PageHeroComponent, ProductCardComponent, CtaBandComponent, RouterLink],
+  imports: [PageHeroComponent, ProductCardComponent, RouterLink],
   template: `
     <app-page-hero heading="محصولات و راهکارها" eyebrow="PRODUCT PORTFOLIO" [crumbs]="crumbs"
       lead="برای انتخاب درست، فقط نام محصول کافی نیست. جنس، گرید، ابعاد، ضخامت، فشار و استاندارد باید با شرایط واقعی پروژه هم‌خوانی داشته باشند. هر گروه را برای مشاهده مشخصات فنی باز کنید." />
@@ -32,7 +32,6 @@ const CRUMBS = [
         }
       </div>
     </section>
-    <app-cta-band />
   `,
 })
 export class ProductsPage {

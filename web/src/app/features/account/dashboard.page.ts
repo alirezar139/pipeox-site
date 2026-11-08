@@ -1,6 +1,6 @@
-import { ChangeDetectionStrategy, Component, effect, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AuthStore } from '../../core/auth.store';
 import { FaDatePipe } from '../../core/format';
 import { ApiService } from '../../core/http/api.service';
@@ -8,7 +8,6 @@ import type { Account, ApiError, InquiryStatus } from '../../core/models';
 import { SeoService } from '../../core/seo.service';
 import { IconComponent } from '../../shared/icon.component';
 import { PageHeroComponent } from '../../shared/page-hero.component';
-import { QuoteModal } from '../../shared/quote/quote-modal';
 
 interface MyInquiry {
   _id: string;
@@ -31,7 +30,7 @@ const CUSTOMER_STATUS: Record<InquiryStatus, string> = {
 @Component({
   selector: 'app-dashboard-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, IconComponent, PageHeroComponent, FaDatePipe],
+  imports: [FormsModule, RouterLink, IconComponent, PageHeroComponent, FaDatePipe],
   template: `
     <app-page-hero heading="حساب من" eyebrow="CUSTOMER ACCOUNT" [crumbs]="[{ label: 'خانه', url: '/' }, { label: 'حساب من', url: '/account' }]" />
     <section class="section section-tight">
@@ -40,7 +39,7 @@ const CUSTOMER_STATUS: Record<InquiryStatus, string> = {
           @if (welcome) { <p class="notice notice-ok">حساب شما ساخته شد. خوش آمدید!</p> }
           <div class="account-head">
             <h2 class="sub-title">درخواست‌های من</h2>
-            <button type="button" class="pill pill-orange" (click)="newInquiry()"><app-icon name="plus" /><span>استعلام جدید</span></button>
+            <a class="pill pill-orange" routerLink="/contact"><app-icon name="plus" /><span>استعلام جدید</span></a>
           </div>
 
           @if (loading()) {
@@ -97,7 +96,6 @@ export class DashboardPage {
   protected readonly auth = inject(AuthStore);
   private readonly api = inject(ApiService);
   private readonly router = inject(Router);
-  private readonly quote = inject(QuoteModal);
 
   protected readonly statusLabel = CUSTOMER_STATUS;
   protected readonly welcome = !!this.router.currentNavigation()?.extras.state?.['welcome'];
@@ -115,13 +113,6 @@ export class DashboardPage {
     const u = this.auth.user();
     if (u) this.profile = { name: u.name, phone: u.phone, company: u.company };
     this.load();
-    // The popup may have sent a new inquiry: refresh the list when it closes
-    let wasOpen = false;
-    effect(() => {
-      const open = this.quote.open();
-      if (wasOpen && !open) void this.load();
-      wasOpen = open;
-    });
   }
 
   private async load() {
@@ -130,10 +121,6 @@ export class DashboardPage {
     } finally {
       this.loading.set(false);
     }
-  }
-
-  newInquiry() {
-    this.quote.show();
   }
 
   async saveProfile() {

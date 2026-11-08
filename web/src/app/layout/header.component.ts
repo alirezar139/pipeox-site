@@ -2,7 +2,6 @@ import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/cor
 import { NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthStore } from '../core/auth.store';
 import { IconComponent } from '../shared/icon.component';
-import { QuoteModal } from '../shared/quote/quote-modal';
 import { LogoComponent } from './logo.component';
 import { HEADER_NAV } from './nav';
 
@@ -27,15 +26,16 @@ import { HEADER_NAV } from './nav';
       </nav>
       <div class="nav-actions">
         <form class="search" role="search" (submit)="search($event, q.value)">
-          <app-icon name="search" />
-          <input #q type="search" name="q" placeholder="جستجو در محصولات..." aria-label="جستجو در محصولات" autocomplete="off">
+          <label for="site-search" class="search-ico"><app-icon name="search" /></label>
+          <input #q id="site-search" type="search" name="q" placeholder="جستجو در محصولات..." aria-label="جستجو در محصولات" autocomplete="off">
         </form>
         <a class="pill pill-ghost nav-account" routerLinkActive="is-active" [routerLink]="auth.user() ? '/account' : '/account/login'"
           [attr.title]="auth.user()?.email ?? null">
           <app-icon name="user" /><span>{{ auth.user() ? 'حساب من' : 'ورود / ثبت‌نام' }}</span>
         </a>
-        <a class="btn-cta" routerLink="/contact" (click)="openQuote($event)">
-          <span>درخواست استعلام قیمت</span><i class="btn-dot"><app-icon name="arrow" /></i>
+        <span class="nav-sep" aria-hidden="true"></span>
+        <a class="btn-cta" routerLink="/contact" routerLinkActive="is-active" ariaCurrentWhenActive="page">
+          <span class="cta-full">تماس و استعلام قیمت</span><span class="cta-short">استعلام</span><i class="btn-dot"><app-icon name="arrow" /></i>
         </a>
         <button class="hamb" type="button" [attr.aria-label]="menuOpen() ? 'بستن منو' : 'باز کردن منو'" aria-controls="navlinks"
           [attr.aria-expanded]="menuOpen()" (click)="menuOpen.update((v) => !v)">
@@ -49,7 +49,6 @@ export class HeaderComponent {
   protected readonly nav = HEADER_NAV;
   protected readonly auth = inject(AuthStore);
   private readonly router = inject(Router);
-  private readonly quote = inject(QuoteModal);
   protected readonly scrolled = signal(false);
   protected readonly menuOpen = signal(false);
 
@@ -64,12 +63,5 @@ export class HeaderComponent {
   search(e: Event, value: string) {
     e.preventDefault();
     this.router.navigate(['/products'], { queryParams: { q: value.trim() || null } });
-  }
-
-  /** The contact page already shows the full form; everywhere else open the popup. */
-  openQuote(e: MouseEvent) {
-    if (this.router.url.startsWith('/contact') || e.ctrlKey || e.metaKey) return;
-    e.preventDefault();
-    this.quote.show();
   }
 }

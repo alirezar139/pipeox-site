@@ -12,7 +12,7 @@ const MAX_MB = 8;
 const ACCEPT = '.pdf,.xlsx,.xls,.docx,.doc,.csv,.jpg,.jpeg,.png';
 
 /**
- * Inquiry card. `compact` = homepage hero version (name, phone, details).
+ * Inquiry card (contact page and product pages).
  * Logged-in customers get name/phone prefilled and the inquiry is linked to their account.
  */
 @Component({
@@ -21,7 +21,7 @@ const ACCEPT = '.pdf,.xlsx,.xls,.docx,.doc,.csv,.jpg,.jpeg,.png';
   imports: [FormsModule, IconComponent, RouterLink],
   host: { class: 'quote glass', '[attr.id]': 'anchor() ? "contact" : null' },
   template: `
-    <h2 [attr.id]="titleId()">{{ title() }}</h2>
+    <h2>{{ title() }}</h2>
     <p>برای دریافت اطلاعات بیشتر با ما در ارتباط باشید.</p>
 
     @if (sent()) {
@@ -41,34 +41,30 @@ const ACCEPT = '.pdf,.xlsx,.xls,.docx,.doc,.csv,.jpg,.jpeg,.png';
           <app-icon name="phone" />
           <input name="phone" [(ngModel)]="phone" required type="tel" inputmode="tel" maxlength="30" autocomplete="tel" placeholder="شماره تماس" aria-label="شماره تماس" [attr.aria-invalid]="error()?.field === 'phone' || null">
         </label>
-        @if (!compact()) {
-          <label class="field">
-            <app-icon name="list" />
-            <select name="category" [(ngModel)]="category" aria-label="گروه محصول موردنظر">
-              <option value="">گروه محصول موردنظر</option>
-              @for (p of products(); track p._id) { <option [value]="p.title">{{ p.title }}</option> }
-              <option value="تأمین پروژه">تأمین پروژه</option>
-            </select>
-          </label>
-        }
+        <label class="field">
+          <app-icon name="list" />
+          <select name="category" [(ngModel)]="category" aria-label="گروه محصول موردنظر">
+            <option value="">گروه محصول موردنظر</option>
+            @for (p of products(); track p._id) { <option [value]="p.title">{{ p.title }}</option> }
+            <option value="تأمین پروژه">تأمین پروژه</option>
+          </select>
+        </label>
         <label class="field field-area">
           <app-icon name="doc" />
-          <textarea name="details" [(ngModel)]="details" [rows]="compact() ? 2 : 3" maxlength="3000" aria-label="توضیحات"
-            [placeholder]="compact() ? 'توضیحات' : 'استاندارد، سایز، گرید، مقدار یا توضیح پروژه'"></textarea>
+          <textarea name="details" [(ngModel)]="details" rows="3" maxlength="3000" aria-label="توضیحات"
+            placeholder="استاندارد، سایز، گرید، مقدار یا توضیح پروژه"></textarea>
         </label>
-        @if (!compact()) {
-          <label class="field file-field" [class.has-file]="file()" [class.invalid]="error()?.field === 'attachment'">
-            <app-icon name="clip" />
-            <input type="file" [accept]="accept" (change)="pick($event)">
-            <span class="file-label">{{ file()?.name ?? 'پیوست لیست متریال یا دیتاشیت (اختیاری)' }}</span>
-          </label>
-        }
+        <label class="field file-field" [class.has-file]="file()" [class.invalid]="error()?.field === 'attachment'">
+          <app-icon name="clip" />
+          <input type="file" [accept]="accept" (change)="pick($event)">
+          <span class="file-label">{{ file()?.name ?? 'پیوست لیست متریال یا دیتاشیت (اختیاری)' }}</span>
+        </label>
         <div class="hp" aria-hidden="true"><label>Website <input name="website" [(ngModel)]="website" tabindex="-1" autocomplete="off"></label></div>
         <button class="btn btn-block" type="submit" [disabled]="busy()">
           <app-icon name="send" /><span>{{ busy() ? 'در حال ارسال...' : 'ارسال درخواست' }}</span>
         </button>
       </form>
-      @if (!compact()) { <div class="formnote">PDF، Excel، Word یا تصویر تا ۸ مگابایت</div> }
+      <div class="formnote">PDF، Excel، Word یا تصویر تا ۸ مگابایت</div>
       @if (error(); as e) { <div class="status" data-type="error" role="alert">{{ e.message }}</div> }
     }
   `,
@@ -78,13 +74,11 @@ export class QuoteFormComponent {
   private readonly api = inject(ApiService);
   private readonly site = inject(SiteStore);
 
-  readonly compact = input(false);
   readonly heading = input<string>();
   readonly selectedProduct = input('');
   readonly products = input<Product[]>([]);
   /** Gives the card id="contact" (target of in-page links). */
   readonly anchor = input(false);
-  readonly titleId = input<string | null>(null);
 
   protected readonly title = computed(() => this.heading() ?? 'درخواست مشاوره و استعلام');
   protected readonly accept = ACCEPT;

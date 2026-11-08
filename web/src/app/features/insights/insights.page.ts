@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
 import type { ArticleSummary } from '../../core/models';
 import { SeoService } from '../../core/seo.service';
-import { CtaBandComponent, StoryCardComponent } from '../../shared/cards';
+import { StoryCardComponent } from '../../shared/cards';
 import { PageHeroComponent } from '../../shared/page-hero.component';
 
 const CRUMBS = [
@@ -12,7 +12,7 @@ const CRUMBS = [
 @Component({
   selector: 'app-insights-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [PageHeroComponent, StoryCardComponent, CtaBandComponent],
+  imports: [PageHeroComponent, StoryCardComponent],
   template: `
     <app-page-hero heading="دانش فنی و تازه‌ها" eyebrow="INSIGHTS & UPDATES" [crumbs]="crumbs"
       lead="راهنماهای انتخاب محصول، استانداردها و نکاتی که به تعریف دقیق‌تر نیاز پروژه کمک می‌کند." />
@@ -24,7 +24,6 @@ const CRUMBS = [
         </div>
       </div>
     </section>
-    <app-cta-band />
   `,
 })
 export class InsightsPage {

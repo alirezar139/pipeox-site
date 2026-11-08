@@ -1,7 +1,7 @@
 /* ═════════ Angular host elements ═════════
    Custom elements are inline by default; components that render blocks must be blocks. */
 app-icon { display: contents; }
-:is(app-root, app-site-layout, app-header, app-footer, app-quote-form, app-page-hero, app-cta-band, app-quote-modal,
+:is(app-root, app-site-layout, app-header, app-footer, app-quote-form, app-page-hero,
   app-home-page, app-products-page, app-product-detail-page, app-insights-page, app-article-page, app-projects-page,
   app-about-page, app-contact-page, app-not-found-page, app-login-page, app-register-page, app-forgot-page,
   app-reset-page, app-dashboard-page, adm-image-field, adm-rich-editor,

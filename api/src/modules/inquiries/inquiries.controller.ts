@@ -1,5 +1,5 @@
 import {
-  Body, Controller, Get, HttpCode, Logger, NotFoundException, Param, Patch, Post, Query, Req, Res, UploadedFile, UseGuards, UseInterceptors,
+  Body, Controller, Get, HttpCode, NotFoundException, Param, Patch, Post, Query, Req, Res, UploadedFile, UseGuards, UseInterceptors,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -21,8 +21,6 @@ const STATUS_FA: Record<string, string> = { new: 'جدید', contacted: 'تما�
 
 @Controller()
 export class InquiriesController {
-  private readonly log = new Logger(InquiriesController.name);
-
   constructor(
     @InjectModel(Inquiry.name) private readonly inquiries: Model<Inquiry>,
     private readonly storage: StorageService,

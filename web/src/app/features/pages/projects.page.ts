@@ -3,7 +3,6 @@ import { RouterLink } from '@angular/router';
 import { FaNumPipe } from '../../core/format';
 import type { Project } from '../../core/models';
 import { SeoService } from '../../core/seo.service';
-import { CtaBandComponent } from '../../shared/cards';
 import { RevealDirective } from '../../shared/motion.directives';
 import { PageHeroComponent } from '../../shared/page-hero.component';
 
@@ -21,7 +20,7 @@ const MARKETS = [
 @Component({
   selector: 'app-projects-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [PageHeroComponent, CtaBandComponent, RevealDirective, RouterLink, FaNumPipe],
+  imports: [PageHeroComponent, RevealDirective, RouterLink, FaNumPipe],
   template: `
     <app-page-hero heading="پروژه‌ها و صنایع" eyebrow="PROJECTS & MARKETS" [crumbs]="crumbs"
       lead="راهکارهای لوله و اتصالات با توجه به شرایط کاری هر صنعت انتخاب می‌شوند. بازارهای هدف و نمونه پروژه‌های ما را در این صفحه ببینید." />
@@ -75,7 +74,6 @@ const MARKETS = [
         </div>
       </div>
     </section>
-    <app-cta-band />
   `,
 })
 export class ProjectsPage {

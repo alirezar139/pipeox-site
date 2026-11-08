@@ -7,7 +7,7 @@ import { QuoteFormComponent } from '../../shared/quote/quote-form.component';
 
 const CRUMBS = [
   { label: 'خانه', url: '/' },
-  { label: 'تماس با ما', url: '/contact' },
+  { label: 'تماس و استعلام', url: '/contact' },
 ];
 
 @Component({

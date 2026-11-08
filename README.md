@@ -76,7 +76,7 @@ npm start            # → http://localhost:4000
       ├─ styles/         سیستم طراحی (CSS)
       └─ app/
          ├─ core/        سرویس API، سئو، تاریخ شمسی، وضعیت سایت و کاربر
-         ├─ shared/      آیکن‌ها، فرم استعلام و پاپ‌آپ، کارت‌ها، انیمیشن‌ها
+         ├─ shared/      آیکن‌ها، فرم استعلام، کارت‌ها، انیمیشن‌ها
          ├─ layout/      هدر، فوتر، لوگو
          └─ features/    home · products · insights · pages · account · admin
 ```

@@ -163,17 +163,9 @@ h3 {
   color: #fff;
   font-weight: 700;
 }
-.pill-ghost:hover,
-.pill-outline:hover {
+.pill-ghost:hover {
   border-color: var(--orange);
   color: var(--orange);
-}
-.pill-outline {
-  border: 1px solid rgba(247, 128, 28, 0.85);
-  color: #fff;
-  font-weight: 700;
-  height: calc(var(--u) * 38);
-  padding: 0 calc(var(--u) * 34);
 }
 .accent {
   color: var(--orange);

@@ -223,27 +223,29 @@
   color: var(--orange);
 }
 .product p {
-  margin: 0 4px 16px;
+  margin: 0 4px 4px;
   font-size: 14px;
   color: var(--muted);
   flex: 1;
 }
-.product .more {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin: 0 4px;
-  padding-top: 12px;
-  border-top: 1px solid var(--line);
-  font-size: 13px;
-  font-weight: 700;
+/* Whole card is one link: the title's link stretches over the card */
+.card-link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
 }
-.product .more span {
+.card-link:focus-visible {
+  outline: none;
+}
+.product:has(.card-link:focus-visible),
+.story:has(.card-link:focus-visible) {
+  outline: 2px solid var(--orange);
+  outline-offset: 3px;
+}
+.product:hover h3,
+.story:hover h3 {
   color: var(--orange);
-  transition: transform 0.3s var(--ease);
-}
-.product .more:hover span {
-  transform: translateX(-4px);
 }
 .no-results {
   color: var(--muted);
@@ -260,6 +262,7 @@
   gap: 18px;
 }
 .story {
+  position: relative;
   display: flex;
   flex-direction: column;
   background: linear-gradient(180deg, #17191c, #111214);
@@ -482,32 +485,6 @@
   font-size: 14px;
 }
 
-/* ---- CTA band ---- */
-.cta-band {
-  padding: 30px 0 80px;
-}
-.cta-card {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 24px;
-  padding: 36px 40px;
-  border-radius: 22px;
-  overflow: hidden;
-  background:
-    radial-gradient(600px 200px at 85% 0%, rgba(247, 134, 30, 0.25), transparent 70%),
-    linear-gradient(120deg, #1d1712, #121315 60%);
-  border: 1px solid rgba(247, 134, 30, 0.35);
-}
-.cta-card h2 {
-  font-size: clamp(20px, 2.4vw, 28px);
-}
-.cta-card p {
-  margin: 6px 0 0;
-  color: var(--ink-2);
-}
-
 /* ---- Chips & type cards ---- */
 .chips {
   display: flex;
@@ -585,11 +562,6 @@
   .product h3 {
     font-size: 16px;
   }
-  .cta-card {
-    flex-direction: column;
-    align-items: flex-start;
-    padding: 28px 24px;
-  }
   .spec {
     display: block;
   }
@@ -607,57 +579,6 @@
   }
 }
 
-/* ---- Price-inquiry popup ---- */
-.quote-modal {
-  width: min(460px, calc(100% - 32px));
-  max-height: calc(100dvh - 32px);
-  padding: 0;
-  margin: auto;
-  border: 0;
-  background: none;
-  color: inherit;
-  overflow: visible;
-}
-.quote-modal .quote {
-  max-height: calc(100dvh - 32px);
-  overflow-y: auto;
-  background: rgba(19, 21, 23, 0.97);
-}
-.quote-modal::backdrop {
-  background: rgba(4, 5, 6, 0.72);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-}
-.quote-modal[open] {
-  animation: modal-in 0.3s var(--ease);
-}
-@keyframes modal-in {
-  from { opacity: 0; transform: translateY(14px) scale(0.98); }
-}
-.modal-close {
-  position: absolute;
-  z-index: 2;
-  top: 14px;
-  left: 14px;
-  width: 34px;
-  height: 34px;
-  display: grid;
-  place-items: center;
-  border: 1px solid var(--line-2);
-  border-radius: 50%;
-  background: #1b1d20;
-  color: #ddd;
-  font-size: 14px;
-  cursor: pointer;
-  transition: color 0.2s, border-color 0.2s;
-}
-.modal-close:hover {
-  color: var(--orange);
-  border-color: var(--orange);
-}
-html:has(.quote-modal[open]) {
-  overflow: hidden;
-}
 /* LTR inputs (email, URL) keep their Persian placeholder right-aligned until typed in */
 .field input[dir="ltr"]:placeholder-shown {
   direction: rtl;

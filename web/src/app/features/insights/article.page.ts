@@ -6,7 +6,6 @@ import type { Article, ArticleSummary } from '../../core/models';
 import { SeoService } from '../../core/seo.service';
 import { PageHeroComponent } from '../../shared/page-hero.component';
 import { NotFoundPage } from '../pages/not-found.page';
-import { QuoteModal } from '../../shared/quote/quote-modal';
 
 @Component({
   selector: 'app-article-page',
@@ -31,7 +30,7 @@ import { QuoteModal } from '../../shared/quote/quote-modal';
           <div class="side-card">
             <b>استعلام با اطلاعات فنی کامل</b>
             <p>لیست متریال یا دیتاشیت پروژه را ارسال کنید تا کارشناسان ما بررسی کنند.</p>
-            <button type="button" class="btn" (click)="quote.show()">ثبت درخواست ←</button>
+            <a class="btn" routerLink="/contact">ثبت درخواست ←</a>
           </div>
           @if (more().length) {
             <div class="side-card">
@@ -52,7 +51,6 @@ import { QuoteModal } from '../../shared/quote/quote-modal';
 export class ArticlePage {
   readonly article = input.required<Article | null>();
   readonly recent = input<ArticleSummary[]>([]);
-  protected readonly quote = inject(QuoteModal);
   private readonly sanitizer = inject(DomSanitizer);
 
   /** The body is sanitized by the API on save (allow-list); trusted here so links keep target/rel. */

@@ -1,7 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { SeoService } from '../../core/seo.service';
 import { SiteStore } from '../../core/site.store';
-import { CtaBandComponent } from '../../shared/cards';
 import { IconComponent } from '../../shared/icon.component';
 import { GlowDirective, RevealDirective } from '../../shared/motion.directives';
 import { PageHeroComponent } from '../../shared/page-hero.component';
@@ -14,7 +13,7 @@ const CRUMBS = [
 @Component({
   selector: 'app-about-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [PageHeroComponent, CtaBandComponent, IconComponent, RevealDirective, GlowDirective],
+  imports: [PageHeroComponent, IconComponent, RevealDirective, GlowDirective],
   template: `
     <app-page-hero heading="درباره پایپ‌اکس" eyebrow="WHY PIPEOX" [crumbs]="crumbs"
       lead="در پروژه‌های صنعتی، انتخاب نادرست متریال یا مغایرت مشخصات می‌تواند هزینه و زمان اجرا را افزایش دهد. رویکرد پایپ‌اکس بر دریافت نیاز فنی، بررسی مشخصات و پیگیری تأمین متناسب با کاربرد پروژه متمرکز است." />
@@ -62,7 +61,6 @@ const CRUMBS = [
         </div>
       </div>
     </section>
-    <app-cta-band />
   `,
 })
 export class AboutPage {

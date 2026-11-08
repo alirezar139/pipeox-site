@@ -6,13 +6,12 @@ import { SeoService } from '../../core/seo.service';
 import { SiteStore } from '../../core/site.store';
 import { IconComponent } from '../../shared/icon.component';
 import { CountUpDirective, GlowDirective, RevealDirective } from '../../shared/motion.directives';
-import { QuoteFormComponent } from '../../shared/quote/quote-form.component';
 
 /** Homepage — 1:1 with design/mockup-home.png (1536px reference). Artwork is cut from the mockup. */
 @Component({
   selector: 'app-home-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, IconComponent, QuoteFormComponent, RevealDirective, CountUpDirective, GlowDirective, FaDatePipe],
+  imports: [RouterLink, IconComponent, RevealDirective, CountUpDirective, GlowDirective, FaDatePipe],
   template: `
     <section class="hero">
       <div class="hero-photo" aria-hidden="true">
@@ -20,15 +19,10 @@ import { QuoteFormComponent } from '../../shared/quote/quote-form.component';
       </div>
       <div class="hero-stripes" aria-hidden="true"><i></i><i></i><i></i></div>
       <div class="wrap-header hero-grid">
-        <app-quote-form [compact]="true" [anchor]="true" />
         <div class="hero-copy">
           <p class="kicker">{{ s().hero.kicker }}</p>
           <h1>{{ s().hero.title }}<br><span class="accent">{{ s().hero.titleAccent }}</span></h1>
           <p class="hero-text">{{ s().hero.text }}</p>
-          <div class="actions">
-            <a class="pill pill-orange" routerLink="/products"><app-icon name="arrow" /><span>مشاهده محصولات</span></a>
-            <a class="pill pill-ghost" routerLink="/about"><app-icon name="play" /><span>درباره ما</span></a>
-          </div>
         </div>
       </div>
     </section>
@@ -47,6 +41,12 @@ import { QuoteFormComponent } from '../../shared/quote/quote-form.component';
         <div class="orbit-art">
           <img src="/assets/img/home/orbit-art.jpg" alt="" width="1720" height="596" loading="lazy">
           <div class="orbit-glint" aria-hidden="true"></div>
+          <div class="orbit-core" aria-hidden="true">
+            <div class="orbit-spin">
+              <div class="orbit-face"><svg viewBox="0 0 46 39"><path fill="currentColor" fill-rule="evenodd" d="M6 1H33a12 12 0 0 1 0 24H18.4L14 36.4a3 3 0 0 1-2.8 2H3.4a2 2 0 0 1-1.9-2.7L4 3a2.6 2.6 0 0 1 2-2ZM3.42 10.6H31a2.2 2.2 0 0 1 0 4.4H3.08Z" /></svg><b>PIPEOX</b></div>
+              <div class="orbit-face orbit-back"><svg viewBox="0 0 46 39"><path fill="currentColor" fill-rule="evenodd" d="M6 1H33a12 12 0 0 1 0 24H18.4L14 36.4a3 3 0 0 1-2.8 2H3.4a2 2 0 0 1-1.9-2.7L4 3a2.6 2.6 0 0 1 2-2ZM3.42 10.6H31a2.2 2.2 0 0 1 0 4.4H3.08Z" /></svg><b>PIPEOX</b></div>
+            </div>
+          </div>
           @for (p of orbit(); track p._id) {
             <a class="orbit-label" [class]="'label-' + p.orbit" [routerLink]="['/products', p.slug]">
               <b>{{ p.shortTitle || p.title }}</b>
@@ -58,7 +58,6 @@ import { QuoteFormComponent } from '../../shared/quote/quote-form.component';
         <div class="band-intro" appReveal>
           <h2>{{ s().showcase.title }}</h2>
           <p>{{ s().showcase.text }}</p>
-          <a class="pill pill-outline" routerLink="/products"><app-icon name="doc" /><span>مشاهده کاتالوگ کامل</span></a>
         </div>
       </div>
     </section>
