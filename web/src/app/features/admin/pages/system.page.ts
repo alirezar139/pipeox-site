@@ -18,6 +18,7 @@ import { AdminApi, type SystemInfo } from '../admin-api.service';
         <section class="adm-card">
           <h2>برنامه</h2>
           <dl class="adm-dl" dir="ltr">
+            <dt>نسخه نرم‌افزار</dt><dd dir="ltr">PIPEOX {{ i.app.version }}</dd>
             <dt>Node.js</dt><dd>{{ i.app.node }}</dd>
             <dt>NODE_ENV</dt><dd>{{ i.app.env }}</dd>
             <dt>Uptime</dt><dd>{{ uptime(i.app.uptimeSec) }}</dd>

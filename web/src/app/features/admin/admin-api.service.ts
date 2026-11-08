@@ -39,7 +39,7 @@ export interface AdminUser {
 }
 
 export interface SystemInfo {
-  app: { node: string; env: string; uptimeSec: number; memoryMb: number; pid: number };
+  app: { version: string; node: string; env: string; uptimeSec: number; memoryMb: number; pid: number };
   host: { platform: string; cpus: number; loadAvg: number[]; freeMemMb: number; totalMemMb: number };
   database: { name: string; version: string; collections: { name: string; count: number }[] };
   config: { siteUrl: string; dataDir: string; trustProxy: string; idleMinutes: number; email: boolean; bale: boolean; telegram: boolean };

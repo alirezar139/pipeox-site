@@ -1,6 +1,7 @@
 import { BadRequestException, Body, Controller, Delete, Get, HttpCode, NotFoundException, Param, Patch, Post, UseGuards } from '@nestjs/common';
 import { InjectConnection, InjectModel } from '@nestjs/mongoose';
 import { trusted, type Connection, type Model } from 'mongoose';
+import { readFileSync } from 'node:fs';
 import os from 'node:os';
 import { z } from 'zod';
 import { hashPassword } from '../../common/security/password.js';
@@ -9,6 +10,9 @@ import { Admin, ADMIN_ROLES, type AdminDocument, toAdmin } from '../users/admin.
 import { adminPassword } from './admin-auth.controller.js';
 import { AdminGuard, CurrentAdmin, DeveloperGuard } from './guards.js';
 import { IDLE_MINUTES } from './session.service.js';
+
+/** Software version (kept the same in the root, api and web package.json). */
+const VERSION = (JSON.parse(readFileSync(new URL('../../../package.json', import.meta.url), 'utf8')) as { version: string }).version;
 
 const username = z
   .string()
@@ -90,7 +94,7 @@ export class AdminSystemController {
     const env = process.env;
     const mem = process.memoryUsage();
     return {
-      app: { node: process.version, env: env.NODE_ENV, uptimeSec: Math.round(process.uptime()), memoryMb: Math.round(mem.rss / 1048576), pid: process.pid },
+      app: { version: VERSION, node: process.version, env: env.NODE_ENV, uptimeSec: Math.round(process.uptime()), memoryMb: Math.round(mem.rss / 1048576), pid: process.pid },
       host: { platform: `${os.type()} ${os.release()}`, cpus: os.cpus().length, loadAvg: os.loadavg().map((x) => Math.round(x * 100) / 100), freeMemMb: Math.round(os.freemem() / 1048576), totalMemMb: Math.round(os.totalmem() / 1048576) },
       database: { name: db.databaseName, version: (build as { version: string }).version, collections: counts.sort((a, b) => a.name.localeCompare(b.name)) },
       config: {
