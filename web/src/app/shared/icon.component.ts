@@ -4,7 +4,7 @@ export type IconName =
   | 'search' | 'arrow' | 'arrow-right' | 'chevron' | 'play' | 'play-solid' | 'send' | 'user' | 'phone' | 'doc' | 'clip'
   | 'list' | 'trophy' | 'check-circle' | 'users' | 'users-solid' | 'headset' | 'gear' | 'shield' | 'calendar' | 'mail'
   | 'menu' | 'close' | 'logout' | 'edit' | 'trash' | 'plus' | 'eye' | 'download' | 'image' | 'home' | 'box' | 'news'
-  | 'folder' | 'settings' | 'inbox' | 'lock';
+  | 'folder' | 'settings' | 'inbox' | 'lock' | 'eye-off' | 'refresh' | 'code';
 
 /** Line icons, 24×24, stroke = currentColor. Decorative unless given a label by the parent. */
 @Component({
@@ -54,6 +54,9 @@ export type IconName =
         @case ('settings') { <path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/> }
         @case ('inbox') { <path d="M3 13l3-8h12l3 8v6H3z"/><path d="M3 13h5l1 3h6l1-3h5"/> }
         @case ('lock') { <rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/> }
+        @case ('eye-off') { <path d="M3 3l18 18"/><path d="M10.6 5.1A9.7 9.7 0 0 1 12 5c6.5 0 10 7 10 7a17 17 0 0 1-3.2 4.1M6.6 6.6C3.9 8.4 2 12 2 12s3.5 7 10 7a9.6 9.6 0 0 0 5.4-1.6"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/> }
+        @case ('refresh') { <path d="M20 11a8 8 0 0 0-14.6-4.5L4 8"/><path d="M4 3v5h5"/><path d="M4 13a8 8 0 0 0 14.6 4.5L20 16"/><path d="M20 21v-5h-5"/> }
+        @case ('code') { <path d="m8 7-5 5 5 5M16 7l5 5-5 5M14 4l-4 16"/> }
       }
     </svg>
   `,

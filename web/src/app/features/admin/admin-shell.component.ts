@@ -1,11 +1,12 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { afterNextRender, ChangeDetectionStrategy, Component, computed, DestroyRef, inject, signal } from '@angular/core';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { watchIdle } from '../../core/idle-watch';
 import { SeoService } from '../../core/seo.service';
 import { IconComponent, type IconName } from '../../shared/icon.component';
-import { AdminApi } from './admin-api.service';
+import { AdminApi, ROLE_LABELS } from './admin-api.service';
 import { ToastService } from './ui/toast.service';
 
-const SECTIONS: { path: string; label: string; icon: IconName; exact?: boolean }[] = [
+const SECTIONS: { path: string; label: string; icon: IconName; exact?: boolean; developer?: boolean }[] = [
   { path: '/admin', label: 'داشبورد', icon: 'home', exact: true },
   { path: '/admin/inquiries', label: 'استعلام‌ها', icon: 'inbox' },
   { path: '/admin/products', label: 'محصولات', icon: 'box' },
@@ -14,6 +15,8 @@ const SECTIONS: { path: string; label: string; icon: IconName; exact?: boolean }
   { path: '/admin/customers', label: 'مشتریان', icon: 'users' },
   { path: '/admin/subscribers', label: 'خبرنامه', icon: 'mail' },
   { path: '/admin/settings', label: 'تنظیمات سایت', icon: 'settings' },
+  { path: '/admin/users', label: 'کاربران پنل', icon: 'lock' },
+  { path: '/admin/system', label: 'سیستم', icon: 'code', developer: true },
 ];
 
 @Component({
@@ -28,13 +31,19 @@ const SECTIONS: { path: string; label: string; icon: IconName; exact?: boolean }
         <span><b>PIPEOX</b><small>پنل مدیریت</small></span>
       </a>
       <nav class="adm-nav">
-        @for (s of sections; track s.path) {
+        @for (s of sections(); track s.path) {
           <a [routerLink]="s.path" routerLinkActive="on" [routerLinkActiveOptions]="{ exact: !!s.exact }">
             <app-icon [name]="s.icon" /><span>{{ s.label }}</span>
             @if (s.path === '/admin/inquiries' && api.newCount()) { <em>{{ api.newCount() }}</em> }
           </a>
         }
       </nav>
+      @if (api.current(); as me) {
+        <div class="adm-me">
+          <span class="adm-me-avatar" aria-hidden="true">{{ me.name.charAt(0) }}</span>
+          <span><b>{{ me.name }}</b><small>{{ roleLabels[me.role] }} · <span dir="ltr">{{ me.username }}</span></small></span>
+        </div>
+      }
       <div class="adm-side-foot">
         <a href="/" target="_blank" rel="noopener"><app-icon name="eye" /><span>مشاهده سایت</span></a>
         <button type="button" (click)="logout()"><app-icon name="logout" /><span>خروج</span></button>
@@ -53,8 +62,9 @@ const SECTIONS: { path: string; label: string; icon: IconName; exact?: boolean }
   `,
 })
 export class AdminShellComponent {
-  protected readonly sections = SECTIONS;
   protected readonly api = inject(AdminApi);
+  protected readonly roleLabels = ROLE_LABELS;
+  protected readonly sections = computed(() => SECTIONS.filter((s) => !s.developer || this.api.current()?.role === 'developer'));
   protected readonly toasts = inject(ToastService);
   private readonly router = inject(Router);
   protected readonly menu = signal(false);
@@ -63,10 +73,23 @@ export class AdminShellComponent {
     inject(SeoService).set({ title: 'پنل مدیریت', path: '/admin', noindex: true });
     void this.api.dashboard().catch(() => {});
     this.router.events.subscribe((e) => e instanceof NavigationEnd && this.menu.set(false));
+    // 30 minutes without activity → sign out (the server enforces the same limit)
+    const destroy = inject(DestroyRef);
+    afterNextRender(() => {
+      const stop = watchIdle('admin', {
+        ping: () => this.api.me(),
+        timeout: () => void this.signOut('idle'),
+      });
+      destroy.onDestroy(stop);
+    });
   }
 
-  async logout() {
+  private async signOut(reason?: 'idle') {
     await this.api.logout().catch(() => {});
-    await this.router.navigateByUrl('/admin/login');
+    await this.router.navigate(['/admin/login'], { queryParams: reason ? { reason } : {} });
+  }
+
+  logout() {
+    return this.signOut();
   }
 }

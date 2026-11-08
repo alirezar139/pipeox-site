@@ -64,7 +64,7 @@ sudo chown -R pipeox:pipeox /var/www/pipeox /var/www/pipeox-data
 ──────────────────────────────────────────
 cd /var/www/pipeox
 sudo -u pipeox npm install          # وابستگی‌های ریشه، api و web را نصب می‌کند
-sudo -u pipeox npm run setup        # می‌پرسد: رمز پنل مدیریت (۱۰+ کاراکتر) و آدرس MongoDB
+sudo -u pipeox npm run setup        # می‌پرسد: رمز اولین کاربر پنل با نام کاربری admin (۱۰+ کاراکتر) و آدرس MongoDB
                                     # و فایل .env را با کلید امنیتی تصادفی می‌سازد
 
 حالا فایل .env را باز کنید و این‌ها را تنظیم کنید:
@@ -180,9 +180,10 @@ sudo ufw enable
 ۹) بعد از راه‌اندازی
 ──────────────────────────────────────────
 - سایت:          https://pipeox.ir
-- پنل مدیریت:    https://pipeox.ir/admin   (فقط رمز می‌خواهد؛ همان رمز مرحله ۴)
+- پنل مدیریت:    https://pipeox.ir/admin   (نام کاربری: admin و رمز مرحله ۴، به‌همراه کد امنیتی)
+- کاربران دیگر (مدیر یا برنامه‌نویس) را از پنل ← «کاربران پنل» بسازید.
 - در پنل → تنظیمات: تلفن، ایمیل، آدرس و واتساپ را پر کنید تا در صفحه تماس و فوتر نمایش داده شوند.
-- تغییر رمز پنل:  cd /var/www/pipeox && sudo -u pipeox npm run admin:password && sudo systemctl restart pipeox
+- رمز فراموش‌شده یا ساخت کاربر از خط فرمان:  cd /var/www/pipeox && sudo -u pipeox npm run admin:user
 
 
 ──────────────────────────────────────────

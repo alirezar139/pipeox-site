@@ -13,6 +13,7 @@ import { safeDisplayName, type UploadedFileData } from '../../common/utils/files
 import { objectId } from '../../common/utils/text.js';
 import { AdminGuard, CurrentUser, CustomerGuard, OptionalCustomerGuard } from '../auth/guards.js';
 import { StorageService } from '../media/storage.service.js';
+import { CaptchaService } from '../captcha/captcha.module.js';
 import { NotificationsService } from '../notifications/notifications.service.js';
 import type { UserDocument } from '../users/user.schema.js';
 import { Inquiry, inquiryInput, type InquiryInput, type InquiryStatus, inquiryUpdate, STATUSES } from './inquiry.schema.js';
@@ -25,6 +26,7 @@ export class InquiriesController {
     @InjectModel(Inquiry.name) private readonly inquiries: Model<Inquiry>,
     private readonly storage: StorageService,
     private readonly notify: NotificationsService,
+    private readonly captcha: CaptchaService,
   ) {}
 
   /* ───────── Public: submit ───────── */
@@ -41,6 +43,7 @@ export class InquiriesController {
     @UploadedFile() file?: UploadedFileData,
   ) {
     if (body.website) return { ok: true }; // honeypot: pretend success to bots
+    this.captcha.verify(req.body);
     const attachment = file ? { ...(await this.storage.saveAttachment(file)), name: safeDisplayName(file.originalname), size: file.size } : null;
 
     const doc = await this.inquiries.create({

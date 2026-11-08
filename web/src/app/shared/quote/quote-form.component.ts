@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal, untracked } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal, untracked, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { AuthStore } from '../../core/auth.store';
@@ -6,6 +6,7 @@ import { toAsciiDigits } from '../../core/format';
 import { ApiService } from '../../core/http/api.service';
 import type { ApiError, Product } from '../../core/models';
 import { SiteStore } from '../../core/site.store';
+import { CaptchaComponent } from '../captcha.component';
 import { IconComponent } from '../icon.component';
 
 const MAX_MB = 8;
@@ -18,7 +19,7 @@ const ACCEPT = '.pdf,.xlsx,.xls,.docx,.doc,.csv,.jpg,.jpeg,.png';
 @Component({
   selector: 'app-quote-form',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, IconComponent, RouterLink],
+  imports: [FormsModule, IconComponent, RouterLink, CaptchaComponent],
   host: { class: 'quote glass', '[attr.id]': 'anchor() ? "contact" : null' },
   template: `
     <h2>{{ title() }}</h2>
@@ -60,6 +61,7 @@ const ACCEPT = '.pdf,.xlsx,.xls,.docx,.doc,.csv,.jpg,.jpeg,.png';
           <span class="file-label">{{ file()?.name ?? 'پیوست لیست متریال یا دیتاشیت (اختیاری)' }}</span>
         </label>
         <div class="hp" aria-hidden="true"><label>Website <input name="website" [(ngModel)]="website" tabindex="-1" autocomplete="off"></label></div>
+        <app-captcha [invalid]="error()?.field === 'captcha'" />
         <button class="btn btn-block" type="submit" [disabled]="busy()">
           <app-icon name="send" /><span>{{ busy() ? 'در حال ارسال...' : 'ارسال درخواست' }}</span>
         </button>
@@ -92,6 +94,7 @@ export class QuoteFormComponent {
   protected readonly busy = signal(false);
   protected readonly sent = signal(false);
   protected readonly error = signal<ApiError | null>(null);
+  private readonly captcha = viewChild(CaptchaComponent);
 
   constructor() {
     effect(() => this.category.set(this.selectedProduct()));
@@ -122,6 +125,11 @@ export class QuoteFormComponent {
     data.set('details', this.details());
     data.set('page', location.pathname);
     data.set('website', this.website());
+    const cap = this.captcha()?.fields();
+    if (cap) {
+      data.set('captchaId', cap.captchaId);
+      data.set('captcha', cap.captcha);
+    }
     const f = this.file();
     if (f) data.set('attachment', f);
 
@@ -132,6 +140,7 @@ export class QuoteFormComponent {
       this.sent.set(true);
     } catch (e) {
       const err = e as ApiError;
+      void this.captcha()?.reload(); // each captcha is single-use
       const tel = this.site.settings().contact.phone;
       this.error.set({ ...err, message: err.message + (tel && err.statusCode >= 500 ? ` در صورت فوریت با ${tel} تماس بگیرید.` : '') });
     } finally {

@@ -7,13 +7,17 @@ import { z } from 'zod';
 import { sendCsv } from '../../common/utils/csv.js';
 import { email, objectId } from '../../common/utils/text.js';
 import { AdminGuard } from '../auth/guards.js';
+import { CaptchaService } from '../captcha/captcha.module.js';
 import { Subscriber } from './subscriber.schema.js';
 
 const subscribeSchema = z.object({ email, website: z.string().max(200).optional() });
 
 @Controller()
 export class SubscribersController {
-  constructor(@InjectModel(Subscriber.name) private readonly subscribers: Model<Subscriber>) {}
+  constructor(
+    @InjectModel(Subscriber.name) private readonly subscribers: Model<Subscriber>,
+    private readonly captcha: CaptchaService,
+  ) {}
 
   /** Re-subscribing an existing address also answers ok (no address enumeration). */
   @Throttle({ default: { limit: 5, ttl: 3_600_000 } })
@@ -21,6 +25,7 @@ export class SubscribersController {
   @Post('subscribers')
   async subscribe(@Body({ schema: subscribeSchema }) body: z.infer<typeof subscribeSchema>, @Req() req: Request) {
     if (!body.website) {
+      this.captcha.verify(req.body);
       await this.subscribers.updateOne({ email: body.email }, { $setOnInsert: { email: body.email, ip: req.ip ?? '' } }, { upsert: true });
     }
     return { ok: true };

@@ -1,82 +1,76 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { createHash } from 'node:crypto';
 import type { CookieOptions, Request, Response } from 'express';
 import type { Env } from '../../config/env.js';
 
 export const CUSTOMER_COOKIE = 'pipeox_session';
 export const ADMIN_COOKIE = 'pipeox_admin';
 
-interface CustomerClaims {
+/** Sessions end after this much inactivity (customers and admins alike). */
+export const IDLE_MINUTES = 30;
+const IDLE_MS = IDLE_MINUTES * 60_000;
+/** A session is re-issued (its idle clock restarted) at most this often. */
+const TOUCH_AFTER_MS = 60_000;
+
+interface Claims {
   sub: string;
+  /** Token version of the account: bumping it ends every session of that account. */
   v: number;
-  role: 'customer';
-}
-interface AdminClaims {
-  role: 'admin';
-  /** Fingerprint of the configured admin hash: changing the password logs every admin out. */
-  fp: string;
+  role: 'customer' | 'admin';
+  iat?: number;
 }
 
-/** Signed, httpOnly session cookies for customers and the admin. */
+/**
+ * Signed, httpOnly session cookies with a sliding idle timeout: every authenticated
+ * request restarts the 30-minute clock; 30 minutes without one and the session is gone.
+ */
 @Injectable()
 export class SessionService {
   private readonly secure: boolean;
-  private readonly adminFp: string;
 
   constructor(
     private readonly jwt: JwtService,
     config: ConfigService<Env, true>,
   ) {
     this.secure = config.get('NODE_ENV', { infer: true }) === 'production';
-    this.adminFp = createHash('sha256').update(config.get('ADMIN_PASSWORD_HASH', { infer: true })).digest('hex').slice(0, 16);
   }
 
-  private opts(maxAgeMs: number, sameSite: 'lax' | 'strict'): CookieOptions {
-    return { httpOnly: true, secure: this.secure, sameSite, path: '/', maxAge: maxAgeMs };
+  private async issue(res: Response, cookie: string, claims: Claims, sameSite: 'lax' | 'strict') {
+    const token = await this.jwt.signAsync({ sub: claims.sub, v: claims.v, role: claims.role }, { expiresIn: `${IDLE_MINUTES}m` });
+    const opts: CookieOptions = { httpOnly: true, secure: this.secure, sameSite, path: '/', maxAge: IDLE_MS };
+    res.cookie(cookie, token, opts);
   }
 
-  /* ───────── Customer ───────── */
-
-  async startCustomer(res: Response, userId: string, tokenVersion: number): Promise<void> {
-    const token = await this.jwt.signAsync({ sub: userId, v: tokenVersion, role: 'customer' } satisfies CustomerClaims, { expiresIn: '30d' });
-    res.cookie(CUSTOMER_COOKIE, token, this.opts(30 * 24 * 3600 * 1000, 'lax'));
-  }
-
-  async readCustomer(req: Request): Promise<CustomerClaims | null> {
-    const token = req.cookies?.[CUSTOMER_COOKIE];
+  private async read(req: Request, cookie: string, role: Claims['role']): Promise<Claims | null> {
+    const token = req.cookies?.[cookie];
     if (typeof token !== 'string') return null;
     try {
-      const claims = await this.jwt.verifyAsync<CustomerClaims>(token);
-      return claims.role === 'customer' ? claims : null;
+      const claims = await this.jwt.verifyAsync<Claims>(token);
+      return claims.role === role && /^[a-f0-9]{24}$/.test(claims.sub) ? claims : null;
     } catch {
       return null;
     }
   }
 
+  private async touch(res: Response | undefined, cookie: string, claims: Claims, sameSite: 'lax' | 'strict') {
+    if (res && !res.headersSent && Date.now() - (claims.iat ?? 0) * 1000 > TOUCH_AFTER_MS) await this.issue(res, cookie, claims, sameSite);
+  }
+
+  /* ───────── Customer ───────── */
+
+  startCustomer = (res: Response, userId: string, v: number) => this.issue(res, CUSTOMER_COOKIE, { sub: userId, v, role: 'customer' }, 'lax');
+  readCustomer = (req: Request) => this.read(req, CUSTOMER_COOKIE, 'customer');
+  touchCustomer = (res: Response | undefined, claims: Claims) => this.touch(res, CUSTOMER_COOKIE, claims, 'lax');
   endCustomer(res: Response): void {
     res.clearCookie(CUSTOMER_COOKIE, { path: '/' });
   }
 
   /* ───────── Admin ───────── */
 
-  async startAdmin(res: Response): Promise<void> {
-    const token = await this.jwt.signAsync({ role: 'admin', fp: this.adminFp } satisfies AdminClaims, { expiresIn: '12h' });
-    res.cookie(ADMIN_COOKIE, token, this.opts(12 * 3600 * 1000, 'strict'));
-  }
-
-  async isAdmin(req: Request): Promise<boolean> {
-    const token = req.cookies?.[ADMIN_COOKIE];
-    if (typeof token !== 'string') return false;
-    try {
-      const claims = await this.jwt.verifyAsync<AdminClaims>(token);
-      return claims.role === 'admin' && claims.fp === this.adminFp;
-    } catch {
-      return false;
-    }
-  }
-
+  startAdmin = (res: Response, adminId: string, v: number) => this.issue(res, ADMIN_COOKIE, { sub: adminId, v, role: 'admin' }, 'strict');
+  readAdmin = (req: Request) => this.read(req, ADMIN_COOKIE, 'admin');
+  touchAdmin = (res: Response | undefined, claims: Claims) => this.touch(res, ADMIN_COOKIE, claims, 'strict');
   endAdmin(res: Response): void {
     res.clearCookie(ADMIN_COOKIE, { path: '/' });
   }

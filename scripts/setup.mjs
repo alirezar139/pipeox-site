@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 /**
  * Creates or updates /.env:
- *   npm run setup             → first-time setup (secrets + admin password + database address)
- *   npm run admin:password    → change only the admin password
+ *   npm run setup             → first-time setup (secrets + first admin password + database address)
+ * The first panel user (username "admin") is created from ADMIN_PASSWORD_HASH on first start;
+ * after that, panel users live in the database — manage them in the panel or with npm run admin:user.
  * Nothing secret is printed; .env is git-ignored.
  */
 import { randomBytes, scrypt } from 'node:crypto';
@@ -13,7 +14,6 @@ import { promisify } from 'node:util';
 
 const ENV = fileURLToPath(new URL('../.env', import.meta.url));
 const EXAMPLE = fileURLToPath(new URL('../.env.example', import.meta.url));
-const onlyPassword = process.argv.includes('--admin-password');
 
 const N = 1 << 15, R = 8, P = 1;
 async function hash(pw) {
@@ -48,12 +48,12 @@ let env = existsSync(ENV) ? readFileSync(ENV, 'utf8') : readFileSync(EXAMPLE, 'u
 // PIPEOX_ADMIN_PASSWORD / PIPEOX_MONGODB_URI allow unattended installs (CI, provisioning scripts)
 let password = process.env.PIPEOX_ADMIN_PASSWORD ?? '';
 while (password.length < 10) {
-  password = await ask('Admin panel password (10+ characters): ', { hidden: true });
+  password = await ask('Password of the first panel user "admin" (10+ characters): ', { hidden: true });
   if (password.length < 10) console.log('  Too short — use at least 10 characters.');
 }
 env = setVar(env, 'ADMIN_PASSWORD_HASH', await hash(password));
 
-if (!onlyPassword) {
+{
   if (!/^JWT_SECRET=.{32,}$/m.test(env)) env = setVar(env, 'JWT_SECRET', randomBytes(48).toString('base64url'));
   const current = env.match(/^MONGODB_URI=(.*)$/m)?.[1] || 'mongodb://127.0.0.1:27017/pipeox';
   const uri = process.env.PIPEOX_ADMIN_PASSWORD ? (process.env.PIPEOX_MONGODB_URI ?? '') : await ask(`MongoDB address [${current}]: `);
@@ -61,4 +61,4 @@ if (!onlyPassword) {
 }
 
 writeFileSync(ENV, env, { mode: 0o600 });
-console.log(onlyPassword ? '✔ Admin password updated — restart the server to apply.' : '✔ .env is ready. Next: npm run dev  (or npm run build && npm start)');
+console.log('✔ .env is ready. Next: npm run dev  (or npm run build && npm start)');

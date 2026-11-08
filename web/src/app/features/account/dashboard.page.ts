@@ -8,6 +8,7 @@ import type { Account, ApiError, InquiryStatus } from '../../core/models';
 import { SeoService } from '../../core/seo.service';
 import { IconComponent } from '../../shared/icon.component';
 import { PageHeroComponent } from '../../shared/page-hero.component';
+import { PasswordToggleComponent } from '../../shared/password-toggle.component';
 
 interface MyInquiry {
   _id: string;
@@ -30,7 +31,7 @@ const CUSTOMER_STATUS: Record<InquiryStatus, string> = {
 @Component({
   selector: 'app-dashboard-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, RouterLink, IconComponent, PageHeroComponent, FaDatePipe],
+  imports: [FormsModule, RouterLink, IconComponent, PageHeroComponent, FaDatePipe, PasswordToggleComponent],
   template: `
     <app-page-hero heading="حساب من" eyebrow="CUSTOMER ACCOUNT" [crumbs]="[{ label: 'خانه', url: '/' }, { label: 'حساب من', url: '/account' }]" />
     <section class="section section-tight">
@@ -80,8 +81,8 @@ const CUSTOMER_STATUS: Record<InquiryStatus, string> = {
           <form class="side-card account-card" (ngSubmit)="changePassword()" novalidate>
             <b>تغییر رمز عبور</b>
             @if (passwordMsg(); as m) { <p class="notice" [class]="m.ok ? 'notice notice-ok' : 'notice notice-error'">{{ m.text }}</p> }
-            <label class="field"><app-icon name="lock" /><input type="password" name="current" [(ngModel)]="pw.current" placeholder="رمز فعلی" aria-label="رمز فعلی" autocomplete="current-password" required></label>
-            <label class="field"><app-icon name="lock" /><input type="password" name="password" [(ngModel)]="pw.password" placeholder="رمز جدید (حداقل ۸ کاراکتر)" aria-label="رمز جدید" autocomplete="new-password" minlength="8" required></label>
+            <label class="field"><app-icon name="lock" /><input #pwCur type="password" name="current" [(ngModel)]="pw.current" placeholder="رمز فعلی" aria-label="رمز فعلی" autocomplete="current-password" required><app-pw-toggle [for]="pwCur" /></label>
+            <label class="field"><app-icon name="lock" /><input #pwNew type="password" name="password" [(ngModel)]="pw.password" placeholder="رمز جدید (حداقل ۸ کاراکتر)" aria-label="رمز جدید" autocomplete="new-password" minlength="8" required><app-pw-toggle [for]="pwNew" /></label>
             <button class="btn btn-block btn-ghost" type="submit" [disabled]="busy()"><span>تغییر رمز</span></button>
             <small class="muted-note">با تغییر رمز، از دستگاه‌های دیگر خارج می‌شوید.</small>
           </form>

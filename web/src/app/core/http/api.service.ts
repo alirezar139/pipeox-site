@@ -35,7 +35,7 @@ export class ApiService {
 
   /* ───────── Forms ───────── */
   sendInquiry = (data: FormData) => this.post<{ ok: true }>('/api/inquiries', data);
-  subscribe = (email: string, website: string) => this.post<{ ok: true }>('/api/subscribers', { email, website });
+  subscribe = (email: string, website: string, captcha: object) => this.post<{ ok: true }>('/api/subscribers', { email, website, ...captcha });
 
   /* ───────── Customer account ───────── */
   me = () => this.get<{ user: Account | null }>('/api/auth/me');

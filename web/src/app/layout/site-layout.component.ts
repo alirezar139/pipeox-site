@@ -1,7 +1,8 @@
 import { DOCUMENT } from '@angular/common';
-import { afterNextRender, ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { afterNextRender, ChangeDetectionStrategy, Component, DestroyRef, effect, inject, untracked } from '@angular/core';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { AuthStore } from '../core/auth.store';
+import { watchIdle } from '../core/idle-watch';
 import { FooterComponent } from './footer.component';
 import { HeaderComponent } from './header.component';
 
@@ -27,5 +28,24 @@ export class SiteLayoutComponent {
     router.events.subscribe((e) => e instanceof NavigationEnd && mark(e.urlAfterRedirects));
     const auth = inject(AuthStore);
     afterNextRender(() => void auth.refresh());
+
+    // Signed-in customers: 30 minutes without activity → sign out (the server enforces the same limit)
+    let stop: (() => void) | null = null;
+    effect(() => {
+      const signedIn = !!auth.user();
+      untracked(() => {
+        stop?.();
+        stop = null;
+        if (!signedIn) return;
+        stop = watchIdle('customer', {
+          ping: () => auth.refresh(true),
+          timeout: async () => {
+            await auth.logout().catch(() => auth.set(null));
+            if (router.url.startsWith('/account')) await router.navigate(['/account/login'], { queryParams: { reason: 'idle' } });
+          },
+        });
+      });
+    });
+    inject(DestroyRef).onDestroy(() => stop?.());
   }
 }

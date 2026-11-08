@@ -25,6 +25,26 @@ export interface Customer {
   inquiries: number;
 }
 
+export type AdminRole = 'admin' | 'developer';
+export const ROLE_LABELS: Record<AdminRole, string> = { admin: 'مدیر', developer: 'برنامه‌نویس' };
+
+export interface AdminUser {
+  id: string;
+  username: string;
+  name: string;
+  role: AdminRole;
+  active: boolean;
+  lastLoginAt: string | null;
+  createdAt: string;
+}
+
+export interface SystemInfo {
+  app: { node: string; env: string; uptimeSec: number; memoryMb: number; pid: number };
+  host: { platform: string; cpus: number; loadAvg: number[]; freeMemMb: number; totalMemMb: number };
+  database: { name: string; version: string; collections: { name: string; count: number }[] };
+  config: { siteUrl: string; dataDir: string; trustProxy: string; idleMinutes: number; email: boolean; bale: boolean; telegram: boolean };
+}
+
 /** Internal sales workflow labels (admin side). */
 export const STATUS_LABELS: Record<InquiryStatus, string> = {
   new: 'جدید',
@@ -40,9 +60,31 @@ export class AdminApi {
   /** Count shown on the sidebar badge; refreshed by the dashboard and inbox. */
   readonly newCount = signal(0);
 
-  me = () => this.api.get<{ admin: boolean }>('/api/admin/me');
-  login = (password: string) => this.api.post<{ admin: true }>('/api/admin/login', { password });
-  logout = () => this.api.post('/api/admin/logout', {});
+  /** The signed-in panel user (set by the route guard and the login page). */
+  readonly current = signal<AdminUser | null>(null);
+
+  me = async () => {
+    const r = await this.api.get<{ admin: AdminUser | null }>('/api/admin/me');
+    this.current.set(r.admin);
+    return r.admin;
+  };
+  login = async (body: { username: string; password: string; captchaId?: string; captcha?: string }) => {
+    const r = await this.api.post<{ admin: AdminUser }>('/api/admin/login', body);
+    this.current.set(r.admin);
+    return r.admin;
+  };
+  logout = async () => {
+    await this.api.post('/api/admin/logout', {});
+    this.current.set(null);
+  };
+  changeMyPassword = (current: string, password: string) => this.api.post('/api/admin/password', { current, password });
+
+  users = () => this.api.get<AdminUser[]>('/api/admin/users');
+  createUser = (body: { username: string; name: string; role: AdminRole; password: string }) => this.api.post<AdminUser>('/api/admin/users', body);
+  updateUser = (id: string, body: Partial<Pick<AdminUser, 'name' | 'role' | 'active'>>) => this.api.patch<AdminUser>(`/api/admin/users/${id}`, body);
+  setUserPassword = (id: string, password: string) => this.api.post(`/api/admin/users/${id}/password`, { password });
+  deleteUser = (id: string) => this.api.delete(`/api/admin/users/${id}`);
+  system = () => this.api.get<SystemInfo>('/api/admin/system');
 
   dashboard = async () => {
     const d = await this.api.get<Dashboard>('/api/admin/dashboard');

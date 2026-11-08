@@ -8,6 +8,7 @@ import { loadEnvFile, validateEnv, type Env } from './config/env.js';
 import { DatabaseModule } from './database/database.module.js';
 import { ArticlesModule } from './modules/articles/articles.module.js';
 import { AuthModule } from './modules/auth/auth.module.js';
+import { CaptchaModule } from './modules/captcha/captcha.module.js';
 import { DashboardModule } from './modules/dashboard/dashboard.module.js';
 import { InquiriesModule } from './modules/inquiries/inquiries.module.js';
 import { MediaModule } from './modules/media/media.module.js';
@@ -36,6 +37,7 @@ loadEnvFile();
     // Generous global default; sensitive routes set tighter @Throttle limits
     ThrottlerModule.forRoot([{ name: 'default', ttl: 60_000, limit: 300 }]),
     NotificationsModule,
+    CaptchaModule,
     AuthModule,
     MediaModule,
     SettingsModule,

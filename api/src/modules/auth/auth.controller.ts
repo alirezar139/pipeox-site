@@ -11,8 +11,9 @@ import { email, password, phone, requiredText, text } from '../../common/utils/t
 import type { Env } from '../../config/env.js';
 import { NotificationsService } from '../notifications/notifications.service.js';
 import { PasswordReset, toAccount, User } from '../users/user.schema.js';
+import { CaptchaService } from '../captcha/captcha.module.js';
 import { CustomerResolver } from './guards.js';
-import { SessionService } from './session.service.js';
+import { IDLE_MINUTES, SessionService } from './session.service.js';
 
 const registerSchema = z.object({
   name: requiredText(100, 'لطفاً نام خود را وارد کنید.'),
@@ -38,18 +39,20 @@ export class AuthController {
     private readonly resolver: CustomerResolver,
     private readonly notify: NotificationsService,
     private readonly config: ConfigService<Env, true>,
+    private readonly captcha: CaptchaService,
   ) {}
 
   @Get('me')
-  async me(@Req() req: Request) {
-    const user = await this.resolver.resolve(req);
-    return { user: user ? toAccount(user) : null };
+  async me(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
+    const user = await this.resolver.resolve(req, res);
+    return { user: user ? toAccount(user) : null, idleMinutes: IDLE_MINUTES };
   }
 
   @Throttle({ default: { limit: 5, ttl: 3_600_000 } })
   @Post('register')
-  async register(@Body({ schema: registerSchema }) body: z.infer<typeof registerSchema>, @Res({ passthrough: true }) res: Response) {
+  async register(@Body({ schema: registerSchema }) body: z.infer<typeof registerSchema>, @Req() req: Request, @Res({ passthrough: true }) res: Response) {
     if (body.website) throw new BadRequestException('درخواست نامعتبر است.');
+    this.captcha.verify(req.body);
     if (await this.users.exists({ email: body.email })) {
       throw new BadRequestException({ message: 'با این ایمیل قبلاً حساب ساخته شده است. وارد شوید یا رمز را بازیابی کنید.', field: 'email' });
     }
@@ -67,7 +70,8 @@ export class AuthController {
   @Throttle({ default: { limit: 10, ttl: 900_000 } })
   @HttpCode(200)
   @Post('login')
-  async login(@Body({ schema: loginSchema }) body: z.infer<typeof loginSchema>, @Res({ passthrough: true }) res: Response) {
+  async login(@Body({ schema: loginSchema }) body: z.infer<typeof loginSchema>, @Req() req: Request, @Res({ passthrough: true }) res: Response) {
+    this.captcha.verify(req.body);
     const user = await this.users.findOne({ email: body.email.trim().toLowerCase() }).select('+passwordHash');
     if (!user) {
       await burnPasswordCheck(body.password); // same timing as a real account
@@ -95,6 +99,7 @@ export class AuthController {
   @HttpCode(200)
   @Post('forgot')
   async forgot(@Body({ schema: forgotSchema }) body: z.infer<typeof forgotSchema>, @Req() req: Request) {
+    this.captcha.verify(req.body);
     if (!this.notify.emailEnabled) {
       return { ok: true, emailEnabled: false };
     }

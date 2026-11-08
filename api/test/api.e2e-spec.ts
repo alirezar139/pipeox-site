@@ -56,12 +56,18 @@ afterAll(async () => {
 /** Agent that keeps cookies, like a browser. */
 const agent = () => request.agent(host);
 
+/** A solved captcha — the API includes the answer only when NODE_ENV=test. */
+async function cap() {
+  const r = await request(host).get('/api/captcha').expect(200);
+  return { captchaId: r.body.id as string, captcha: r.body.answer as string };
+}
+
 /** One admin session for the whole run — admin login is limited to 5 attempts per 15 minutes per IP. */
 let admin: ReturnType<typeof agent> | null = null;
 async function adminAgent() {
   if (!admin) {
     admin = agent();
-    await admin.post('/api/admin/login').set(H).send({ password: ADMIN_PW }).expect(200);
+    await admin.post('/api/admin/login').set(H).send({ username: 'admin', password: ADMIN_PW, ...(await cap()) }).expect(200);
   }
   return admin;
 }
@@ -91,13 +97,37 @@ describe('public content (seeded on first start)', () => {
   });
 });
 
+describe('panel users and roles', () => {
+  it('adds users, keeps the System page developer-only, and ends sessions on role change', async () => {
+    const a = await adminAgent();
+    await a.get('/api/admin/system').expect(403); // "admin" role
+    await a.post('/api/admin/users').set(H).send({ username: 'Dev.One', name: 'برنامه‌نویس', role: 'developer', password: 'short' }).expect(400);
+    const dev = (await a.post('/api/admin/users').set(H).send({ username: 'Dev.One', name: 'برنامه‌نویس', role: 'developer', password: 'developer-pass-1' }).expect(201)).body;
+    expect(dev).toMatchObject({ username: 'dev.one', role: 'developer', active: true });
+    await a.post('/api/admin/users').set(H).send({ username: 'dev.one', name: 'تکراری', role: 'admin', password: 'developer-pass-1' }).expect(400);
+
+    const d = agent();
+    await d.post('/api/admin/login').set(H).send({ username: 'dev.one', password: 'developer-pass-1', ...(await cap()) }).expect(200);
+    const sys = (await d.get('/api/admin/system').expect(200)).body;
+    expect(sys.database.name).toBeTruthy();
+    expect(JSON.stringify(sys)).not.toMatch(/JWT_SECRET|passwordHash|scrypt\$/);
+
+    await a.patch(`/api/admin/users/${dev.id}`).set(H).send({ role: 'admin' }).expect(200);
+    await d.get('/api/admin/dashboard').expect(401); // role change ended the developer's session
+
+    const me = (await a.get('/api/admin/me').expect(200)).body.admin;
+    await a.delete(`/api/admin/users/${me.id}`).set(H).expect(400); // cannot delete yourself
+    await a.delete(`/api/admin/users/${dev.id}`).set(H).expect(200);
+  });
+});
+
 describe('security', () => {
   it('rejects state-changing requests without the CSRF header', async () => {
-    await request(host).post('/api/admin/login').send({ password: ADMIN_PW }).expect(403);
+    await request(host).post('/api/admin/login').send({ username: 'admin', password: ADMIN_PW }).expect(403);
   });
 
   it('rejects cross-site Origin', async () => {
-    await request(host).post('/api/subscribers').set(H).set('Origin', 'https://evil.example').send({ email: 'a@b.co' }).expect(403);
+    await request(host).post('/api/subscribers').set(H).set('Origin', 'https://evil.example').send({ email: 'a@b.co', ...(await cap()) }).expect(403);
   });
 
   it('protects admin routes', async () => {
@@ -107,26 +137,47 @@ describe('security', () => {
   });
 
   it('rejects a wrong admin password and accepts the right one', async () => {
-    await agent().post('/api/admin/login').set(H).send({ password: 'wrong' }).expect(401);
+    await agent().post('/api/admin/login').set(H).send({ username: 'admin', password: 'wrong', ...(await cap()) }).expect(401);
     const a = await adminAgent();
     await a.get('/api/admin/dashboard').expect(200);
+    const me = (await a.get('/api/admin/me').expect(200)).body;
+    expect(me.admin).toMatchObject({ username: 'admin', role: 'admin' });
+    expect(me.admin.passwordHash).toBeUndefined();
+  });
+
+  it('requires a correct, single-use captcha on forms', async () => {
+    const missing = await agent().post('/api/auth/login').set(H).send({ email: 'x@y.co', password: 'whatever1' }).expect(400);
+    expect(missing.body.field).toBe('captcha');
+    const c = await cap();
+    await agent().post('/api/auth/login').set(H).send({ email: 'x@y.co', password: 'whatever1', ...c, captcha: 'wrong' }).expect(400);
+    await agent().post('/api/auth/login').set(H).send({ email: 'x@y.co', password: 'whatever1', ...c }).expect(400); // already used
+    const fresh = await cap();
+    await agent().post('/api/auth/login').set(H).send({ email: 'x@y.co', password: 'whatever1', ...fresh, captcha: fresh.captcha.toUpperCase() }).expect(401); // case-insensitive
+    const img = await request(host).get('/api/captcha').expect(200);
+    expect(img.body.svg).toMatch(/^<svg/);
+    expect(img.body.svg).not.toContain('<text'); // glyphs are paths, not readable text
+  });
+
+  it('ends sessions after 30 idle minutes (cookie lifetime)', async () => {
+    const r = await agent().post('/api/auth/register').set(H).send({ name: 'زمان', email: 'idle@example.com', phone: '09120000008', password: 'goodpass123', ...(await cap()) }).expect(201);
+    expect(String(r.headers['set-cookie'])).toMatch(/Max-Age=1800;/);
   });
 
   it('locks out admin password guessing', async () => {
     const statuses: number[] = [];
-    for (let i = 0; i < 4; i++) statuses.push((await agent().post('/api/admin/login').set(H).send({ password: 'guess' + i })).status);
+    for (let i = 0; i < 4; i++) statuses.push((await agent().post('/api/admin/login').set(H).send({ username: 'admin', password: 'guess' + i, ...(await cap()) })).status);
     expect(statuses).toContain(429);
   });
 
   it('is not fooled by NoSQL operator injection on login', async () => {
-    const r = await agent().post('/api/auth/login').set(H).send({ email: { $gt: '' }, password: { $gt: '' } });
+    const r = await agent().post('/api/auth/login').set(H).send({ email: { $gt: '' }, password: { $gt: '' }, ...(await cap()) });
     expect(r.status).toBe(400);
   });
 
   it('sets httpOnly session cookies', async () => {
-    const r = await agent().post('/api/auth/login').set(H).send({ email: 'nobody@example.com', password: 'whatever1' });
+    const r = await agent().post('/api/auth/login').set(H).send({ email: 'nobody@example.com', password: 'whatever1', ...(await cap()) });
     expect(r.status).toBe(401);
-    const reg = await agent().post('/api/auth/register').set(H).send({ name: 'کوکی', email: 'cookie@example.com', phone: '09120000009', password: 'goodpass123' });
+    const reg = await agent().post('/api/auth/register').set(H).send({ name: 'کوکی', email: 'cookie@example.com', phone: '09120000009', password: 'goodpass123', ...(await cap()) });
     expect(String(reg.headers['set-cookie'])).toMatch(/pipeox_session=.*HttpOnly.*SameSite=Lax/i);
   });
 });
@@ -192,13 +243,14 @@ describe('customer accounts and inquiries', () => {
 
   it('registers, links inquiries to the account, and shows status without internal notes', async () => {
     const c = agent();
-    await c.post('/api/auth/register').set(H).send({ ...customer, password: 'short' }).expect(400);
-    const reg = await c.post('/api/auth/register').set(H).send(customer).expect(201);
+    await c.post('/api/auth/register').set(H).send({ ...customer, password: 'short', ...(await cap()) }).expect(400);
+    const reg = await c.post('/api/auth/register').set(H).send({ ...customer, ...(await cap()) }).expect(201);
     expect(reg.body.user.email).toBe('buyer@example.com');
     expect(reg.body.user.phone).toBe('09121234567');
-    await agent().post('/api/auth/register').set(H).send(customer).expect(400); // duplicate (case-insensitive)
+    await agent().post('/api/auth/register').set(H).send({ ...customer, ...(await cap()) }).expect(400); // duplicate (case-insensitive)
 
-    await c.post('/api/inquiries').set(H).field('name', customer.name).field('phone', '09121234567').field('details', '۱۰۰ متر لوله').expect(200);
+    const k = await cap();
+    await c.post('/api/inquiries').set(H).field('captchaId', k.captchaId).field('captcha', k.captcha).field('name', customer.name).field('phone', '09121234567').field('details', '۱۰۰ متر لوله').expect(200);
     const mine = (await c.get('/api/account/inquiries').expect(200)).body;
     expect(mine).toHaveLength(1);
 
@@ -215,10 +267,10 @@ describe('customer accounts and inquiries', () => {
 
   it('logs in, rejects wrong passwords, and revokes sessions on password change', async () => {
     const c = agent();
-    await c.post('/api/auth/login').set(H).send({ email: customer.email, password: 'wrong-pass' }).expect(401);
-    await c.post('/api/auth/login').set(H).send({ email: customer.email, password: customer.password }).expect(200);
+    await c.post('/api/auth/login').set(H).send({ email: customer.email, password: 'wrong-pass', ...(await cap()) }).expect(401);
+    await c.post('/api/auth/login').set(H).send({ email: customer.email, password: customer.password, ...(await cap()) }).expect(200);
     const other = agent();
-    await other.post('/api/auth/login').set(H).send({ email: customer.email, password: customer.password }).expect(200);
+    await other.post('/api/auth/login').set(H).send({ email: customer.email, password: customer.password, ...(await cap()) }).expect(200);
 
     await c.post('/api/account/password').set(H).send({ current: customer.password, password: 'newpass456' }).expect(200);
     await c.get('/api/account/inquiries').expect(200); // this device stays signed in
@@ -226,7 +278,8 @@ describe('customer accounts and inquiries', () => {
   });
 
   it('rejects disguised attachments and honours the honeypot', async () => {
-    await request(host).post('/api/inquiries').set(H).field('name', 'آزمون').field('phone', '09120000000')
+    const k = await cap();
+    await request(host).post('/api/inquiries').set(H).field('captchaId', k.captchaId).field('captcha', k.captcha).field('name', 'آزمون').field('phone', '09120000000')
       .attach('attachment', Buffer.from('MZ fake exe'), 'list.pdf').expect(415);
     await request(host).post('/api/inquiries').set(H).field('name', 'ربات').field('phone', '09120000000').field('website', 'spam').expect(200);
     const a = await adminAgent();

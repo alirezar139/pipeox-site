@@ -3,12 +3,14 @@ import { ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { MongooseModule } from '@nestjs/mongoose';
 import type { Env } from '../../config/env.js';
+import { Admin, AdminSchema } from '../users/admin.schema.js';
 import { PasswordReset, PasswordResetSchema, User, UserSchema } from '../users/user.schema.js';
 import { AccountController } from './account.controller.js';
 import { AdminAuthController } from './admin-auth.controller.js';
 import { AdminCustomersController } from './admin-customers.controller.js';
+import { AdminSystemController, AdminUsersController } from './admin-users.controller.js';
 import { AuthController } from './auth.controller.js';
-import { AdminGuard, CustomerGuard, CustomerResolver, OptionalCustomerGuard } from './guards.js';
+import { AdminGuard, AdminResolver, CustomerGuard, CustomerResolver, DeveloperGuard, OptionalCustomerGuard } from './guards.js';
 import { SessionService } from './session.service.js';
 
 /** Global: every feature module can use AdminGuard / CustomerGuard. */
@@ -18,6 +20,7 @@ import { SessionService } from './session.service.js';
     MongooseModule.forFeature([
       { name: User.name, schema: UserSchema },
       { name: PasswordReset.name, schema: PasswordResetSchema },
+      { name: Admin.name, schema: AdminSchema },
     ]),
     JwtModule.registerAsync({
       inject: [ConfigService],
@@ -28,8 +31,8 @@ import { SessionService } from './session.service.js';
       }),
     }),
   ],
-  controllers: [AuthController, AccountController, AdminAuthController, AdminCustomersController],
-  providers: [SessionService, CustomerResolver, CustomerGuard, OptionalCustomerGuard, AdminGuard],
-  exports: [SessionService, CustomerResolver, CustomerGuard, OptionalCustomerGuard, AdminGuard, MongooseModule],
+  controllers: [AuthController, AccountController, AdminAuthController, AdminCustomersController, AdminUsersController, AdminSystemController],
+  providers: [SessionService, CustomerResolver, AdminResolver, CustomerGuard, OptionalCustomerGuard, AdminGuard, DeveloperGuard],
+  exports: [SessionService, CustomerResolver, AdminResolver, CustomerGuard, OptionalCustomerGuard, AdminGuard, DeveloperGuard, MongooseModule],
 })
 export class AuthModule {}

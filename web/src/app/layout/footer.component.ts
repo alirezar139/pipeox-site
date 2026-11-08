@@ -1,15 +1,16 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { ApiService } from '../core/http/api.service';
 import { SiteStore } from '../core/site.store';
+import { CaptchaComponent } from '../shared/captcha.component';
 import { LogoComponent } from './logo.component';
 import { NAV } from './nav';
 
 @Component({
   selector: 'app-footer',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, FormsModule, LogoComponent],
+  imports: [RouterLink, FormsModule, LogoComponent, CaptchaComponent],
   host: { class: 'site-footer' },
   template: `
     <div class="footer-glow" aria-hidden="true"></div>
@@ -23,6 +24,7 @@ import { NAV } from './nav';
           <input class="hp-input" name="website" [(ngModel)]="website" tabindex="-1" autocomplete="off" aria-hidden="true">
           <button type="submit" [disabled]="busy()">عضویت</button>
         </div>
+        @if (email) { <app-captcha [invalid]="status()?.field === 'captcha'" /> }
         <div class="newsletter-copy">
           <b>{{ s().newsletter.title }}</b>
           <span>{{ s().newsletter.text }}</span>
@@ -56,7 +58,8 @@ export class FooterComponent {
   protected email = '';
   protected website = '';
   protected readonly busy = signal(false);
-  protected readonly status = signal<{ type: 'ok' | 'error'; text: string } | null>(null);
+  protected readonly status = signal<{ type: 'ok' | 'error'; text: string; field?: string } | null>(null);
+  private readonly captcha = viewChild(CaptchaComponent);
 
   protected tel = (v: string) => v.replace(/[^\d+]/g, '');
 
@@ -66,11 +69,13 @@ export class FooterComponent {
     }
     this.busy.set(true);
     try {
-      await this.api.subscribe(this.email.trim(), this.website);
+      await this.api.subscribe(this.email.trim(), this.website, this.captcha()?.fields() ?? {});
       this.email = '';
       this.status.set({ type: 'ok', text: 'عضویت شما ثبت شد. ممنون!' });
     } catch (e) {
-      this.status.set({ type: 'error', text: (e as { message: string }).message });
+      const err = e as { message: string; field?: string };
+      this.status.set({ type: 'error', text: err.message, field: err.field });
+      void this.captcha()?.reload();
     } finally {
       this.busy.set(false);
     }
