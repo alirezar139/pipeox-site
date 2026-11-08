@@ -30,6 +30,10 @@ export const MESSAGES = {
   'footer.subscribed': { fa: 'عضویت شما ثبت شد. ممنون!', en: 'You are subscribed. Thank you!', de: 'Sie sind angemeldet. Vielen Dank!' },
   'footer.badEmail': { fa: 'لطفاً یک ایمیل معتبر وارد کنید.', en: 'Please enter a valid email address.', de: 'Bitte geben Sie eine gültige E-Mail-Adresse ein.' },
   'footer.whatsapp': { fa: 'واتساپ', en: 'WhatsApp', de: 'WhatsApp' },
+  'support.label': { fa: 'پشتیبانی', en: 'Support', de: 'Support' },
+  'support.title': { fa: 'چطور کمکتان کنیم؟', en: 'How can we help?', de: 'Wie können wir helfen?' },
+  'support.text': { fa: 'کارشناسان فنی ما پاسخ‌گوی شما هستند.', en: 'Our technical team is here to help.', de: 'Unser technisches Team hilft Ihnen gerne.' },
+  'support.form': { fa: 'ارسال استعلام / پیام', en: 'Send an inquiry', de: 'Anfrage senden' },
 
   /* ───── Shared ───── */
   'common.captcha': { fa: 'کد امنیتی', en: 'Security code', de: 'Sicherheitscode' },

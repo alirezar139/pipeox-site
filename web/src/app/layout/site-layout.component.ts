@@ -6,17 +6,19 @@ import { I18n, TPipe } from '../core/i18n';
 import { watchIdle } from '../core/idle-watch';
 import { FooterComponent } from './footer.component';
 import { HeaderComponent } from './header.component';
+import { SupportFabComponent } from './support-fab.component';
 
 /** Public website shell: header, page, footer. */
 @Component({
   selector: 'app-site-layout',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterOutlet, HeaderComponent, FooterComponent, TPipe],
+  imports: [RouterOutlet, HeaderComponent, FooterComponent, SupportFabComponent, TPipe],
   template: `
     <a class="skip-link" href="#main">{{ 'layout.skip' | t }}</a>
     <app-header />
     <main id="main"><router-outlet /></main>
     <app-footer />
+    <app-support-fab />
   `,
 })
 export class SiteLayoutComponent {
