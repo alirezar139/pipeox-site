@@ -9,6 +9,9 @@ const adminOnly: CanActivateFn = async () => {
   return !!admin || inject(Router).createUrlTree(['/admin/login']);
 };
 
+/** Support accounts only reach inquiries, chats and their own password (the API enforces it too). */
+const managers: CanActivateFn = () => !inject(AdminApi).isSupport() || inject(Router).createUrlTree(['/admin/chats']);
+
 /** The System page is for developer accounts (the API enforces it too). */
 const developerOnly: CanActivateFn = () => inject(AdminApi).current()?.role === 'developer' || inject(Router).createUrlTree(['/admin']);
 
@@ -25,17 +28,17 @@ export const ADMIN_ROUTES: Routes = [
     canActivate: [persian, adminOnly],
     loadComponent: () => import('./admin-shell.component').then((m) => m.AdminShellComponent),
     children: [
-      { path: '', loadComponent: () => import('./pages/dashboard.page').then((m) => m.AdminDashboardPage) },
+      { path: '', canActivate: [managers], loadComponent: () => import('./pages/dashboard.page').then((m) => m.AdminDashboardPage) },
       { path: 'inquiries', loadComponent: () => import('./pages/inquiries.page').then((m) => m.AdminInquiriesPage) },
       { path: 'chats', loadComponent: () => import('./pages/chats.page').then((m) => m.AdminChatsPage) },
-      { path: 'products', loadComponent: () => import('./pages/products.page').then((m) => m.AdminProductsPage) },
-      { path: 'products/:id', loadComponent: () => import('./pages/product-edit.page').then((m) => m.AdminProductEditPage) },
-      { path: 'articles', loadComponent: () => import('./pages/articles.page').then((m) => m.AdminArticlesPage) },
-      { path: 'articles/:id', loadComponent: () => import('./pages/article-edit.page').then((m) => m.AdminArticleEditPage) },
-      { path: 'projects', loadComponent: () => import('./pages/projects.page').then((m) => m.AdminProjectsPage) },
-      { path: 'customers', loadComponent: () => import('./pages/customers.page').then((m) => m.AdminCustomersPage) },
-      { path: 'subscribers', loadComponent: () => import('./pages/subscribers.page').then((m) => m.AdminSubscribersPage) },
-      { path: 'settings', loadComponent: () => import('./pages/settings.page').then((m) => m.AdminSettingsPage) },
+      { path: 'products', canActivate: [managers], loadComponent: () => import('./pages/products.page').then((m) => m.AdminProductsPage) },
+      { path: 'products/:id', canActivate: [managers], loadComponent: () => import('./pages/product-edit.page').then((m) => m.AdminProductEditPage) },
+      { path: 'articles', canActivate: [managers], loadComponent: () => import('./pages/articles.page').then((m) => m.AdminArticlesPage) },
+      { path: 'articles/:id', canActivate: [managers], loadComponent: () => import('./pages/article-edit.page').then((m) => m.AdminArticleEditPage) },
+      { path: 'projects', canActivate: [managers], loadComponent: () => import('./pages/projects.page').then((m) => m.AdminProjectsPage) },
+      { path: 'customers', canActivate: [managers], loadComponent: () => import('./pages/customers.page').then((m) => m.AdminCustomersPage) },
+      { path: 'subscribers', canActivate: [managers], loadComponent: () => import('./pages/subscribers.page').then((m) => m.AdminSubscribersPage) },
+      { path: 'settings', canActivate: [managers], loadComponent: () => import('./pages/settings.page').then((m) => m.AdminSettingsPage) },
       { path: 'users', loadComponent: () => import('./pages/users.page').then((m) => m.AdminUsersPage) },
       { path: 'system', canActivate: [developerOnly], loadComponent: () => import('./pages/system.page').then((m) => m.AdminSystemPage) },
     ],

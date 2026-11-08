@@ -9,7 +9,7 @@ import { createHash, randomBytes, timingSafeEqual } from 'node:crypto';
 import { z } from 'zod';
 import { langOf } from '../../common/i18n.js';
 import { objectId } from '../../common/utils/text.js';
-import { AdminGuard, CurrentAdmin, CurrentUser, OptionalCustomerGuard } from '../auth/guards.js';
+import { AdminGuard, CurrentAdmin, StaffGuard, CurrentUser, OptionalCustomerGuard } from '../auth/guards.js';
 import { NotificationsService } from '../notifications/notifications.service.js';
 import type { AdminDocument } from '../users/admin.schema.js';
 import type { UserDocument } from '../users/user.schema.js';
@@ -102,7 +102,7 @@ export class ChatController {
 
   /* ───────── Panel ───────── */
 
-  @UseGuards(AdminGuard)
+  @UseGuards(StaffGuard)
   @Get('admin/chats')
   async list() {
     const [items, unread] = await Promise.all([
@@ -117,13 +117,13 @@ export class ChatController {
     return { items, unread };
   }
 
-  @UseGuards(AdminGuard)
+  @UseGuards(StaffGuard)
   @Get('admin/chats/unread')
   async unread() {
     return { unread: await this.unreadCount() };
   }
 
-  @UseGuards(AdminGuard)
+  @UseGuards(StaffGuard)
   @Get('admin/chats/:id')
   async open(@Param('id', { schema: objectId }) id: string) {
     const chat = await this.chats.findByIdAndUpdate(id, { unread: 0 }, { returnDocument: 'after' }).select('+ip').populate('user', 'email name').lean();
@@ -131,7 +131,7 @@ export class ChatController {
     return chat;
   }
 
-  @UseGuards(AdminGuard)
+  @UseGuards(StaffGuard)
   @HttpCode(200)
   @Post('admin/chats/:id/messages')
   async reply(@Param('id', { schema: objectId }) id: string, @Body({ schema: messageInput }) body: z.infer<typeof messageInput>, @CurrentAdmin() admin: AdminDocument) {
@@ -143,7 +143,7 @@ export class ChatController {
     return chat;
   }
 
-  @UseGuards(AdminGuard)
+  @UseGuards(StaffGuard)
   @Patch('admin/chats/:id')
   async setStatus(@Param('id', { schema: objectId }) id: string, @Body({ schema: statusInput }) body: z.infer<typeof statusInput>) {
     if (!(await this.chats.findByIdAndUpdate(id, body))) throw new NotFoundException();

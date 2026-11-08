@@ -6,17 +6,18 @@ import { IconComponent, type IconName } from '../../shared/icon.component';
 import { AdminApi, ROLE_LABELS } from './admin-api.service';
 import { ToastService } from './ui/toast.service';
 
-const SECTIONS: { path: string; label: string; icon: IconName; exact?: boolean; developer?: boolean }[] = [
+/** staff: also shown to support accounts (supportLabel replaces the label for them). */
+const SECTIONS: { path: string; label: string; icon: IconName; exact?: boolean; developer?: boolean; staff?: boolean; supportLabel?: string }[] = [
   { path: '/admin', label: 'داشبورد', icon: 'home', exact: true },
-  { path: '/admin/inquiries', label: 'استعلام‌ها', icon: 'inbox' },
-  { path: '/admin/chats', label: 'گفت‌وگوها', icon: 'headset' },
+  { path: '/admin/inquiries', label: 'استعلام‌ها', icon: 'inbox', staff: true },
+  { path: '/admin/chats', label: 'گفت‌وگوها', icon: 'headset', staff: true },
   { path: '/admin/products', label: 'محصولات', icon: 'box' },
   { path: '/admin/articles', label: 'مقالات و اخبار', icon: 'news' },
   { path: '/admin/projects', label: 'پروژه‌ها', icon: 'folder' },
   { path: '/admin/customers', label: 'مشتریان', icon: 'users' },
   { path: '/admin/subscribers', label: 'خبرنامه', icon: 'mail' },
   { path: '/admin/settings', label: 'تنظیمات سایت', icon: 'settings' },
-  { path: '/admin/users', label: 'کاربران پنل', icon: 'lock' },
+  { path: '/admin/users', label: 'کاربران پنل', icon: 'lock', staff: true, supportLabel: 'تغییر رمز من' },
   { path: '/admin/system', label: 'سیستم', icon: 'code', developer: true },
 ];
 
@@ -27,14 +28,14 @@ const SECTIONS: { path: string; label: string; icon: IconName; exact?: boolean; 
   host: { class: 'admin-app' },
   template: `
     <aside class="adm-side" [class.open]="menu()">
-      <a class="adm-brand" routerLink="/admin">
+      <a class="adm-brand" [routerLink]="api.isSupport() ? '/admin/chats' : '/admin'">
         <svg viewBox="0 0 46 39" aria-hidden="true"><path fill="currentColor" fill-rule="evenodd" d="M6 1H33a12 12 0 0 1 0 24H18.4L14 36.4a3 3 0 0 1-2.8 2H3.4a2 2 0 0 1-1.9-2.7L4 3a2.6 2.6 0 0 1 2-2ZM3.42 10.6H31a2.2 2.2 0 0 1 0 4.4H3.08Z"/></svg>
         <span><b>PIPEOX</b><small>پنل مدیریت</small></span>
       </a>
       <nav class="adm-nav">
         @for (s of sections(); track s.path) {
           <a [routerLink]="s.path" routerLinkActive="on" [routerLinkActiveOptions]="{ exact: !!s.exact }">
-            <app-icon [name]="s.icon" /><span>{{ s.label }}</span>
+            <app-icon [name]="s.icon" /><span>{{ (api.isSupport() && s.supportLabel) || s.label }}</span>
             @if (s.path === '/admin/inquiries' && api.newCount()) { <em>{{ api.newCount() }}</em> }
             @if (s.path === '/admin/chats' && api.chatUnread()) { <em>{{ api.chatUnread() }}</em> }
           </a>
@@ -66,14 +67,17 @@ const SECTIONS: { path: string; label: string; icon: IconName; exact?: boolean; 
 export class AdminShellComponent {
   protected readonly api = inject(AdminApi);
   protected readonly roleLabels = ROLE_LABELS;
-  protected readonly sections = computed(() => SECTIONS.filter((s) => !s.developer || this.api.current()?.role === 'developer'));
+  protected readonly sections = computed(() => {
+    const role = this.api.current()?.role;
+    return SECTIONS.filter((s) => (role === 'support' ? s.staff : !s.developer || role === 'developer'));
+  });
   protected readonly toasts = inject(ToastService);
   private readonly router = inject(Router);
   protected readonly menu = signal(false);
 
   constructor() {
     inject(SeoService).set({ title: 'پنل مدیریت', path: '/admin', noindex: true });
-    void this.api.dashboard().catch(() => {});
+    if (!this.api.isSupport()) void this.api.dashboard().catch(() => {});
     this.router.events.subscribe((e) => e instanceof NavigationEnd && this.menu.set(false));
     // 30 minutes without activity → sign out (the server enforces the same limit)
     const destroy = inject(DestroyRef);

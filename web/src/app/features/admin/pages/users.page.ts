@@ -12,22 +12,28 @@ import { ToastService } from '../ui/toast.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [FormsModule, IconComponent, FaDatePipe, FaNumPipe, PasswordToggleComponent],
   template: `
-    <div class="adm-head">
-      <div><h1>کاربران پنل ({{ items().length | faNum }})</h1><p>هر کس با نام کاربری و رمز خودش وارد می‌شود. «برنامه‌نویس» علاوه بر همه بخش‌ها، صفحه «سیستم» را هم می‌بیند.</p></div>
-    </div>
+    @if (api.isSupport()) {
+      <div class="adm-head"><div><h1>تغییر رمز من</h1><p>رمز ورود خودتان به پنل را عوض کنید.</p></div></div>
+    } @else {
+      <div class="adm-head">
+        <div><h1>کاربران پنل ({{ items().length | faNum }})</h1><p>هر کس با نام کاربری و رمز خودش وارد می‌شود. «برنامه‌نویس» علاوه بر همه بخش‌ها، صفحه «سیستم» را هم می‌بیند. «پشتیبان» فقط استعلام‌ها و گفت‌وگوها را می‌بیند و جواب می‌دهد.</p></div>
+      </div>
+    }
 
     <div class="adm-grid-2">
+      @if (!api.isSupport()) {
       <form class="adm-card" (ngSubmit)="create()" novalidate>
         <h2>افزودن کاربر</h2>
         @if (createError(); as e) { <p class="adm-error" role="alert">{{ e.message }}</p> }
         <label class="adm-field"><span class="adm-label">نام کاربری (انگلیسی)</span><input class="adm-input" name="username" [(ngModel)]="f.username" dir="ltr" autocomplete="off" autocapitalize="off" spellcheck="false" required></label>
         <label class="adm-field"><span class="adm-label">نام نمایشی</span><input class="adm-input" name="name" [(ngModel)]="f.name" required></label>
         <label class="adm-field"><span class="adm-label">نقش</span>
-          <select class="adm-input" name="role" [(ngModel)]="f.role"><option value="admin">مدیر</option><option value="developer">برنامه‌نویس</option></select>
+          <select class="adm-input" name="role" [(ngModel)]="f.role"><option value="admin">مدیر</option><option value="developer">برنامه‌نویس</option><option value="support">پشتیبان</option></select>
         </label>
         <label class="adm-field adm-field-pw"><span class="adm-label">رمز (حداقل ۱۰ کاراکتر)</span><input #npw class="adm-input" type="password" name="password" [(ngModel)]="f.password" autocomplete="new-password" required><app-pw-toggle [for]="npw" /></label>
         <button class="adm-btn" type="submit" [disabled]="busy()"><app-icon name="plus" /> افزودن</button>
       </form>
+      }
 
       <form class="adm-card" (ngSubmit)="changeMine()" novalidate>
         <h2>تغییر رمز من</h2>
@@ -39,7 +45,8 @@ import { ToastService } from '../ui/toast.service';
       </form>
     </div>
 
-    @if (loading()) { <div class="adm-skeleton"></div> }
+    @if (api.isSupport()) {}
+    @else if (loading()) { <div class="adm-skeleton"></div> }
     @else {
       <div class="adm-table-wrap">
         <table class="adm-table">
@@ -53,7 +60,7 @@ import { ToastService } from '../ui/toast.service';
                   @if (u.id === api.current()?.id) { {{ roleLabels[u.role] }} }
                   @else {
                     <select class="adm-select-sm" [ngModel]="u.role" (ngModelChange)="setRole(u, $event)" [name]="'role-' + u.id" aria-label="نقش">
-                      <option value="admin">مدیر</option><option value="developer">برنامه‌نویس</option>
+                      <option value="admin">مدیر</option><option value="developer">برنامه‌نویس</option><option value="support">پشتیبان</option>
                     </select>
                   }
                 </td>
@@ -88,7 +95,7 @@ export class AdminUsersPage {
   protected mine = { current: '', password: '' };
 
   constructor() {
-    void this.load();
+    if (!this.api.isSupport()) void this.load();
   }
 
   private async load() {

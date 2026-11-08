@@ -3,7 +3,7 @@
  * npm run admin:user — create a panel user or reset its password, straight in the database.
  * Use it to recover access (forgotten password) or to add the first developer account.
  *
- * Unattended: PIPEOX_ADMIN_USER, PIPEOX_ADMIN_PASSWORD, PIPEOX_ADMIN_ROLE (admin|developer), PIPEOX_ADMIN_NAME.
+ * Unattended: PIPEOX_ADMIN_USER, PIPEOX_ADMIN_PASSWORD, PIPEOX_ADMIN_ROLE (admin|developer|support), PIPEOX_ADMIN_NAME.
  * The user's other sessions end when its password is reset.
  */
 import { randomBytes, scrypt } from 'node:crypto';
@@ -61,10 +61,10 @@ if (existing) {
   await admins.updateOne({ _id: existing._id }, { $set: { passwordHash: await hash(password), active: true, updatedAt: new Date() }, $inc: { tokenVersion: 1 } });
   console.log(`✔ Password of "${username}" (${existing.role}) updated; the account is active.`);
 } else {
-  let role = env.PIPEOX_ADMIN_ROLE ?? (await ask('Role — admin or developer [admin]: ')) ?? '';
+  let role = env.PIPEOX_ADMIN_ROLE ?? (await ask('Role — admin, developer or support [admin]: ')) ?? '';
   role = role || 'admin';
-  if (!['admin', 'developer'].includes(role)) {
-    console.error('Role must be admin or developer.');
+  if (!['admin', 'developer', 'support'].includes(role)) {
+    console.error('Role must be admin, developer or support.');
     process.exit(1);
   }
   const name = env.PIPEOX_ADMIN_NAME ?? ((await ask('Display name: ')) || username);

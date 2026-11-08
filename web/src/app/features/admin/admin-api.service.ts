@@ -1,4 +1,4 @@
-import { inject, Injectable, signal } from '@angular/core';
+import { computed, inject, Injectable, signal } from '@angular/core';
 import { ApiService } from '../../core/http/api.service';
 import type { ArticleSummary, Article, Inquiry, InquiryStatus, Product, Project, SiteSettings } from '../../core/models';
 
@@ -25,8 +25,8 @@ export interface Customer {
   inquiries: number;
 }
 
-export type AdminRole = 'admin' | 'developer';
-export const ROLE_LABELS: Record<AdminRole, string> = { admin: 'مدیر', developer: 'برنامه‌نویس' };
+export type AdminRole = 'admin' | 'developer' | 'support';
+export const ROLE_LABELS: Record<AdminRole, string> = { admin: 'مدیر', developer: 'برنامه‌نویس', support: 'پشتیبان' };
 
 export interface AdminUser {
   id: string;
@@ -89,6 +89,8 @@ export class AdminApi {
 
   /** The signed-in panel user (set by the route guard and the login page). */
   readonly current = signal<AdminUser | null>(null);
+  /** Support accounts only answer inquiries and chats; the API enforces the same. */
+  readonly isSupport = computed(() => this.current()?.role === 'support');
 
   me = async () => {
     const r = await this.api.get<{ admin: AdminUser | null }>('/api/admin/me');

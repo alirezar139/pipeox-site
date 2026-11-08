@@ -1,8 +1,11 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import type { HydratedDocument } from 'mongoose';
 
-/** admin: everything in the panel. developer: the same plus the technical "System" page. */
-export const ADMIN_ROLES = ['admin', 'developer'] as const;
+/**
+ * admin: everything in the panel. developer: the same plus the technical "System" page.
+ * support: only answers customers — inquiries and support chats (plus their own password).
+ */
+export const ADMIN_ROLES = ['admin', 'developer', 'support'] as const;
 export type AdminRole = (typeof ADMIN_ROLES)[number];
 
 @Schema({ timestamps: true, collection: 'admins' })

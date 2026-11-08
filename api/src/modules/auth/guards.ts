@@ -74,7 +74,21 @@ export class OptionalCustomerGuard implements CanActivate {
   }
 }
 
-/** Any active admin user (role admin or developer). */
+/** Any active panel user, support included: inquiries, support chats, own password. */
+@Injectable()
+export class StaffGuard implements CanActivate {
+  constructor(private readonly resolver: AdminResolver) {}
+
+  async canActivate(ctx: ExecutionContext): Promise<boolean> {
+    const [req, res] = http(ctx);
+    const admin = await this.resolver.resolve(req, res);
+    if (!admin) throw new UnauthorizedException('Admin login required');
+    req.admin = admin;
+    return true;
+  }
+}
+
+/** Site management (role admin or developer); support accounts are refused. */
 @Injectable()
 export class AdminGuard implements CanActivate {
   constructor(private readonly resolver: AdminResolver) {}
@@ -83,6 +97,7 @@ export class AdminGuard implements CanActivate {
     const [req, res] = http(ctx);
     const admin = await this.resolver.resolve(req, res);
     if (!admin) throw new UnauthorizedException('Admin login required');
+    if (admin.role === 'support') throw new ForbiddenException('حساب پشتیبان به این بخش دسترسی ندارد.');
     req.admin = admin;
     return true;
   }

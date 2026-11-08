@@ -122,6 +122,35 @@ describe('panel users and roles', () => {
   });
 });
 
+describe('support role', () => {
+  it('answers inquiries and chats, but cannot reach the rest of the panel', async () => {
+    const a = await adminAgent();
+    const sup = (await a.post('/api/admin/users').set(H).send({ username: 'support.one', name: 'پشتیبان', role: 'support', password: 'support-pass-1' }).expect(201)).body;
+    expect(sup.role).toBe('support');
+
+    const s = agent();
+    await s.post('/api/admin/login').set(H).send({ username: 'support.one', password: 'support-pass-1', ...(await cap()) }).expect(200);
+
+    // Allowed: inquiries, chats, own password
+    await s.get('/api/admin/inquiries').expect(200);
+    const chat = (await request(host).post('/api/chat').set(H).send({ text: 'Need a quote' }).expect(200)).body as { id: string };
+    await s.get('/api/admin/chats').expect(200);
+    await s.post(`/api/admin/chats/${chat.id}/messages`).set(H).send({ text: 'Sure, sending it now.' }).expect(200);
+    await s.patch(`/api/admin/chats/${chat.id}`).set(H).send({ status: 'closed' }).expect(200);
+    await s.post('/api/admin/password').set(H).send({ current: 'support-pass-1', password: 'support-pass-2' }).expect(200);
+
+    // Refused: management, exports, deleting
+    for (const path of ['/api/admin/dashboard', '/api/admin/products', '/api/admin/settings', '/api/admin/users', '/api/admin/customers', '/api/admin/inquiries/export.csv']) {
+      await s.get(path).expect(403);
+    }
+    await s.delete(`/api/admin/chats/${chat.id}`).set(H).expect(403);
+    await s.post('/api/admin/users').set(H).send({ username: 'evil', name: 'x', role: 'admin', password: 'evil-pass-123' }).expect(403);
+
+    await a.delete(`/api/admin/chats/${chat.id}`).set(H).expect(200);
+    await a.delete(`/api/admin/users/${sup.id}`).set(H).expect(200);
+  });
+});
+
 describe('security', () => {
   it('rejects state-changing requests without the CSRF header', async () => {
     await request(host).post('/api/admin/login').send({ username: 'admin', password: ADMIN_PW }).expect(403);
@@ -377,3 +406,4 @@ describe('support chat', () => {
     await request(host).get(`/api/chat/${id}`).set('x-chat-token', token).expect(404);
   });
 });
+

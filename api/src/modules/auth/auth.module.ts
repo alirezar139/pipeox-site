@@ -10,7 +10,7 @@ import { AdminAuthController } from './admin-auth.controller.js';
 import { AdminCustomersController } from './admin-customers.controller.js';
 import { AdminSystemController, AdminUsersController } from './admin-users.controller.js';
 import { AuthController } from './auth.controller.js';
-import { AdminGuard, AdminResolver, CustomerGuard, CustomerResolver, DeveloperGuard, OptionalCustomerGuard } from './guards.js';
+import { AdminGuard, AdminResolver, StaffGuard, CustomerGuard, CustomerResolver, DeveloperGuard, OptionalCustomerGuard } from './guards.js';
 import { SessionService } from './session.service.js';
 
 /** Global: every feature module can use AdminGuard / CustomerGuard. */
@@ -32,7 +32,7 @@ import { SessionService } from './session.service.js';
     }),
   ],
   controllers: [AuthController, AccountController, AdminAuthController, AdminCustomersController, AdminUsersController, AdminSystemController],
-  providers: [SessionService, CustomerResolver, AdminResolver, CustomerGuard, OptionalCustomerGuard, AdminGuard, DeveloperGuard],
+  providers: [SessionService, CustomerResolver, AdminResolver, CustomerGuard, OptionalCustomerGuard, AdminGuard, StaffGuard, DeveloperGuard],
   exports: [SessionService, CustomerResolver, AdminResolver, CustomerGuard, OptionalCustomerGuard, AdminGuard, DeveloperGuard, MongooseModule],
 })
 export class AuthModule {}

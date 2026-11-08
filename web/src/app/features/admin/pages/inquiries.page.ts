@@ -14,7 +14,7 @@ import { ToastService } from '../ui/toast.service';
   template: `
     <div class="adm-head">
       <div><h1>استعلام‌ها</h1><p>@if (user() && items().length) { درخواست‌های {{ items()[0].user?.email }} } @else { صندوق درخواست‌های سایت }</p></div>
-      <a class="adm-btn adm-btn-ghost" href="/api/admin/inquiries/export.csv" download><app-icon name="download" /> خروجی Excel</a>
+      @if (!api.isSupport()) { <a class="adm-btn adm-btn-ghost" href="/api/admin/inquiries/export.csv" download><app-icon name="download" /> خروجی Excel</a> }
     </div>
     <nav class="adm-chips">
       <a routerLink="/admin/inquiries" [class.on]="!status() && !user()">همه ({{ total() | faNum }})</a>
@@ -55,7 +55,7 @@ import { ToastService } from '../ui/toast.service';
 export class AdminInquiriesPage {
   readonly status = input<InquiryStatus>();
   readonly user = input<string>();
-  private readonly api = inject(AdminApi);
+  protected readonly api = inject(AdminApi);
   private readonly toast = inject(ToastService);
   protected readonly router = inject(Router);
 

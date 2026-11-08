@@ -58,7 +58,7 @@ const LANG_FA: Record<string, string> = { fa: 'فارسی', en: 'انگلیسی'
                 } @else {
                   <button type="button" class="adm-btn adm-btn-ghost adm-btn-sm" (click)="setStatus(c, 'open')"><app-icon name="refresh" /> بازکردن</button>
                 }
-                <button type="button" class="adm-icon-btn danger" (click)="remove(c)" aria-label="حذف گفت‌وگو"><app-icon name="trash" /></button>
+                @if (!api.isSupport()) { <button type="button" class="adm-icon-btn danger" (click)="remove(c)" aria-label="حذف گفت‌وگو"><app-icon name="trash" /></button> }
               </div>
             </header>
 
@@ -84,7 +84,7 @@ const LANG_FA: Record<string, string> = { fa: 'فارسی', en: 'انگلیسی'
   `,
 })
 export class AdminChatsPage {
-  private readonly api = inject(AdminApi);
+  protected readonly api = inject(AdminApi);
   private readonly toast = inject(ToastService);
   private readonly msgs = viewChild<ElementRef<HTMLElement>>('msgs');
   protected readonly items = signal<ChatSummary[]>([]);

@@ -11,7 +11,7 @@ import { z } from 'zod';
 import { sendCsv } from '../../common/utils/csv.js';
 import { safeDisplayName, type UploadedFileData } from '../../common/utils/files.js';
 import { objectId } from '../../common/utils/text.js';
-import { AdminGuard, CurrentUser, CustomerGuard, OptionalCustomerGuard } from '../auth/guards.js';
+import { AdminGuard, StaffGuard, CurrentUser, CustomerGuard, OptionalCustomerGuard } from '../auth/guards.js';
 import { StorageService } from '../media/storage.service.js';
 import { CaptchaService } from '../captcha/captcha.module.js';
 import { NotificationsService } from '../notifications/notifications.service.js';
@@ -88,7 +88,7 @@ export class InquiriesController {
 
   /* ───────── Admin ───────── */
 
-  @UseGuards(AdminGuard)
+  @UseGuards(StaffGuard)
   @Get('admin/inquiries')
   async list(
     @Query('status', { schema: z.enum(STATUSES).optional() }) status?: InquiryStatus,
@@ -102,14 +102,14 @@ export class InquiriesController {
     return { items, counts: Object.fromEntries(counts.map((c) => [c._id, c.n])) };
   }
 
-  @UseGuards(AdminGuard)
+  @UseGuards(StaffGuard)
   @Patch('admin/inquiries/:id')
   async update(@Param('id', { schema: objectId }) id: string, @Body({ schema: inquiryUpdate }) body: z.infer<typeof inquiryUpdate>) {
     if (!(await this.inquiries.findByIdAndUpdate(id, body))) throw new NotFoundException();
     return { ok: true };
   }
 
-  @UseGuards(AdminGuard)
+  @UseGuards(StaffGuard)
   @Get('admin/inquiries/:id/attachment')
   async attachment(@Param('id', { schema: objectId }) id: string, @Res() res: Response) {
     const inq = await this.inquiries.findById(id).lean();

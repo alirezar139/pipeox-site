@@ -9,7 +9,7 @@ import { burnPasswordCheck, hashPassword, verifyPassword } from '../../common/se
 import type { Env } from '../../config/env.js';
 import { CaptchaService } from '../captcha/captcha.module.js';
 import { Admin, type AdminDocument, toAdmin } from '../users/admin.schema.js';
-import { AdminGuard, AdminResolver, CurrentAdmin } from './guards.js';
+import { AdminResolver, CurrentAdmin, StaffGuard } from './guards.js';
 import { IDLE_MINUTES, SessionService } from './session.service.js';
 
 const loginSchema = z.object({ username: z.string().trim().min(1).max(40), password: z.string().min(1).max(200) });
@@ -69,7 +69,7 @@ export class AdminAuthController implements OnModuleInit {
 
   /** Change your own password; other sessions of this account end, this one continues. */
   @Throttle({ default: { limit: 10, ttl: 900_000 } })
-  @UseGuards(AdminGuard)
+  @UseGuards(StaffGuard)
   @HttpCode(200)
   @Post('password')
   async changePassword(@CurrentAdmin() me: AdminDocument, @Body({ schema: changeSchema }) body: z.infer<typeof changeSchema>, @Res({ passthrough: true }) res: Response) {
