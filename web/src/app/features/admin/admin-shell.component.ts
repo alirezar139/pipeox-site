@@ -9,6 +9,7 @@ import { ToastService } from './ui/toast.service';
 const SECTIONS: { path: string; label: string; icon: IconName; exact?: boolean; developer?: boolean }[] = [
   { path: '/admin', label: 'داشبورد', icon: 'home', exact: true },
   { path: '/admin/inquiries', label: 'استعلام‌ها', icon: 'inbox' },
+  { path: '/admin/chats', label: 'گفت‌وگوها', icon: 'headset' },
   { path: '/admin/products', label: 'محصولات', icon: 'box' },
   { path: '/admin/articles', label: 'مقالات و اخبار', icon: 'news' },
   { path: '/admin/projects', label: 'پروژه‌ها', icon: 'folder' },
@@ -35,6 +36,7 @@ const SECTIONS: { path: string; label: string; icon: IconName; exact?: boolean; 
           <a [routerLink]="s.path" routerLinkActive="on" [routerLinkActiveOptions]="{ exact: !!s.exact }">
             <app-icon [name]="s.icon" /><span>{{ s.label }}</span>
             @if (s.path === '/admin/inquiries' && api.newCount()) { <em>{{ api.newCount() }}</em> }
+            @if (s.path === '/admin/chats' && api.chatUnread()) { <em>{{ api.chatUnread() }}</em> }
           </a>
         }
       </nav>
@@ -81,6 +83,18 @@ export class AdminShellComponent {
         timeout: () => void this.signOut('idle'),
       });
       destroy.onDestroy(stop);
+
+      // New support chat messages: badge in the menu and a toast, wherever the admin is in the panel
+      let known = -1;
+      const pollChats = () =>
+        this.api.refreshChatUnread().then(() => {
+          const n = this.api.chatUnread();
+          if (known >= 0 && n > known && !this.router.url.startsWith('/admin/chats')) this.toasts.show('پیام تازه در گفت‌وگوهای پشتیبانی');
+          known = n;
+        }, () => {});
+      void pollChats();
+      const chatTimer = setInterval(pollChats, 20_000);
+      destroy.onDestroy(() => clearInterval(chatTimer));
     });
   }
 

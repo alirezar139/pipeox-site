@@ -49,8 +49,14 @@ export const MESSAGES = {
   'support.label': { fa: 'پشتیبانی', en: 'Support', de: 'Support' },
   'support.title': { fa: 'چطور کمکتان کنیم؟', en: 'How can we help?', de: 'Wie können wir helfen?' },
   'support.text': { fa: 'کارشناسان فنی ما پاسخ‌گوی شما هستند.', en: 'Our technical team is here to help.', de: 'Unser technisches Team hilft Ihnen gerne.' },
-  'support.form': { fa: 'ارسال استعلام / پیام', en: 'Send an inquiry', de: 'Anfrage senden' },
-  'support.formHint': { fa: 'دریافت قیمت و زمان تحویل', en: 'Get price and lead time', de: 'Preis und Lieferzeit erhalten' },
+  'support.formShort': { fa: 'فرم استعلام', en: 'Inquiry form', de: 'Anfrageformular' },
+  'support.welcome': { fa: 'سلام! سؤالتان را همین‌جا بنویسید؛ کارشناسان ما در همین پنجره پاسخ می‌دهند.', en: 'Hi! Type your question here and our specialists will reply right in this window.', de: 'Hallo! Schreiben Sie Ihre Frage hier, unsere Fachleute antworten direkt in diesem Fenster.' },
+  'support.placeholder': { fa: 'پیام خود را بنویسید…', en: 'Type your message…', de: 'Ihre Nachricht…' },
+  'support.send': { fa: 'ارسال', en: 'Send', de: 'Senden' },
+  'support.name': { fa: 'نام (اختیاری)', en: 'Name (optional)', de: 'Name (optional)' },
+  'support.contact': { fa: 'تلفن یا ایمیل (اختیاری)', en: 'Phone or email (optional)', de: 'Telefon oder E-Mail (optional)' },
+  'support.waiting': { fa: 'پیامتان رسید. پاسخ کارشناس همین‌جا نمایش داده می‌شود.', en: 'Message received. Our reply will appear right here.', de: 'Nachricht erhalten. Unsere Antwort erscheint hier.' },
+  'support.team': { fa: 'کارشناس پایپ‌اکس', en: 'PIPEOX team', de: 'PIPEOX-Team' },
 
   /* ───── Shared ───── */
   'common.captcha': { fa: 'کد امنیتی', en: 'Security code', de: 'Sicherheitscode' },

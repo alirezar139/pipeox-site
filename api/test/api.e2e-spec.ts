@@ -342,3 +342,38 @@ describe('languages (fa / en / de)', () => {
     expect(map).toContain('hreflang="x-default"');
   });
 });
+
+describe('support chat', () => {
+  it('visitor starts a chat, the team answers from the panel, the visitor sees the reply', async () => {
+    const start = await request(host).post('/api/chat').set(H).send({ text: 'Do you stock 6 inch API 5L pipe?', name: 'Visitor', contact: '09120000000' }).expect(200);
+    const { id, token } = start.body as { id: string; token: string };
+    expect(token).toBeTruthy();
+
+    // Without (or with a wrong) token the conversation is invisible
+    await request(host).get(`/api/chat/${id}`).expect(404);
+    await request(host).get(`/api/chat/${id}`).set('x-chat-token', 'wrong').expect(404);
+
+    await request(host).post(`/api/chat/${id}/messages`).set(H).set('x-chat-token', token).send({ text: 'Grade B please' }).expect(200);
+    await request(host).post(`/api/chat/${id}/messages`).set(H).set('x-chat-token', token).send({ text: '   ' }).expect(400);
+
+    const a = await adminAgent();
+    const list = await a.get('/api/admin/chats').expect(200);
+    expect(list.body.unread).toBeGreaterThanOrEqual(1);
+    const item = list.body.items.find((c: { _id: string }) => c._id === id);
+    expect(item).toMatchObject({ name: 'Visitor', unread: 2, count: 2 });
+
+    const full = await a.get(`/api/admin/chats/${id}`).expect(200);
+    expect(full.body.messages).toHaveLength(2);
+    expect(full.body.tokenHash).toBeUndefined();
+    await a.post(`/api/admin/chats/${id}/messages`).set(H).send({ text: 'Yes, in stock.' }).expect(200);
+    expect((await a.get('/api/admin/chats/unread').expect(200)).body.unread).toBe(0);
+
+    const seen = await request(host).get(`/api/chat/${id}`).set('x-chat-token', token).expect(200);
+    expect(seen.body.messages.at(-1)).toMatchObject({ from: 'staff', text: 'Yes, in stock.' });
+
+    // Visitors cannot reach the panel endpoints
+    await request(host).get('/api/admin/chats').expect(401);
+    await a.delete(`/api/admin/chats/${id}`).set(H).expect(200);
+    await request(host).get(`/api/chat/${id}`).set('x-chat-token', token).expect(404);
+  });
+});

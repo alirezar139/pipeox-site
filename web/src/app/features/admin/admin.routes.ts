@@ -27,6 +27,7 @@ export const ADMIN_ROUTES: Routes = [
     children: [
       { path: '', loadComponent: () => import('./pages/dashboard.page').then((m) => m.AdminDashboardPage) },
       { path: 'inquiries', loadComponent: () => import('./pages/inquiries.page').then((m) => m.AdminInquiriesPage) },
+      { path: 'chats', loadComponent: () => import('./pages/chats.page').then((m) => m.AdminChatsPage) },
       { path: 'products', loadComponent: () => import('./pages/products.page').then((m) => m.AdminProductsPage) },
       { path: 'products/:id', loadComponent: () => import('./pages/product-edit.page').then((m) => m.AdminProductEditPage) },
       { path: 'articles', loadComponent: () => import('./pages/articles.page').then((m) => m.AdminArticlesPage) },

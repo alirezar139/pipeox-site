@@ -8,6 +8,7 @@ import { loadEnvFile, validateEnv, type Env } from './config/env.js';
 import { DatabaseModule } from './database/database.module.js';
 import { ArticlesModule } from './modules/articles/articles.module.js';
 import { AuthModule } from './modules/auth/auth.module.js';
+import { ChatModule } from './modules/chat/chat.module.js';
 import { CaptchaModule } from './modules/captcha/captcha.module.js';
 import { DashboardModule } from './modules/dashboard/dashboard.module.js';
 import { InquiriesModule } from './modules/inquiries/inquiries.module.js';
@@ -45,6 +46,7 @@ loadEnvFile();
     ArticlesModule,
     ProjectsModule,
     InquiriesModule,
+    ChatModule,
     SubscribersModule,
     DashboardModule,
     SeoModule,

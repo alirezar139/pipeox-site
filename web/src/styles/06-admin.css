@@ -331,3 +331,44 @@ select.adm-input { cursor: pointer; }
 .adm-field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .adm-ltr-editor { direction: ltr; text-align: left; }
 input.adm-input[dir="ltr"]::placeholder, textarea.adm-input[dir="ltr"]::placeholder { direction: rtl; text-align: left; opacity: 0.55; }
+
+/* ───── Support chats ───── */
+.adm-chat { display: grid; grid-template-columns: 330px minmax(0, 1fr); height: calc(100dvh - 190px); min-height: 460px; border: 1px solid var(--a-line); border-radius: 16px; background: var(--a-panel); overflow: hidden; }
+.adm-chat-list { list-style: none; margin: 0; padding: 6px; overflow-y: auto; border-inline-end: 1px solid var(--a-line); }
+.adm-chat-list button { display: flex; align-items: center; gap: 11px; width: 100%; padding: 11px 10px; border: 0; border-radius: 12px; background: none; color: var(--a-ink); font: inherit; text-align: start; cursor: pointer; }
+.adm-chat-list button:hover { background: rgba(255, 255, 255, 0.035); }
+.adm-chat-list button.on { background: rgba(247, 128, 28, 0.1); box-shadow: inset -3px 0 0 var(--a-orange); }
+.adm-chat-list button.closed { opacity: 0.6; }
+.adm-chat-avatar { display: grid; place-items: center; width: 40px; height: 40px; flex: none; border-radius: 50%; background: rgba(247, 128, 28, 0.14); color: var(--a-orange); font-weight: 800; }
+.adm-chat-sum { display: grid; gap: 2px; flex: 1; min-width: 0; }
+.adm-chat-sum b { font-size: 14px; }
+.adm-chat-sum small { color: var(--a-muted); font-size: 12.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.adm-chat-list button.unread .adm-chat-sum small { color: var(--a-ink); font-weight: 600; }
+.adm-chat-side { display: grid; justify-items: end; gap: 5px; flex: none; }
+.adm-chat-side time { color: var(--a-muted); font-size: 11px; }
+.adm-chat-side em { min-width: 20px; padding: 0 6px; border-radius: 999px; background: var(--a-orange); color: #160e05; font: 800 11px/20px Vazirmatn, sans-serif; font-style: normal; text-align: center; }
+.adm-chat-view { display: flex; flex-direction: column; min-width: 0; min-height: 0; }
+.adm-chat-top { display: flex; align-items: center; gap: 12px; padding: 14px 18px; border-bottom: 1px solid var(--a-line); }
+.adm-chat-back { display: none; }
+.adm-chat-who { display: grid; gap: 3px; flex: 1; min-width: 0; }
+.adm-chat-who b { font-size: 15px; }
+.adm-chat-who small { color: var(--a-muted); font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.adm-chat-msgs { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding: 18px; background: radial-gradient(100% 60% at 50% 0%, rgba(247, 128, 28, 0.04), transparent 70%); }
+.adm-chat-msg { display: grid; gap: 3px; justify-items: start; max-width: 72%; }
+.adm-chat-msg.staff { align-self: flex-end; justify-items: end; }
+.adm-chat-bubble { padding: 10px 14px; border-radius: 16px; border-start-start-radius: 5px; background: var(--a-panel-2); border: 1px solid var(--a-line-2); line-height: 1.8; white-space: pre-wrap; overflow-wrap: anywhere; }
+.adm-chat-msg.staff .adm-chat-bubble { border-radius: 16px; border-start-end-radius: 5px; background: rgba(247, 128, 28, 0.16); border-color: rgba(247, 128, 28, 0.35); }
+.adm-chat-msg small { padding-inline: 4px; color: var(--a-muted); font-size: 11px; }
+.adm-chat-reply { display: flex; gap: 10px; align-items: flex-end; padding: 12px 16px; border-top: 1px solid var(--a-line); }
+.adm-chat-reply textarea { flex: 1; resize: none; min-height: 48px; }
+.adm-chat-pick { margin: auto; display: grid; justify-items: center; gap: 10px; color: var(--a-muted); }
+.adm-chat-pick .ico { width: 34px; height: 34px; color: var(--a-orange); opacity: 0.7; }
+@media (max-width: 860px) {
+  .adm-chat { grid-template-columns: 1fr; height: calc(100dvh - 210px); }
+  .adm-chat-list { border: 0; }
+  .adm-chat-view { display: none; }
+  .adm-chat.has-open .adm-chat-list { display: none; }
+  .adm-chat.has-open .adm-chat-view { display: flex; }
+  .adm-chat-back { display: inline-grid; }
+  .adm-chat-msg { max-width: 88%; }
+}

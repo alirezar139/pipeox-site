@@ -45,6 +45,31 @@ export interface SystemInfo {
   config: { siteUrl: string; dataDir: string; trustProxy: string; idleMinutes: number; email: boolean; bale: boolean; telegram: boolean };
 }
 
+export interface ChatMsg {
+  from: 'visitor' | 'staff';
+  text: string;
+  at: string;
+  by?: string;
+}
+export interface ChatSummary {
+  _id: string;
+  name: string;
+  contact: string;
+  status: 'open' | 'closed';
+  unread: number;
+  lastAt: string;
+  createdAt: string;
+  count: number;
+  last?: ChatMsg;
+}
+export interface ChatFull extends Omit<ChatSummary, 'count' | 'last'> {
+  messages: ChatMsg[];
+  lang: string;
+  page: string;
+  ip?: string;
+  user: { _id: string; email: string; name: string } | null;
+}
+
 /** Internal sales workflow labels (admin side). */
 export const STATUS_LABELS: Record<InquiryStatus, string> = {
   new: 'جدید',
@@ -59,6 +84,8 @@ export class AdminApi {
   private readonly api = inject(ApiService);
   /** Count shown on the sidebar badge; refreshed by the dashboard and inbox. */
   readonly newCount = signal(0);
+  /** Support conversations with unanswered visitor messages (sidebar badge). */
+  readonly chatUnread = signal(0);
 
   /** The signed-in panel user (set by the route guard and the login page). */
   readonly current = signal<AdminUser | null>(null);
@@ -118,6 +145,17 @@ export class AdminApi {
   setCustomerActive = (id: string, active: boolean) => this.api.patch(`/api/admin/customers/${id}`, { active });
   setCustomerPassword = (id: string, password: string) => this.api.post(`/api/admin/customers/${id}/password`, { password });
   deleteCustomer = (id: string) => this.api.delete(`/api/admin/customers/${id}`);
+
+  chats = async () => {
+    const r = await this.api.get<{ items: ChatSummary[]; unread: number }>('/api/admin/chats');
+    this.chatUnread.set(r.unread);
+    return r.items;
+  };
+  refreshChatUnread = async () => this.chatUnread.set((await this.api.get<{ unread: number }>('/api/admin/chats/unread')).unread);
+  chat = (id: string) => this.api.get<ChatFull>(`/api/admin/chats/${id}`);
+  replyChat = (id: string, text: string) => this.api.post<ChatFull>(`/api/admin/chats/${id}/messages`, { text });
+  setChatStatus = (id: string, status: 'open' | 'closed') => this.api.patch(`/api/admin/chats/${id}`, { status });
+  deleteChat = (id: string) => this.api.delete(`/api/admin/chats/${id}`);
 
   subscribers = () => this.api.get<{ _id: string; email: string; createdAt: string }[]>('/api/admin/subscribers');
   deleteSubscriber = (id: string) => this.api.delete(`/api/admin/subscribers/${id}`);
