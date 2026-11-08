@@ -11,7 +11,7 @@ import { PageHeroComponent } from '../../shared/page-hero.component';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [PageHeroComponent, StoryCardComponent, TPipe],
   template: `
-    <app-page-hero [heading]="'insights.title' | t" eyebrow="INSIGHTS & UPDATES" [crumbs]="crumbs" [lead]="'insights.lead' | t" />
+    <app-page-hero [heading]="'insights.title' | t" [eyebrow]="'eb.insightsAll' | t" [crumbs]="crumbs" [lead]="'insights.lead' | t" />
     <section class="section section-tight">
       <div class="wrap">
         @if (!articles().length) { <p class="no-results">{{ 'insights.none' | t }}</p> }

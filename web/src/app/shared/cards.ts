@@ -1,19 +1,20 @@
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { FaDatePipe } from '../core/format';
-import { LinkPipe } from '../core/i18n';
+import { I18n, LinkPipe } from '../core/i18n';
+import { FaNumPipe } from '../core/format';
 import type { ArticleSummary, Product } from '../core/models';
 
 @Component({
   selector: 'app-product-card',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, LinkPipe],
+  imports: [RouterLink, LinkPipe, FaNumPipe],
   host: { class: 'product' },
   template: `
     <div class="visual">
       @if (p().image) { <img [src]="p().image" [alt]="p().alt" loading="lazy" decoding="async" width="600" height="400"> }
     </div>
-    <small>{{ index().toString().padStart(2, '0') }} / {{ p().code }}</small>
+    <small>{{ index().toString().padStart(2, '0') | faNum }}@if (i18n.lang() !== 'fa' && p().code) { / {{ p().code }} }</small>
     <h3><a class="card-link" [routerLink]="'/products/' + p().slug | link">{{ p().title }}</a></h3>
     <p>{{ p().summary }}</p>
   `,
@@ -21,6 +22,7 @@ import type { ArticleSummary, Product } from '../core/models';
 export class ProductCardComponent {
   readonly p = input.required<Product>({ alias: 'product' });
   readonly index = input(1);
+  protected readonly i18n = inject(I18n);
 }
 
 @Component({

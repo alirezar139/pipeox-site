@@ -8,9 +8,9 @@ import { RevealDirective } from '../../shared/motion.directives';
 import { PageHeroComponent } from '../../shared/page-hero.component';
 
 const MARKETS = [
-  { num: '01', tag: 'ENERGY', title: 'projects.m1', text: 'projects.m1Text' },
-  { num: '02', tag: 'PROCESS', title: 'projects.m2', text: 'projects.m2Text' },
-  { num: '03', tag: 'INFRASTRUCTURE', title: 'projects.m3', text: 'projects.m3Text' },
+  { num: '01', tag: 'eb.energy', title: 'projects.m1', text: 'projects.m1Text' },
+  { num: '02', tag: 'eb.process', title: 'projects.m2', text: 'projects.m2Text' },
+  { num: '03', tag: 'eb.infra', title: 'projects.m3', text: 'projects.m3Text' },
 ] as const;
 
 @Component({
@@ -18,18 +18,18 @@ const MARKETS = [
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [PageHeroComponent, RevealDirective, RouterLink, FaNumPipe, TPipe, LinkPipe],
   template: `
-    <app-page-hero [heading]="'projects.title' | t" eyebrow="PROJECTS & MARKETS" [crumbs]="crumbs" [lead]="'projects.lead' | t" />
+    <app-page-hero [heading]="'projects.title' | t" [eyebrow]="'eb.projects' | t" [crumbs]="crumbs" [lead]="'projects.lead' | t" />
 
     <section class="section">
       <div class="wrap">
         <div class="section-head" appReveal>
-          <div><div class="eyebrow">MARKETS WE SERVE</div><h2>{{ 'projects.markets' | t }}</h2></div>
+          <div><div class="eyebrow">{{ 'eb.markets' | t }}</div><h2>{{ 'projects.markets' | t }}</h2></div>
           <p>{{ 'projects.marketsLead' | t }}</p>
         </div>
         <div class="markets">
           @for (m of markets; track m.num) {
             <article class="market" appReveal [attr.data-num]="m.num">
-              <span class="num">{{ m.num }} / {{ m.tag }}</span><h3>{{ m.title | t }}</h3><p>{{ m.text | t }}</p>
+              <span class="num">{{ m.num | faNum }} / {{ m.tag | t }}</span><h3>{{ m.title | t }}</h3><p>{{ m.text | t }}</p>
             </article>
           }
         </div>
@@ -40,7 +40,7 @@ const MARKETS = [
       <div class="flowline" aria-hidden="true"><i></i></div>
       <section class="section">
         <div class="wrap">
-          <div class="section-head" appReveal><div><div class="eyebrow">FEATURED PROJECTS</div><h2>{{ 'projects.featured' | t }}</h2></div></div>
+          <div class="section-head" appReveal><div><div class="eyebrow">{{ 'eb.featured' | t }}</div><h2>{{ 'projects.featured' | t }}</h2></div></div>
           <div class="project-grid">
             @for (pr of projects(); track pr._id) {
               <article class="project-card" appReveal>
@@ -62,7 +62,7 @@ const MARKETS = [
       <div class="wrap capgrid">
         <div class="capimage" appReveal><img src="/assets/img/refinery-pipeline.webp" [alt]="'projects.imgAlt' | t" loading="lazy" width="1180" height="720"></div>
         <div class="capcopy" appReveal>
-          <div class="eyebrow">PROJECT SUPPLY</div>
+          <div class="eyebrow">{{ 'eb.supply' | t }}</div>
           <h2>{{ 'projects.supply' | t }}</h2>
           <p>{{ 'projects.supplyText' | t }}</p>
           <a class="btn btn-pill" [routerLink]="'/contact' | link"><span>{{ 'projects.sendMto' | t }}</span></a>

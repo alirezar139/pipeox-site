@@ -14,7 +14,7 @@ import { NotFoundPage } from '../pages/not-found.page';
   imports: [PageHeroComponent, RouterLink, FaDatePipe, NotFoundPage, TPipe, LinkPipe],
   template: `
     @if (article(); as a) {
-    <app-page-hero [heading]="a.title" eyebrow="INSIGHTS" [crumbs]="crumbs()" />
+    <app-page-hero [heading]="a.title" [eyebrow]="'eb.insights' | t" [crumbs]="crumbs()" />
     <section class="section section-tight">
       <div class="wrap article-grid">
         <article class="prose">

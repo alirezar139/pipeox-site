@@ -34,7 +34,7 @@ const CUSTOMER_STATUS = {
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [FormsModule, RouterLink, IconComponent, PageHeroComponent, FaDatePipe, PasswordToggleComponent, TPipe, LinkPipe],
   template: `
-    <app-page-hero [heading]="'acc.mine' | t" eyebrow="CUSTOMER ACCOUNT" [crumbs]="[{ label: 'nav.home' | t, url: '/' }, { label: 'acc.mine' | t, url: '/account' }]" />
+    <app-page-hero [heading]="'acc.mine' | t" [eyebrow]="'eb.account' | t" [crumbs]="[{ label: 'nav.home' | t, url: '/' }, { label: 'acc.mine' | t, url: '/account' }]" />
     <section class="section section-tight">
       <div class="wrap account-grid">
         <div class="account-main">

@@ -12,7 +12,7 @@ import { PageHeroComponent } from '../../shared/page-hero.component';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [PageHeroComponent, ProductCardComponent, RouterLink, TPipe, LinkPipe],
   template: `
-    <app-page-hero [heading]="'products.title' | t" eyebrow="PRODUCT PORTFOLIO" [crumbs]="crumbs" [lead]="'products.lead' | t" />
+    <app-page-hero [heading]="'products.title' | t" [eyebrow]="'eb.products' | t" [crumbs]="crumbs" [lead]="'products.lead' | t" />
     <section class="section section-tight">
       <div class="wrap">
         @if (q()) {

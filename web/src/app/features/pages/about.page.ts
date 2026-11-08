@@ -12,13 +12,13 @@ import { PageHeroComponent } from '../../shared/page-hero.component';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [PageHeroComponent, IconComponent, RevealDirective, GlowDirective, TPipe],
   template: `
-    <app-page-hero [heading]="'about.title' | t" eyebrow="WHY PIPEOX" [crumbs]="crumbs" [lead]="'about.lead' | t" />
+    <app-page-hero [heading]="'about.title' | t" [eyebrow]="'eb.why' | t" [crumbs]="crumbs" [lead]="'about.lead' | t" />
 
     <section class="section">
       <div class="wrap capgrid">
         <div class="capimage" appReveal><img src="/assets/img/steel-pipes-stack.jpg" [alt]="'about.imgAlt' | t" loading="lazy" width="1100" height="740"></div>
         <div class="capcopy" appReveal>
-          <div class="eyebrow">OUR APPROACH</div>
+          <div class="eyebrow">{{ 'eb.approach' | t }}</div>
           <h2>{{ 'about.approach' | t }}</h2>
           <p>{{ 'about.approachText' | t }}</p>
           <div class="caplist">
@@ -36,7 +36,7 @@ import { PageHeroComponent } from '../../shared/page-hero.component';
     <section class="section">
       <div class="wrap">
         <div class="section-head" appReveal>
-          <div><div class="eyebrow">HOW WE WORK</div><h2>{{ 'about.how' | t }}</h2></div>
+          <div><div class="eyebrow">{{ 'eb.how' | t }}</div><h2>{{ 'about.how' | t }}</h2></div>
           <p>{{ 'about.howLead' | t }}</p>
         </div>
         <ol class="steps">
@@ -49,7 +49,7 @@ import { PageHeroComponent } from '../../shared/page-hero.component';
 
     <section class="section section-alt">
       <div class="wrap">
-        <div class="section-head" appReveal><div><div class="eyebrow">OUR VALUES</div><h2>{{ 'about.values' | t }}</h2></div></div>
+        <div class="section-head" appReveal><div><div class="eyebrow">{{ 'eb.values' | t }}</div><h2>{{ 'about.values' | t }}</h2></div></div>
         <div class="tile-features tile features-wide" appReveal appGlow>
           @for (f of s().features; track $index) {
             <div class="feature"><span class="feature-icon"><app-icon [name]="f.icon" /></span><b>{{ f.title }}</b><small>{{ f.text }}</small></div>

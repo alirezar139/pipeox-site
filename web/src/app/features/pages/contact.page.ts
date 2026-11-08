@@ -12,7 +12,7 @@ import { QuoteFormComponent } from '../../shared/quote/quote-form.component';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [PageHeroComponent, QuoteFormComponent, TPipe],
   template: `
-    <app-page-hero [heading]="'contact.title' | t" eyebrow="CONTACT & INQUIRY" [crumbs]="crumbs" [lead]="'contact.lead' | t" />
+    <app-page-hero [heading]="'contact.title' | t" [eyebrow]="'eb.contact' | t" [crumbs]="crumbs" [lead]="'contact.lead' | t" />
     <section class="section section-tight">
       <div class="wrap detail-grid contact-grid">
         <div class="detail-main">

@@ -49,7 +49,7 @@ const SHARED = [FormsModule, RouterLink, IconComponent, PageHeroComponent, Captc
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: SHARED,
   template: `
-    <app-page-hero [heading]="'acc.hero' | t" eyebrow="CUSTOMER ACCOUNT" [lead]="'acc.heroLead' | t" />
+    <app-page-hero [heading]="'acc.hero' | t" [eyebrow]="'eb.account' | t" [lead]="'acc.heroLead' | t" />
     <section class="section section-tight">
       <div class="wrap auth-wrap">
         <form class="auth-card glass" (ngSubmit)="submit()" novalidate>
@@ -94,7 +94,7 @@ export class LoginPage extends FormPage {
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: SHARED,
   template: `
-    <app-page-hero [heading]="'acc.registerHero' | t" eyebrow="CUSTOMER ACCOUNT" [lead]="'acc.registerLead' | t" />
+    <app-page-hero [heading]="'acc.registerHero' | t" [eyebrow]="'eb.account' | t" [lead]="'acc.registerLead' | t" />
     <section class="section section-tight">
       <div class="wrap auth-wrap">
         <form class="auth-card glass" (ngSubmit)="submit()" novalidate>
@@ -137,7 +137,7 @@ export class RegisterPage extends FormPage {
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [FormsModule, RouterLink, IconComponent, PageHeroComponent, CaptchaComponent, TPipe, LinkPipe],
   template: `
-    <app-page-hero [heading]="'acc.forgotHero' | t" eyebrow="CUSTOMER ACCOUNT" />
+    <app-page-hero [heading]="'acc.forgotHero' | t" [eyebrow]="'eb.account' | t" />
     <section class="section section-tight">
       <div class="wrap auth-wrap">
         <form class="auth-card glass" (ngSubmit)="submit()" novalidate>
@@ -182,7 +182,7 @@ export class ForgotPage extends FormPage {
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [FormsModule, RouterLink, IconComponent, PageHeroComponent, PasswordToggleComponent, TPipe, LinkPipe],
   template: `
-    <app-page-hero [heading]="'acc.resetHero' | t" eyebrow="CUSTOMER ACCOUNT" />
+    <app-page-hero [heading]="'acc.resetHero' | t" [eyebrow]="'eb.account' | t" />
     <section class="section section-tight">
       <div class="wrap auth-wrap">
         <form class="auth-card glass" (ngSubmit)="submit()" novalidate>
