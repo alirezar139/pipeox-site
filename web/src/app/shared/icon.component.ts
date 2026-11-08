@@ -10,7 +10,7 @@ export type IconName =
 @Component({
   selector: 'app-icon',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  host: { class: 'ico-host' },
+  host: { class: 'ico-host', '[attr.data-icon]': 'name()' },
   template: `
     <svg class="ico" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8"
       stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">

@@ -1,26 +1,22 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import type { Product } from '../../core/models';
+import { I18n, LinkPipe, TPipe } from '../../core/i18n';
 import { SeoService } from '../../core/seo.service';
 import { ProductCardComponent } from '../../shared/cards';
 import { PageHeroComponent } from '../../shared/page-hero.component';
 
-const CRUMBS = [
-  { label: 'خانه', url: '/' },
-  { label: 'محصولات', url: '/products' },
-];
 
 @Component({
   selector: 'app-products-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [PageHeroComponent, ProductCardComponent, RouterLink],
+  imports: [PageHeroComponent, ProductCardComponent, RouterLink, TPipe, LinkPipe],
   template: `
-    <app-page-hero heading="محصولات و راهکارها" eyebrow="PRODUCT PORTFOLIO" [crumbs]="crumbs"
-      lead="برای انتخاب درست، فقط نام محصول کافی نیست. جنس، گرید، ابعاد، ضخامت، فشار و استاندارد باید با شرایط واقعی پروژه هم‌خوانی داشته باشند. هر گروه را برای مشاهده مشخصات فنی باز کنید." />
+    <app-page-hero [heading]="'products.title' | t" eyebrow="PRODUCT PORTFOLIO" [crumbs]="crumbs" [lead]="'products.lead' | t" />
     <section class="section section-tight">
       <div class="wrap">
         @if (q()) {
-          <p class="search-note">نتایج جستجو برای «{{ q() }}» — <a routerLink="/products">نمایش همه</a></p>
+          <p class="search-note">{{ 'products.results' | t: { q: q() } }} — <a [routerLink]="'/products' | link">{{ 'products.showAll' | t }}</a></p>
         }
         <div class="products">
           @for (p of filtered(); track p._id) {
@@ -28,7 +24,7 @@ const CRUMBS = [
           }
         </div>
         @if (!filtered().length) {
-          <p class="no-results">محصولی با این عبارت پیدا نشد. <a routerLink="/contact">درخواست خود را مستقیم ثبت کنید ←</a></p>
+          <p class="no-results">{{ 'products.none' | t }} <a [routerLink]="'/contact' | link">{{ 'products.direct' | t }}</a></p>
         }
       </div>
     </section>
@@ -38,7 +34,11 @@ export class ProductsPage {
   readonly products = input.required<Product[]>();
   /** ?q= from the header search box. */
   readonly q = input<string>('');
-  protected readonly crumbs = CRUMBS;
+  private readonly i18n = inject(I18n);
+  protected readonly crumbs = [
+    { label: this.i18n.t('nav.home'), url: '/' },
+    { label: this.i18n.t('nav.products'), url: '/products' },
+  ];
 
   protected readonly filtered = computed(() => {
     const q = (this.q() ?? '').trim().toLowerCase();
@@ -49,10 +49,10 @@ export class ProductsPage {
 
   constructor() {
     inject(SeoService).set({
-      title: 'محصولات و راهکارها',
-      description: 'کاتالوگ PIPEOX — لوله‌های فولادی، اتصالات صنعتی، فلنج و متعلقات، شیرآلات و تجهیزات خطوط انتقال؛ همراه با استانداردها و مشخصات فنی هر گروه.',
+      title: this.i18n.t('products.title'),
+      description: this.i18n.t('products.seoDesc'),
       path: '/products',
-      breadcrumbs: CRUMBS,
+      breadcrumbs: this.crumbs,
     });
   }
 }

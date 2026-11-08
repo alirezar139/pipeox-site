@@ -749,3 +749,22 @@
   width: 18px;
   height: 18px;
 }
+
+/* Narrow screens: form controls never grow wider than their card (a select sizes to its longest option) */
+.formgrid {
+  grid-template-columns: minmax(0, 1fr);
+}
+.field select,
+.field input,
+.field textarea {
+  min-width: 0;
+  width: 100%;
+}
+@media (max-width: 400px) {
+  .captcha-input .ico {
+    display: none;
+  }
+  .captcha-input {
+    padding: 0 10px;
+  }
+}

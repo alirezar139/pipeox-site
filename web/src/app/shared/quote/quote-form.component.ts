@@ -4,6 +4,7 @@ import { RouterLink } from '@angular/router';
 import { AuthStore } from '../../core/auth.store';
 import { toAsciiDigits } from '../../core/format';
 import { ApiService } from '../../core/http/api.service';
+import { I18n, LinkPipe, TPipe } from '../../core/i18n';
 import type { ApiError, Product } from '../../core/models';
 import { SiteStore } from '../../core/site.store';
 import { CaptchaComponent } from '../captcha.component';
@@ -19,54 +20,54 @@ const ACCEPT = '.pdf,.xlsx,.xls,.docx,.doc,.csv,.jpg,.jpeg,.png';
 @Component({
   selector: 'app-quote-form',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, IconComponent, RouterLink, CaptchaComponent],
+  imports: [FormsModule, IconComponent, RouterLink, CaptchaComponent, TPipe, LinkPipe],
   host: { class: 'quote glass', '[attr.id]': 'anchor() ? "contact" : null' },
   template: `
     <h2>{{ title() }}</h2>
-    <p>برای دریافت اطلاعات بیشتر با ما در ارتباط باشید.</p>
+    <p>{{ 'quote.lead' | t }}</p>
 
     @if (sent()) {
       <div class="quote-done" role="status">
         <span class="quote-done-icon"><app-icon name="check-circle" /></span>
-        <b>درخواست شما ثبت شد.</b>
-        <p>کارشناسان ما به‌زودی با شما تماس می‌گیرند.@if (auth.user()) { وضعیت را در <a routerLink="/account">حساب من</a> دنبال کنید.}</p>
-        <button type="button" class="btn btn-ghost btn-block" (click)="reset()">ثبت درخواست دیگر</button>
+        <b>{{ 'quote.sent' | t }}</b>
+        <p>{{ 'quote.sentText' | t }}@if (auth.user()) {{{ 'quote.trackPre' | t }}<a [routerLink]="'/account' | link">{{ 'acc.mine' | t }}</a>{{ 'quote.trackPost' | t }}}</p>
+        <button type="button" class="btn btn-ghost btn-block" (click)="reset()">{{ 'quote.another' | t }}</button>
       </div>
     } @else {
       <form class="formgrid" (ngSubmit)="submit()" novalidate>
         <label class="field" [class.invalid]="error()?.field === 'name'">
           <app-icon name="user" />
-          <input name="name" [(ngModel)]="name" required maxlength="100" autocomplete="name" placeholder="نام و نام خانوادگی" aria-label="نام و نام خانوادگی" [attr.aria-invalid]="error()?.field === 'name' || null">
+          <input name="name" [(ngModel)]="name" required maxlength="100" autocomplete="name" [placeholder]="'quote.name' | t" [attr.aria-label]="'quote.name' | t" [attr.aria-invalid]="error()?.field === 'name' || null">
         </label>
         <label class="field" [class.invalid]="error()?.field === 'phone'">
           <app-icon name="phone" />
-          <input name="phone" [(ngModel)]="phone" required type="tel" inputmode="tel" maxlength="30" autocomplete="tel" placeholder="شماره تماس" aria-label="شماره تماس" [attr.aria-invalid]="error()?.field === 'phone' || null">
+          <input name="phone" [(ngModel)]="phone" required type="tel" inputmode="tel" maxlength="30" autocomplete="tel" [placeholder]="'quote.phone' | t" [attr.aria-label]="'quote.phone' | t" [attr.aria-invalid]="error()?.field === 'phone' || null">
         </label>
         <label class="field">
           <app-icon name="list" />
-          <select name="category" [(ngModel)]="category" aria-label="گروه محصول موردنظر">
-            <option value="">گروه محصول موردنظر</option>
+          <select name="category" [(ngModel)]="category" [attr.aria-label]="'quote.category' | t">
+            <option value="">{{ 'quote.category' | t }}</option>
             @for (p of products(); track p._id) { <option [value]="p.title">{{ p.title }}</option> }
-            <option value="تأمین پروژه">تأمین پروژه</option>
+            <option [value]="'quote.projectSupply' | t">{{ 'quote.projectSupply' | t }}</option>
           </select>
         </label>
         <label class="field field-area">
           <app-icon name="doc" />
-          <textarea name="details" [(ngModel)]="details" rows="3" maxlength="3000" aria-label="توضیحات"
-            placeholder="استاندارد، سایز، گرید، مقدار یا توضیح پروژه"></textarea>
+          <textarea name="details" [(ngModel)]="details" rows="3" maxlength="3000" [attr.aria-label]="'quote.details' | t"
+            [placeholder]="'quote.detailsHint' | t"></textarea>
         </label>
         <label class="field file-field" [class.has-file]="file()" [class.invalid]="error()?.field === 'attachment'">
           <app-icon name="clip" />
           <input type="file" [accept]="accept" (change)="pick($event)">
-          <span class="file-label">{{ file()?.name ?? 'پیوست لیست متریال یا دیتاشیت (اختیاری)' }}</span>
+          <span class="file-label">{{ file()?.name ?? ('quote.attach' | t) }}</span>
         </label>
         <div class="hp" aria-hidden="true"><label>Website <input name="website" [(ngModel)]="website" tabindex="-1" autocomplete="off"></label></div>
         <app-captcha [invalid]="error()?.field === 'captcha'" />
         <button class="btn btn-block" type="submit" [disabled]="busy()">
-          <app-icon name="send" /><span>{{ busy() ? 'در حال ارسال...' : 'ارسال درخواست' }}</span>
+          <app-icon name="send" /><span>{{ (busy() ? 'quote.sending' : 'quote.send') | t }}</span>
         </button>
       </form>
-      <div class="formnote">PDF، Excel، Word یا تصویر تا ۸ مگابایت</div>
+      <div class="formnote">{{ 'quote.fileNote' | t }}</div>
       @if (error(); as e) { <div class="status" data-type="error" role="alert">{{ e.message }}</div> }
     }
   `,
@@ -75,6 +76,7 @@ export class QuoteFormComponent {
   protected readonly auth = inject(AuthStore);
   private readonly api = inject(ApiService);
   private readonly site = inject(SiteStore);
+  private readonly i18n = inject(I18n);
 
   readonly heading = input<string>();
   readonly selectedProduct = input('');
@@ -82,7 +84,7 @@ export class QuoteFormComponent {
   /** Gives the card id="contact" (target of in-page links). */
   readonly anchor = input(false);
 
-  protected readonly title = computed(() => this.heading() ?? 'درخواست مشاوره و استعلام');
+  protected readonly title = computed(() => this.heading() ?? this.i18n.t('quote.title'));
   protected readonly accept = ACCEPT;
 
   protected readonly name = signal('');
@@ -109,14 +111,14 @@ export class QuoteFormComponent {
 
   pick(e: Event) {
     const f = (e.target as HTMLInputElement).files?.[0] ?? null;
-    this.error.set(f && f.size > MAX_MB * 1024 * 1024 ? { statusCode: 413, message: `حداکثر حجم فایل ${MAX_MB} مگابایت است.`, field: 'attachment' } : null);
+    this.error.set(f && f.size > MAX_MB * 1024 * 1024 ? { statusCode: 413, message: this.i18n.t('quote.fileTooBig', { n: MAX_MB }), field: 'attachment' } : null);
     this.file.set(this.error() ? null : f);
   }
 
   async submit() {
     const phoneDigits = toAsciiDigits(this.phone()).replace(/\D/g, '');
-    if (this.name().trim().length < 2) return this.error.set({ statusCode: 400, message: 'لطفاً نام خود را وارد کنید.', field: 'name' });
-    if (phoneDigits.length < 8) return this.error.set({ statusCode: 400, message: 'شماره تماس معتبر نیست.', field: 'phone' });
+    if (this.name().trim().length < 2) return this.error.set({ statusCode: 400, message: this.i18n.t('quote.needName'), field: 'name' });
+    if (phoneDigits.length < 8) return this.error.set({ statusCode: 400, message: this.i18n.t('quote.badPhone'), field: 'phone' });
 
     const data = new FormData();
     data.set('name', this.name());
@@ -142,7 +144,7 @@ export class QuoteFormComponent {
       const err = e as ApiError;
       void this.captcha()?.reload(); // each captcha is single-use
       const tel = this.site.settings().contact.phone;
-      this.error.set({ ...err, message: err.message + (tel && err.statusCode >= 500 ? ` در صورت فوریت با ${tel} تماس بگیرید.` : '') });
+      this.error.set({ ...err, message: err.message + (tel && err.statusCode >= 500 ? this.i18n.t('quote.urgent', { tel }) : '') });
     } finally {
       this.busy.set(false);
     }

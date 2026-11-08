@@ -1,24 +1,20 @@
 import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
 import type { ArticleSummary } from '../../core/models';
+import { I18n, TPipe } from '../../core/i18n';
 import { SeoService } from '../../core/seo.service';
 import { StoryCardComponent } from '../../shared/cards';
 import { PageHeroComponent } from '../../shared/page-hero.component';
 
-const CRUMBS = [
-  { label: 'خانه', url: '/' },
-  { label: 'دانش فنی', url: '/insights' },
-];
 
 @Component({
   selector: 'app-insights-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [PageHeroComponent, StoryCardComponent],
+  imports: [PageHeroComponent, StoryCardComponent, TPipe],
   template: `
-    <app-page-hero heading="دانش فنی و تازه‌ها" eyebrow="INSIGHTS & UPDATES" [crumbs]="crumbs"
-      lead="راهنماهای انتخاب محصول، استانداردها و نکاتی که به تعریف دقیق‌تر نیاز پروژه کمک می‌کند." />
+    <app-page-hero [heading]="'insights.title' | t" eyebrow="INSIGHTS & UPDATES" [crumbs]="crumbs" [lead]="'insights.lead' | t" />
     <section class="section section-tight">
       <div class="wrap">
-        @if (!articles().length) { <p class="no-results">هنوز مطلبی منتشر نشده است.</p> }
+        @if (!articles().length) { <p class="no-results">{{ 'insights.none' | t }}</p> }
         <div class="news news-list">
           @for (a of articles(); track a._id) { <app-story-card [article]="a" /> }
         </div>
@@ -28,14 +24,18 @@ const CRUMBS = [
 })
 export class InsightsPage {
   readonly articles = input.required<ArticleSummary[]>();
-  protected readonly crumbs = CRUMBS;
+  private readonly i18n = inject(I18n);
+  protected readonly crumbs = [
+    { label: this.i18n.t('nav.home'), url: '/' },
+    { label: this.i18n.t('nav.insights'), url: '/insights' },
+  ];
 
   constructor() {
     inject(SeoService).set({
-      title: 'دانش فنی و تازه‌ها',
-      description: 'راهنماهای فنی PIPEOX درباره انتخاب لوله، اتصالات، فلنج و شیرآلات صنعتی، استانداردها و نکات استعلام.',
+      title: this.i18n.t('insights.title'),
+      description: this.i18n.t('insights.seoDesc'),
       path: '/insights',
-      breadcrumbs: CRUMBS,
+      breadcrumbs: this.crumbs,
     });
   }
 }

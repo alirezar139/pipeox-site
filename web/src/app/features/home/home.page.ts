@@ -3,6 +3,7 @@ import { RouterLink } from '@angular/router';
 import { FaDatePipe } from '../../core/format';
 import type { ArticleSummary, Product } from '../../core/models';
 import { SeoService } from '../../core/seo.service';
+import { LinkPipe, TPipe } from '../../core/i18n';
 import { SiteStore } from '../../core/site.store';
 import { IconComponent } from '../../shared/icon.component';
 import { CountUpDirective, GlowDirective, RevealDirective } from '../../shared/motion.directives';
@@ -11,7 +12,7 @@ import { CountUpDirective, GlowDirective, RevealDirective } from '../../shared/m
 @Component({
   selector: 'app-home-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, IconComponent, RevealDirective, CountUpDirective, GlowDirective, FaDatePipe],
+  imports: [RouterLink, IconComponent, RevealDirective, CountUpDirective, GlowDirective, FaDatePipe, TPipe, LinkPipe],
   template: `
     <section class="hero">
       <div class="hero-photo" aria-hidden="true">
@@ -27,7 +28,7 @@ import { CountUpDirective, GlowDirective, RevealDirective } from '../../shared/m
       </div>
     </section>
 
-    <section class="band" aria-label="محصولات و آمار">
+    <section class="band" [attr.aria-label]="'home.bandLabel' | t">
       <div class="wrap-wide band-grid">
         <ul class="stats" appReveal>
           @for (st of s().stats; track $index) {
@@ -48,9 +49,9 @@ import { CountUpDirective, GlowDirective, RevealDirective } from '../../shared/m
             </div>
           </div>
           @for (p of orbit(); track p._id) {
-            <a class="orbit-label" [class]="'label-' + p.orbit" [routerLink]="['/products', p.slug]">
+            <a class="orbit-label" [class]="'label-' + p.orbit" [routerLink]="'/products/' + p.slug | link">
               <b>{{ p.shortTitle || p.title }}</b>
-              <small>مشاهده بیشتر <app-icon name="chevron" /></small>
+              <small>{{ 'home.viewMore' | t }} <app-icon name="chevron" /></small>
             </a>
           }
         </div>
@@ -66,11 +67,11 @@ import { CountUpDirective, GlowDirective, RevealDirective } from '../../shared/m
       <div class="wrap-wide tiles-grid">
         <article class="tile tile-news" appReveal appGlow>
           <header class="tile-head">
-            <h2>آخرین اخبار و اطلاعیه‌ها</h2>
-            <a class="link-more" routerLink="/insights"><app-icon name="arrow" />مشاهده همه</a>
+            <h2>{{ 'home.news' | t }}</h2>
+            <a class="link-more" [routerLink]="'/insights' | link"><app-icon name="arrow" />{{ 'home.viewAll' | t }}</a>
           </header>
           @if (latest(); as a) {
-            <a class="news-item" [routerLink]="['/insights', a.slug]">
+            <a class="news-item" [routerLink]="'/insights/' + a.slug | link">
               <span class="news-thumb"><img src="/assets/img/home/news.jpg" alt="" width="208" height="184" loading="lazy"></span>
               <span class="news-body">
                 <b>{{ a.title }}</b>
@@ -94,14 +95,14 @@ import { CountUpDirective, GlowDirective, RevealDirective } from '../../shared/m
           <div class="projects-copy">
             <h2>{{ s().projects.title }}</h2>
             <p>{{ s().projects.text }}</p>
-            <a class="link-more link-underline" routerLink="/projects"><app-icon name="arrow-right" />مشاهده پروژه‌ها</a>
+            <a class="link-more link-underline" [routerLink]="'/projects' | link"><app-icon name="arrow-right" />{{ 'home.viewProjects' | t }}</a>
           </div>
           @if (s().projects.video) {
             <a class="projects-media" [href]="s().projects.video" target="_blank" rel="noopener" [attr.aria-label]="s().projects.title">
               <img src="/assets/img/home/projects.jpg" alt="" width="654" height="258" loading="lazy">
             </a>
           } @else {
-            <a class="projects-media" routerLink="/projects" [attr.aria-label]="s().projects.title">
+            <a class="projects-media" [routerLink]="'/projects' | link" [attr.aria-label]="s().projects.title">
               <img src="/assets/img/home/projects.jpg" alt="" width="654" height="258" loading="lazy">
             </a>
           }

@@ -1,13 +1,14 @@
 import { DOCUMENT } from '@angular/common';
 import { inject, Injectable, REQUEST } from '@angular/core';
 import { Meta, Title } from '@angular/platform-browser';
+import { I18n, LANG_LIST } from './i18n';
 import { SiteStore } from './site.store';
 
 export interface PageMeta {
   /** Page title without the site name; omit on the homepage. */
   title?: string;
   description?: string;
-  /** Path of this page, e.g. /products/steel-pipes */
+  /** Path of this page without a language prefix, e.g. /products/steel-pipes */
   path: string;
   image?: string;
   type?: 'website' | 'article';
@@ -29,6 +30,7 @@ export class SeoService {
   private readonly meta = inject(Meta);
   private readonly site = inject(SiteStore);
   private readonly request = inject(REQUEST, { optional: true });
+  private readonly i18n = inject(I18n);
 
   /** Public origin: the configured domain, else the current request/page origin. */
   origin(): string {
@@ -42,7 +44,7 @@ export class SeoService {
     const s = this.site.settings();
     const title = page.title ? `${page.title} | ${s.site.name}` : s.site.title;
     const description = page.description || s.site.description;
-    const url = this.origin() + page.path;
+    const url = this.origin() + this.i18n.link(page.path);
     const image = this.origin() + (page.image || '/assets/img/home/hero-pipes.jpg');
 
     this.titleSvc.setTitle(title);
@@ -54,7 +56,7 @@ export class SeoService {
       'og:url': url,
       'og:image': image,
       'og:site_name': s.site.name,
-      'og:locale': 'fa_IR',
+      'og:locale': this.i18n.meta().og,
       'twitter:card': 'summary_large_image',
       'twitter:title': title,
       'twitter:description': description,
@@ -68,13 +70,24 @@ export class SeoService {
     else this.meta.removeTag('name="robots"');
 
     this.setLink('canonical', url);
+    // The same page in every language (+ x-default → Persian)
+    this.doc.head.querySelectorAll('link[rel="alternate"][hreflang]').forEach((n) => n.remove());
+    if (!page.noindex) {
+      for (const l of [...LANG_LIST, 'x-default' as const]) {
+        const el = this.doc.createElement('link');
+        el.rel = 'alternate';
+        el.hreflang = l;
+        el.href = this.origin() + this.i18n.link(page.path, l === 'x-default' ? 'fa' : l);
+        this.doc.head.appendChild(el);
+      }
+    }
 
     const ld: object[] = [...(page.jsonLd ?? [])];
     if (page.breadcrumbs?.length) {
       ld.push({
         '@context': 'https://schema.org',
         '@type': 'BreadcrumbList',
-        itemListElement: page.breadcrumbs.map((b, i) => ({ '@type': 'ListItem', position: i + 1, name: b.label, item: this.origin() + b.url })),
+        itemListElement: page.breadcrumbs.map((b, i) => ({ '@type': 'ListItem', position: i + 1, name: b.label, item: this.origin() + this.i18n.link(b.url) })),
       });
     }
     this.setJsonLd(ld);
@@ -90,7 +103,7 @@ export class SeoService {
         name: s.site.name,
         alternateName: s.site.nameFa,
         description: s.site.description,
-        url: this.origin() + '/',
+        url: this.origin() + this.i18n.link('/'),
         logo: this.origin() + '/favicon.svg',
         email: s.contact.email,
         telephone: s.contact.phone,

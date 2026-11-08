@@ -360,7 +360,7 @@
 @media (max-width: 1080px) {
   .detail-grid,
   .article-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
   .detail-side,
   .article-side {

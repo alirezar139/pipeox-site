@@ -1,6 +1,7 @@
 import { isPlatformBrowser } from '@angular/common';
 import { afterNextRender, DestroyRef, Directive, ElementRef, inject, input, PLATFORM_ID } from '@angular/core';
-import { faNumber } from '../core/format';
+import { formatNumber } from '../core/format';
+import { I18n } from '../core/i18n';
 
 const reducedMotion = () => typeof matchMedia !== 'undefined' && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -38,12 +39,13 @@ export class RevealDirective {
   }
 }
 
-/** Counts up to the value once visible: «۰» → «۲۵». Renders the final value on the server. */
+/** Counts up to the value once visible: «۰» → «۲۵» (digits in the site language). Renders the final value on the server. */
 @Directive({ selector: '[appCountUp]', host: { '[textContent]': 'initial()' } })
 export class CountUpDirective {
   readonly appCountUp = input.required<number>();
   private readonly el = inject(ElementRef<HTMLElement>).nativeElement;
-  protected initial = () => faNumber(this.appCountUp());
+  private readonly i18n = inject(I18n);
+  protected initial = () => formatNumber(this.appCountUp(), this.i18n.lang());
 
   constructor() {
     afterNextRender(() => {
@@ -53,7 +55,7 @@ export class CountUpDirective {
         const start = performance.now();
         const tick = (now: number) => {
           const p = Math.min(1, (now - start) / 1600);
-          this.el.textContent = faNumber(Math.round(target * (1 - Math.pow(1 - p, 3))));
+          this.el.textContent = formatNumber(Math.round(target * (1 - Math.pow(1 - p, 3))), this.i18n.lang());
           if (p < 1) requestAnimationFrame(tick);
         };
         requestAnimationFrame(tick);

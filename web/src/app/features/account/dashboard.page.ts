@@ -4,6 +4,7 @@ import { Router, RouterLink } from '@angular/router';
 import { AuthStore } from '../../core/auth.store';
 import { FaDatePipe } from '../../core/format';
 import { ApiService } from '../../core/http/api.service';
+import { I18n, LinkPipe, TPipe } from '../../core/i18n';
 import type { Account, ApiError, InquiryStatus } from '../../core/models';
 import { SeoService } from '../../core/seo.service';
 import { IconComponent } from '../../shared/icon.component';
@@ -20,35 +21,35 @@ interface MyInquiry {
 }
 
 /** How a customer sees each internal status. */
-const CUSTOMER_STATUS: Record<InquiryStatus, string> = {
-  new: 'دریافت شد',
-  contacted: 'در حال بررسی',
-  quoted: 'پیشنهاد ارسال شد',
-  won: 'انجام شد',
-  closed: 'بسته شد',
-};
+const CUSTOMER_STATUS = {
+  new: 'acc.st.new',
+  contacted: 'acc.st.contacted',
+  quoted: 'acc.st.quoted',
+  won: 'acc.st.won',
+  closed: 'acc.st.closed',
+} as const satisfies Record<InquiryStatus, string>;
 
 @Component({
   selector: 'app-dashboard-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, RouterLink, IconComponent, PageHeroComponent, FaDatePipe, PasswordToggleComponent],
+  imports: [FormsModule, RouterLink, IconComponent, PageHeroComponent, FaDatePipe, PasswordToggleComponent, TPipe, LinkPipe],
   template: `
-    <app-page-hero heading="حساب من" eyebrow="CUSTOMER ACCOUNT" [crumbs]="[{ label: 'خانه', url: '/' }, { label: 'حساب من', url: '/account' }]" />
+    <app-page-hero [heading]="'acc.mine' | t" eyebrow="CUSTOMER ACCOUNT" [crumbs]="[{ label: 'nav.home' | t, url: '/' }, { label: 'acc.mine' | t, url: '/account' }]" />
     <section class="section section-tight">
       <div class="wrap account-grid">
         <div class="account-main">
-          @if (welcome) { <p class="notice notice-ok">حساب شما ساخته شد. خوش آمدید!</p> }
+          @if (welcome) { <p class="notice notice-ok">{{ 'acc.welcome' | t }}</p> }
           <div class="account-head">
-            <h2 class="sub-title">درخواست‌های من</h2>
-            <a class="pill pill-orange" routerLink="/contact"><app-icon name="plus" /><span>استعلام جدید</span></a>
+            <h2 class="sub-title">{{ 'acc.requests' | t }}</h2>
+            <a class="pill pill-orange" [routerLink]="'/contact' | link"><app-icon name="plus" /><span>{{ 'acc.newRequest' | t }}</span></a>
           </div>
 
           @if (loading()) {
             <div class="skeleton-list"><i></i><i></i><i></i></div>
           } @else if (!inquiries().length) {
             <div class="empty-card">
-              <b>هنوز درخواستی ثبت نکرده‌اید.</b>
-              <p>استعلام‌هایی که بعد از ورود ثبت کنید، این‌جا با وضعیتشان نمایش داده می‌شوند.</p>
+              <b>{{ 'acc.noRequests' | t }}</b>
+              <p>{{ 'acc.noRequestsText' | t }}</p>
             </div>
           } @else {
             <ol class="inq-list">
@@ -56,9 +57,9 @@ const CUSTOMER_STATUS: Record<InquiryStatus, string> = {
                 <li class="inq" [class]="'s-' + q.status">
                   <div class="inq-top">
                     <span class="inq-id">#{{ q._id.slice(-6).toUpperCase() }}</span>
-                    <span class="inq-status">{{ statusLabel[q.status] }}</span>
+                    <span class="inq-status">{{ statusLabel[q.status] | t }}</span>
                   </div>
-                  <b>{{ q.category || 'درخواست استعلام' }}</b>
+                  <b>{{ q.category || ('acc.request' | t) }}</b>
                   @if (q.details) { <p class="pre-line">{{ q.details.length > 300 ? q.details.slice(0, 300) + '…' : q.details }}</p> }
                   <small>{{ q.createdAt | faDate }}@if (q.attachment) { · {{ q.attachment.name }} }</small>
                 </li>
@@ -69,25 +70,25 @@ const CUSTOMER_STATUS: Record<InquiryStatus, string> = {
 
         <aside class="account-side">
           <form class="side-card account-card" (ngSubmit)="saveProfile()" novalidate>
-            <b>اطلاعات حساب</b>
+            <b>{{ 'acc.details' | t }}</b>
             <p class="account-email" dir="ltr">{{ auth.user()?.email }}</p>
             @if (profileMsg(); as m) { <p class="notice" [class]="m.ok ? 'notice notice-ok' : 'notice notice-error'">{{ m.text }}</p> }
-            <label class="field"><app-icon name="user" /><input name="name" [(ngModel)]="profile.name" placeholder="نام و نام خانوادگی" aria-label="نام و نام خانوادگی" maxlength="100" required></label>
-            <label class="field"><app-icon name="phone" /><input type="tel" name="phone" [(ngModel)]="profile.phone" placeholder="شماره تماس" aria-label="شماره تماس" maxlength="30" required></label>
-            <label class="field"><app-icon name="list" /><input name="company" [(ngModel)]="profile.company" placeholder="شرکت / سازمان" aria-label="شرکت یا سازمان" maxlength="150"></label>
-            <button class="btn btn-block" type="submit" [disabled]="busy()"><span>ذخیره</span></button>
+            <label class="field"><app-icon name="user" /><input name="name" [(ngModel)]="profile.name" [placeholder]="'quote.name' | t" [attr.aria-label]="'quote.name' | t" maxlength="100" required></label>
+            <label class="field"><app-icon name="phone" /><input type="tel" name="phone" [(ngModel)]="profile.phone" [placeholder]="'quote.phone' | t" [attr.aria-label]="'quote.phone' | t" maxlength="30" required></label>
+            <label class="field"><app-icon name="list" /><input name="company" [(ngModel)]="profile.company" [placeholder]="'acc.companyShort' | t" [attr.aria-label]="'acc.companyShort' | t" maxlength="150"></label>
+            <button class="btn btn-block" type="submit" [disabled]="busy()"><span>{{ 'acc.save' | t }}</span></button>
           </form>
 
           <form class="side-card account-card" (ngSubmit)="changePassword()" novalidate>
-            <b>تغییر رمز عبور</b>
+            <b>{{ 'acc.changePassword' | t }}</b>
             @if (passwordMsg(); as m) { <p class="notice" [class]="m.ok ? 'notice notice-ok' : 'notice notice-error'">{{ m.text }}</p> }
-            <label class="field"><app-icon name="lock" /><input #pwCur type="password" name="current" [(ngModel)]="pw.current" placeholder="رمز فعلی" aria-label="رمز فعلی" autocomplete="current-password" required><app-pw-toggle [for]="pwCur" /></label>
-            <label class="field"><app-icon name="lock" /><input #pwNew type="password" name="password" [(ngModel)]="pw.password" placeholder="رمز جدید (حداقل ۸ کاراکتر)" aria-label="رمز جدید" autocomplete="new-password" minlength="8" required><app-pw-toggle [for]="pwNew" /></label>
-            <button class="btn btn-block btn-ghost" type="submit" [disabled]="busy()"><span>تغییر رمز</span></button>
-            <small class="muted-note">با تغییر رمز، از دستگاه‌های دیگر خارج می‌شوید.</small>
+            <label class="field"><app-icon name="lock" /><input #pwCur type="password" name="current" [(ngModel)]="pw.current" [placeholder]="'acc.currentPassword' | t" [attr.aria-label]="'acc.currentPassword' | t" autocomplete="current-password" required><app-pw-toggle [for]="pwCur" /></label>
+            <label class="field"><app-icon name="lock" /><input #pwNew type="password" name="password" [(ngModel)]="pw.password" [placeholder]="'acc.newPassword8' | t" [attr.aria-label]="'acc.newPassword8' | t" autocomplete="new-password" minlength="8" required><app-pw-toggle [for]="pwNew" /></label>
+            <button class="btn btn-block btn-ghost" type="submit" [disabled]="busy()"><span>{{ 'acc.changeBtn' | t }}</span></button>
+            <small class="muted-note">{{ 'acc.otherDevices' | t }}</small>
           </form>
 
-          <button type="button" class="link-more logout-btn" (click)="logout()"><app-icon name="logout" />خروج از حساب</button>
+          <button type="button" class="link-more logout-btn" (click)="logout()"><app-icon name="logout" />{{ 'acc.logout' | t }}</button>
         </aside>
       </div>
     </section>
@@ -97,6 +98,7 @@ export class DashboardPage {
   protected readonly auth = inject(AuthStore);
   private readonly api = inject(ApiService);
   private readonly router = inject(Router);
+  private readonly i18n = inject(I18n);
 
   protected readonly statusLabel = CUSTOMER_STATUS;
   protected readonly welcome = !!this.router.currentNavigation()?.extras.state?.['welcome'];
@@ -110,7 +112,7 @@ export class DashboardPage {
   protected pw = { current: '', password: '' };
 
   constructor() {
-    inject(SeoService).set({ title: 'حساب من', path: '/account', noindex: true });
+    inject(SeoService).set({ title: this.i18n.t('acc.mine'), path: '/account', noindex: true });
     const u = this.auth.user();
     if (u) this.profile = { name: u.name, phone: u.phone, company: u.company };
     this.load();
@@ -129,7 +131,7 @@ export class DashboardPage {
     try {
       const r = await this.api.patch<{ user: Account }>('/api/account/profile', this.profile);
       this.auth.set(r.user);
-      this.profileMsg.set({ ok: true, text: 'اطلاعات حساب ذخیره شد.' });
+      this.profileMsg.set({ ok: true, text: this.i18n.t('acc.saved') });
     } catch (e) {
       this.profileMsg.set({ ok: false, text: (e as ApiError).message });
     } finally {
@@ -142,7 +144,7 @@ export class DashboardPage {
     try {
       await this.api.post('/api/account/password', this.pw);
       this.pw = { current: '', password: '' };
-      this.passwordMsg.set({ ok: true, text: 'رمز عبور تغییر کرد.' });
+      this.passwordMsg.set({ ok: true, text: this.i18n.t('acc.changed') });
     } catch (e) {
       this.passwordMsg.set({ ok: false, text: (e as ApiError).message });
     } finally {
@@ -152,6 +154,6 @@ export class DashboardPage {
 
   async logout() {
     await this.auth.logout();
-    await this.router.navigateByUrl('/');
+    await this.router.navigateByUrl(this.i18n.link('/'));
   }
 }

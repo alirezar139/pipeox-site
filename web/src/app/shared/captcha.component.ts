@@ -1,6 +1,7 @@
 import { isPlatformBrowser } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject, input, PLATFORM_ID, signal } from '@angular/core';
 import { ApiService } from '../core/http/api.service';
+import { TPipe } from '../core/i18n';
 import { IconComponent } from './icon.component';
 
 /** The two fields every captcha-protected request carries. */
@@ -16,19 +17,19 @@ export interface CaptchaFields {
 @Component({
   selector: 'app-captcha',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [IconComponent],
+  imports: [IconComponent, TPipe],
   host: { class: 'captcha', '[class.captcha-admin]': "variant() === 'admin'", '[class.invalid]': 'invalid()' },
   template: `
     <label class="captcha-input">
       <app-icon name="shield" />
       <input name="captcha" [value]="answer()" (input)="answer.set($any($event.target).value)" inputmode="text" autocomplete="off"
-        autocapitalize="off" spellcheck="false" maxlength="8" placeholder="کد امنیتی" aria-label="کد امنیتی تصویر" required
+        autocapitalize="off" spellcheck="false" maxlength="8" [placeholder]="'common.captcha' | t" [attr.aria-label]="'common.captchaLabel' | t" required
         [attr.aria-invalid]="invalid() || null">
     </label>
     <span class="captcha-img">
-      @if (image(); as src) { <img [src]="src" alt="تصویر کد امنیتی" width="150" height="48"> } @else { <i class="captcha-wait"></i> }
+      @if (image(); as src) { <img [src]="src" [alt]="'common.captchaImage' | t" width="150" height="48"> } @else { <i class="captcha-wait"></i> }
     </span>
-    <button type="button" class="captcha-refresh" (click)="reload()" aria-label="کد جدید" title="کد جدید"><app-icon name="refresh" /></button>
+    <button type="button" class="captcha-refresh" (click)="reload()" [attr.aria-label]="'common.captchaNew' | t" [title]="'common.captchaNew' | t"><app-icon name="refresh" /></button>
   `,
 })
 export class CaptchaComponent {

@@ -1,5 +1,6 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router, Routes } from '@angular/router';
+import { I18n } from '../../core/i18n';
 import { AdminApi } from './admin-api.service';
 
 /** The real check is server-side (every /api/admin call); this only routes to the login screen. */
@@ -11,11 +12,17 @@ const adminOnly: CanActivateFn = async () => {
 /** The System page is for developer accounts (the API enforces it too). */
 const developerOnly: CanActivateFn = () => inject(AdminApi).current()?.role === 'developer' || inject(Router).createUrlTree(['/admin']);
 
+/** The panel is Persian and right-to-left whatever language the visitor last used on the site. */
+const persian: CanActivateFn = () => {
+  inject(I18n).set('fa');
+  return true;
+};
+
 export const ADMIN_ROUTES: Routes = [
-  { path: 'login', loadComponent: () => import('./admin-login.page').then((m) => m.AdminLoginPage) },
+  { path: 'login', canActivate: [persian], loadComponent: () => import('./admin-login.page').then((m) => m.AdminLoginPage) },
   {
     path: '',
-    canActivate: [adminOnly],
+    canActivate: [persian, adminOnly],
     loadComponent: () => import('./admin-shell.component').then((m) => m.AdminShellComponent),
     children: [
       { path: '', loadComponent: () => import('./pages/dashboard.page').then((m) => m.AdminDashboardPage) },

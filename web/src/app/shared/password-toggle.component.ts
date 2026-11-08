@@ -1,14 +1,15 @@
 import { ChangeDetectionStrategy, Component, input, signal } from '@angular/core';
+import { TPipe } from '../core/i18n';
 import { IconComponent } from './icon.component';
 
 /** Eye button that shows / hides the password typed into `for`. Place it inside the field's label. */
 @Component({
   selector: 'app-pw-toggle',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [IconComponent],
+  imports: [IconComponent, TPipe],
   template: `
-    <button type="button" class="pw-toggle" (click)="toggle()" [attr.aria-label]="shown() ? 'پنهان کردن رمز' : 'نمایش رمز'"
-      [attr.aria-pressed]="shown()" [title]="shown() ? 'پنهان کردن رمز' : 'نمایش رمز'">
+    <button type="button" class="pw-toggle" (click)="toggle()" [attr.aria-label]="(shown() ? 'common.hidePassword' : 'common.showPassword') | t"
+      [attr.aria-pressed]="shown()" [title]="(shown() ? 'common.hidePassword' : 'common.showPassword') | t">
       <app-icon [name]="shown() ? 'eye-off' : 'eye'" />
     </button>
   `,

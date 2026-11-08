@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { LinkPipe, TPipe } from '../core/i18n';
 
 export interface Crumb {
   label: string;
@@ -10,17 +11,17 @@ export interface Crumb {
 @Component({
   selector: 'app-page-hero',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink],
+  imports: [RouterLink, TPipe, LinkPipe],
   host: { class: 'page-hero' },
   template: `
     <div class="wrap">
       @if (crumbs().length) {
-        <nav class="breadcrumb" aria-label="مسیر صفحه">
+        <nav class="breadcrumb" [attr.aria-label]="'layout.breadcrumb' | t">
           @for (c of crumbs(); track c.url; let last = $last) {
             @if (last) {
               <span aria-current="page">{{ c.label }}</span>
             } @else {
-              <a [routerLink]="c.url">{{ c.label }}</a><i aria-hidden="true">/</i>
+              <a [routerLink]="c.url | link">{{ c.label }}</a><i aria-hidden="true">/</i>
             }
           }
         </nav>

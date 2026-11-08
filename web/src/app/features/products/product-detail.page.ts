@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input } from '@angular/core';
 import type { Product } from '../../core/models';
+import { I18n, TPipe } from '../../core/i18n';
 import { SeoService } from '../../core/seo.service';
 import { ProductCardComponent } from '../../shared/cards';
 import { PageHeroComponent } from '../../shared/page-hero.component';
@@ -9,7 +10,7 @@ import { QuoteFormComponent } from '../../shared/quote/quote-form.component';
 @Component({
   selector: 'app-product-detail-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [PageHeroComponent, QuoteFormComponent, ProductCardComponent, NotFoundPage],
+  imports: [PageHeroComponent, QuoteFormComponent, ProductCardComponent, NotFoundPage, TPipe],
   template: `
     @if (product(); as p) {
     <app-page-hero [heading]="p.title" [eyebrow]="p.code" [lead]="p.summary" [crumbs]="crumbs()" />
@@ -24,28 +25,28 @@ import { QuoteFormComponent } from '../../shared/quote/quote-form.component';
           </div>
 
           @if (p.types.length) {
-            <h2 class="sub-title">انواع رایج</h2>
+            <h2 class="sub-title">{{ 'product.types' | t }}</h2>
             <div class="type-grid">
               @for (t of p.types; track $index) { <div class="type-card"><b>{{ t.name }}</b><span>{{ t.desc }}</span></div> }
             </div>
           }
 
-          <h2 class="sub-title">مشخصات فنی قابل استعلام</h2>
+          <h2 class="sub-title">{{ 'product.specs' | t }}</h2>
           <div class="specs">
             @for (row of p.specs; track $index) { <div class="spec"><span>{{ row.label }}</span><b dir="auto">{{ row.value }}</b></div> }
-            <div class="spec"><span>مدارک</span><b>MTC طبق EN 10204 (3.1 / 3.2) · بازرسی شخص ثالث در صورت نیاز</b></div>
+            <div class="spec"><span>{{ 'product.docs' | t }}</span><b>{{ 'product.docsValue' | t }}</b></div>
           </div>
-          <p class="spec-note">موجودی، برند و محدوده دقیق هر قلم در زمان استعلام اعلام می‌شود.</p>
+          <p class="spec-note">{{ 'product.note' | t }}</p>
 
           @if (p.applications.length) {
-            <h2 class="sub-title">کاربردها</h2>
+            <h2 class="sub-title">{{ 'product.applications' | t }}</h2>
             <ul class="chips">
               @for (a of p.applications; track $index) { <li>{{ a }}</li> }
             </ul>
           }
         </div>
         <div class="detail-side">
-          <app-quote-form [heading]="'استعلام ' + p.title" [selectedProduct]="p.title" [products]="all()" [anchor]="true" />
+          <app-quote-form [heading]="'quote.titleFor' | t: { name: p.title }" [selectedProduct]="p.title" [products]="all()" [anchor]="true" />
         </div>
       </div>
     </section>
@@ -53,7 +54,7 @@ import { QuoteFormComponent } from '../../shared/quote/quote-form.component';
     @if (others().length) {
       <section class="section section-tight related">
         <div class="wrap">
-          <h2 class="sub-title">سایر گروه‌های محصول</h2>
+          <h2 class="sub-title">{{ 'product.others' | t }}</h2>
           <div class="products products-3">
             @for (o of others(); track o._id) { <app-product-card [product]="o" [index]="all().indexOf(o) + 1" /> }
           </div>
@@ -69,9 +70,10 @@ export class ProductDetailPage {
   readonly product = input.required<Product | null>();
   readonly all = input.required<Product[]>({ alias: 'products' });
   protected readonly others = computed(() => this.all().filter((o) => o.slug !== this.product()?.slug));
+  private readonly i18n = inject(I18n);
   protected readonly crumbs = computed(() => [
-    { label: 'خانه', url: '/' },
-    { label: 'محصولات', url: '/products' },
+    { label: this.i18n.t('nav.home'), url: '/' },
+    { label: this.i18n.t('nav.products'), url: '/products' },
     { label: this.product()?.title ?? '', url: `/products/${this.product()?.slug}` },
   ]);
 

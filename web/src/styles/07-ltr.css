@@ -1,0 +1,93 @@
+/* ═══════════════════════════════════════════════════════════════
+   English & German (left-to-right). The design is drawn right-to-left;
+   these rules mirror the parts that use physical positions.
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Arrows and chevrons point the reading direction */
+[dir="ltr"] .ico-host:is([data-icon="arrow"], [data-icon="chevron"]) .ico {
+  transform: scaleX(-1);
+}
+[dir="ltr"] .btn-cta:hover .btn-dot {
+  transform: translateX(4px);
+}
+
+/* Home hero: photo on the right, heat stripes on the left */
+[dir="ltr"] .hero-photo {
+  left: auto;
+  right: 0;
+  -webkit-mask: linear-gradient(270deg, #000 88%, transparent);
+  mask: linear-gradient(270deg, #000 88%, transparent);
+}
+[dir="ltr"] .hero-stripes {
+  transform: scaleX(-1);
+}
+@media (max-width: 1180px) {
+  [dir="ltr"] .hero-photo {
+    -webkit-mask: none;
+    mask: none;
+  }
+}
+
+/* Inner-page hero stripes sit on the edge opposite the text */
+[dir="ltr"] .page-hero::before,
+[dir="ltr"] .page-hero::after {
+  left: auto;
+  transform: skewX(-32deg);
+}
+[dir="ltr"] .page-hero::before {
+  right: 60px;
+}
+[dir="ltr"] .page-hero::after {
+  right: 100px;
+}
+
+/* Text that was explicitly right-aligned for Persian */
+[dir="ltr"] :is(.field input[type="tel"], .product small, .captcha-input input, .prose th, .prose td, .account-email, .newsletter-field input[type="email"]) {
+  text-align: left;
+}
+@media (max-width: 1180px) {
+  [dir="ltr"] .detail-main .spec b {
+    text-align: left;
+  }
+}
+
+/* Decorations positioned with left/right */
+[dir="ltr"] .market::after {
+  left: auto;
+  right: 18px;
+}
+[dir="ltr"] .newsletter .captcha {
+  right: auto;
+  left: 0;
+}
+
+/* Latin text: Montserrat/Vazirmatn Latin read best slightly looser */
+[dir="ltr"] body {
+  letter-spacing: 0.005em;
+}
+[dir="ltr"] .step::after {
+  left: auto;
+  right: -19px;
+}
+/* Footer: English/German newsletter copy is longer — let it wrap instead of pushing into the logo */
+@media (min-width: 1181px) {
+  [dir="ltr"] .newsletter-copy {
+    white-space: normal;
+    max-width: calc(var(--u) * 250);
+  }
+}
+@media (min-width: 1181px) {
+  [dir="ltr"] .newsletter-copy span {
+    display: block;
+    line-height: 1.55;
+  }
+}
+
+/* German: long compound words — hyphenate instead of overflowing on phones */
+html[lang="de"] body {
+  hyphens: auto;
+  -webkit-hyphens: auto;
+}
+html[lang="de"] :is(.spec span, .spec b, .sub-title, h1, h2, h3) {
+  overflow-wrap: break-word;
+}
