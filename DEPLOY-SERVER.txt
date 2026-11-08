@@ -1,0 +1,218 @@
+راهنمای راه‌اندازی سایت PIPEOX روی سرور
+=========================================
+(برای سرور لینوکس Ubuntu 22.04 یا 24.04 — دستورها را به ترتیب اجرا کنید)
+
+سایت = Angular (SSR) + NestJS + MongoDB
+در production همه‌چیز با یک فرمان روی یک پورت (4000) اجرا می‌شود و nginx جلوی آن HTTPS می‌دهد.
+
+
+──────────────────────────────────────────
+۰) چیزهایی که قبل از شروع لازم دارید
+──────────────────────────────────────────
+- یک سرور لینوکس با دسترسی root (حداقل 2GB رم؛ برای build پیشنهاد 4GB)
+- دامنه که رکورد A آن به IP سرور اشاره کند (مثلاً pipeox.ir و www.pipeox.ir)
+- (اختیاری) اطلاعات SMTP برای ایمیل اعلان استعلام و بازیابی رمز مشتری
+- (اختیاری) توکن ربات بله برای اعلان استعلام
+
+
+──────────────────────────────────────────
+۱) نصب Node.js 22
+──────────────────────────────────────────
+sudo apt update && sudo apt install -y curl git build-essential
+curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
+sudo apt install -y nodejs
+node -v          # باید 22.12 یا بالاتر باشد
+
+
+──────────────────────────────────────────
+۲) پایگاه داده MongoDB
+──────────────────────────────────────────
+یکی از این دو راه:
+
+الف) MongoDB روی خود سرور (نسخه 8):
+curl -fsSL https://www.mongodb.org/static/pgp/server-8.0.asc | sudo gpg -o /usr/share/keyrings/mongodb-server-8.0.gpg --dearmor
+echo "deb [ signed-by=/usr/share/keyrings/mongodb-server-8.0.gpg ] https://repo.mongodb.org/apt/ubuntu $(lsb_release -cs)/mongodb-org/8.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-8.0.list
+sudo apt update && sudo apt install -y mongodb-org
+sudo systemctl enable --now mongod
+→ آدرس پایگاه داده: mongodb://127.0.0.1:27017/pipeox
+
+ب) MongoDB Atlas (سرویس ابری): یک کلاستر بسازید و connection string آن را بردارید
+   (شبیه mongodb+srv://user:pass@cluster0.xxxxx.mongodb.net/pipeox)
+
+
+──────────────────────────────────────────
+۳) کپی پروژه روی سرور
+──────────────────────────────────────────
+پروژه را در /var/www/pipeox بگذارید. یکی از این دو راه:
+
+الف) با git (اگر ریپو روی GitHub باشد):
+sudo mkdir -p /var/www && cd /var/www
+sudo git clone <آدرس-ریپو> pipeox
+
+ب) با فایل فشرده: کل پوشه پروژه را zip کنید **بدون** این پوشه‌ها و فایل‌ها:
+   node_modules  ،  api/node_modules  ،  web/node_modules  ،  api/dist  ،  web/dist  ،  web/.angular  ،  .env
+   بعد با WinSCP یا scp به /var/www/pipeox منتقل و unzip کنید.
+
+یک کاربر جدا برای اجرای سایت (امن‌تر از root):
+sudo useradd -r -m -d /var/www/pipeox-home -s /usr/sbin/nologin pipeox
+sudo mkdir -p /var/www/pipeox-data
+sudo chown -R pipeox:pipeox /var/www/pipeox /var/www/pipeox-data
+
+
+──────────────────────────────────────────
+۴) نصب وابستگی‌ها و ساخت تنظیمات
+──────────────────────────────────────────
+cd /var/www/pipeox
+sudo -u pipeox npm install          # وابستگی‌های ریشه، api و web را نصب می‌کند
+sudo -u pipeox npm run setup        # می‌پرسد: رمز پنل مدیریت (۱۰+ کاراکتر) و آدرس MongoDB
+                                    # و فایل .env را با کلید امنیتی تصادفی می‌سازد
+
+حالا فایل .env را باز کنید و این‌ها را تنظیم کنید:
+sudo -u pipeox nano .env
+
+  NODE_ENV=production
+  PORT=4000
+  SITE_URL=https://pipeox.ir            ← دامنه خودتان، بدون / در آخر
+  DATA_DIR=/var/www/pipeox-data         ← عکس‌ها و پیوست‌های آپلودی
+  TRUST_PROXY=1                         ← چون nginx جلوی سایت است
+
+  ایمیل (اختیاری):
+  SMTP_HOST=mail.example.com
+  SMTP_PORT=465
+  SMTP_SECURE=true
+  SMTP_USER=...
+  SMTP_PASS=...
+  MAIL_FROM=PIPEOX <no-reply@pipeox.ir>
+  NOTIFY_EMAIL_TO=sales@pipeox.ir       ← استعلام‌های جدید به این ایمیل می‌رود
+
+  ربات بله (اختیاری): BALE_BOT_TOKEN و BALE_CHAT_ID
+  (تلگرام معمولاً از سرورهای داخل ایران در دسترس نیست)
+
+
+──────────────────────────────────────────
+۵) ساخت نسخه نهایی و تست
+──────────────────────────────────────────
+sudo -u pipeox npm run build
+sudo -u pipeox npm start            # باید بنویسد: PIPEOX is running on http://localhost:4000
+(با Ctrl+C متوقفش کنید؛ در مرحله بعد سرویس دائمی می‌شود)
+
+اولین اجرا، محتوای اولیه (پوشه seed) را خودکار در پایگاه داده می‌ریزد.
+
+
+──────────────────────────────────────────
+۶) اجرای دائمی با systemd (بعد از ری‌استارت سرور هم بالا می‌آید)
+──────────────────────────────────────────
+sudo nano /etc/systemd/system/pipeox.service
+
+محتوای فایل:
+------------------------------------------
+[Unit]
+Description=PIPEOX website
+After=network.target mongod.service
+
+[Service]
+User=pipeox
+WorkingDirectory=/var/www/pipeox
+ExecStart=/usr/bin/node server.mjs
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+------------------------------------------
+
+sudo systemctl daemon-reload
+sudo systemctl enable --now pipeox
+sudo systemctl status pipeox        # باید active (running) باشد
+journalctl -u pipeox -f             # دیدن لاگ‌ها
+
+
+──────────────────────────────────────────
+۷) nginx و HTTPS
+──────────────────────────────────────────
+sudo apt install -y nginx certbot python3-certbot-nginx
+sudo nano /etc/nginx/sites-available/pipeox
+
+محتوای فایل (pipeox.ir را با دامنه خودتان عوض کنید):
+------------------------------------------
+server {
+    listen 80;
+    server_name www.pipeox.ir;
+    return 301 https://pipeox.ir$request_uri;
+}
+
+server {
+    listen 80;
+    server_name pipeox.ir;
+    client_max_body_size 12m;          # برای آپلود پیوست استعلام (تا ۸ مگابایت) و عکس‌ها
+
+    location / {
+        proxy_pass http://127.0.0.1:4000;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-Host $host;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+}
+------------------------------------------
+
+sudo ln -s /etc/nginx/sites-available/pipeox /etc/nginx/sites-enabled/
+sudo rm -f /etc/nginx/sites-enabled/default
+sudo nginx -t && sudo systemctl reload nginx
+sudo certbot --nginx -d pipeox.ir -d www.pipeox.ir     # گواهی SSL رایگان
+
+نکته: سایت فقط به دامنه‌ای که در SITE_URL نوشته‌اید جواب می‌دهد؛
+به همین دلیل www در nginx به دامنه اصلی ریدایرکت شده است.
+
+
+──────────────────────────────────────────
+۸) فایروال
+──────────────────────────────────────────
+sudo ufw allow OpenSSH
+sudo ufw allow 'Nginx Full'
+sudo ufw enable
+(پورت 4000 و 27017 نباید از بیرون باز باشند)
+
+
+──────────────────────────────────────────
+۹) بعد از راه‌اندازی
+──────────────────────────────────────────
+- سایت:          https://pipeox.ir
+- پنل مدیریت:    https://pipeox.ir/admin   (فقط رمز می‌خواهد؛ همان رمز مرحله ۴)
+- در پنل → تنظیمات: تلفن، ایمیل، آدرس و واتساپ را پر کنید تا در صفحه تماس و فوتر نمایش داده شوند.
+- تغییر رمز پنل:  cd /var/www/pipeox && sudo -u pipeox npm run admin:password && sudo systemctl restart pipeox
+
+
+──────────────────────────────────────────
+۱۰) به‌روزرسانی سایت (بعد از هر تغییر در کد)
+──────────────────────────────────────────
+cd /var/www/pipeox
+sudo -u pipeox git pull             # یا فایل‌های جدید را کپی کنید
+sudo -u pipeox npm install
+sudo -u pipeox npm run build
+sudo systemctl restart pipeox
+
+
+──────────────────────────────────────────
+۱۱) پشتیبان‌گیری (مهم)
+──────────────────────────────────────────
+دو چیز باید بک‌آپ گرفته شود:
+- پایگاه داده:   mongodump --db pipeox --out /root/backup/pipeox-$(date +%F)
+- فایل‌های آپلودی: /var/www/pipeox-data
+- و فایل /var/www/pipeox/.env (رمزها و کلیدها)
+
+بازگردانی پایگاه داده:  mongorestore --db pipeox /root/backup/pipeox-YYYY-MM-DD/pipeox
+
+
+──────────────────────────────────────────
+عیب‌یابی
+──────────────────────────────────────────
+- «Missing .env»              → مرحله ۴ (npm run setup) اجرا نشده.
+- «Missing api/dist/...»      → npm run build اجرا نشده.
+- خطای 502 در مرورگر          → سرویس pipeox بالا نیست: sudo systemctl status pipeox
+- اتصال به MongoDB برقرار نمی‌شود → sudo systemctl status mongod  و مقدار MONGODB_URI در .env
+- سرور داخل ایران و npm install خطای شبکه می‌دهد → از یک mirror برای npm استفاده کنید
+  (مثلاً: npm config set registry <آدرس mirror>) یا پروژه را جای دیگری build کرده و
+  پوشه‌ها را با node_modules منتقل کنید.

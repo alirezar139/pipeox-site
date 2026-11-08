@@ -13,3 +13,6 @@ coverage/
 .vscode/*
 !.vscode/extensions.json
 *.log
+
+# Database backups (customer data — never commit)
+backup/
