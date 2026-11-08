@@ -336,6 +336,7 @@ body app-site-layout > main {
   padding: calc(var(--u) * 9) 0 calc(var(--u) * 10);
   font: 500 calc(var(--u) * 10.4) / 1.6 Montserrat, Vazirmatn, sans-serif;
   color: #a5a5a5;
+  text-align: center;
 }
 
 /* ═════════ Tablet & mobile: regular responsive layout ═════════ */
