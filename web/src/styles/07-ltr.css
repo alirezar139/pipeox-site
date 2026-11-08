@@ -91,3 +91,6 @@ html[lang="de"] body {
 html[lang="de"] :is(.spec span, .spec b, .sub-title, h1, h2, h3) {
   overflow-wrap: break-word;
 }
+[dir="ltr"] .orbit-label:hover small .ico {
+  translate: 3px 0;
+}

@@ -181,46 +181,165 @@
   perspective: 60cqw;
   pointer-events: none;
 }
+/* P mark: one full turn while the wordmark is being written, then a pause facing front (7s loop) */
+.orbit-core {
+  flex-direction: column;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1.1cqw;
+}
+.orbit-mark {
+  perspective: 40cqw;
+}
 .orbit-spin {
-  position: relative;
-  width: 15cqw;
-  height: 9.4cqw;
-  transform-style: preserve-3d;
-  animation: orbit-spin 24s linear infinite;
-}
-.orbit-face {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  justify-items: center;
-  align-content: center;
-  gap: 0.9cqw;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-}
-.orbit-back {
-  transform: rotateY(180deg);
-}
-.orbit-face svg {
-  width: 7.9cqw;
+  display: block;
+  width: 7.6cqw;
   height: auto;
   color: #f7801c;
   filter: drop-shadow(0 0 1.2cqw rgba(247, 128, 28, 0.35));
+  animation: orbit-turn 7s cubic-bezier(0.65, 0, 0.35, 1) infinite;
 }
-.orbit-face b {
-  font: 600 3.3cqw / 1 Montserrat, Vazirmatn, sans-serif;
-  letter-spacing: 0.08em;
-  color: #f2f2f2;
-}
-@keyframes orbit-spin {
-  to {
+@keyframes orbit-turn {
+  0%,
+  6% {
+    transform: rotateY(0deg);
+    filter: drop-shadow(0 0 1.2cqw rgba(247, 128, 28, 0.35));
+  }
+  42% {
     transform: rotateY(360deg);
+    filter: drop-shadow(0 0 2.4cqw rgba(255, 150, 60, 0.85));
+  }
+  58%,
+  100% {
+    transform: rotateY(360deg);
+    filter: drop-shadow(0 0 1.2cqw rgba(247, 128, 28, 0.35));
+  }
+}
+/* Wordmark: outlined letters are drawn, then filled, held, and faded for the next round */
+.orbit-word {
+  width: 15cqw;
+  height: auto;
+  overflow: visible;
+}
+.orbit-word text {
+  font: 600 50px Montserrat, sans-serif;
+  letter-spacing: 5px;
+  fill: rgba(242, 242, 242, 0);
+  stroke: #f2f2f2;
+  stroke-width: 1.2;
+  stroke-dasharray: 520;
+  stroke-dashoffset: 520;
+  animation: orbit-write 7s ease-in-out infinite;
+}
+@keyframes orbit-write {
+  0%,
+  6% {
+    stroke-dashoffset: 520;
+    fill: rgba(242, 242, 242, 0);
+    opacity: 1;
+  }
+  38% {
+    stroke-dashoffset: 0;
+    fill: rgba(242, 242, 242, 0);
+  }
+  50%,
+  86% {
+    stroke-dashoffset: 0;
+    fill: rgba(242, 242, 242, 1);
+    opacity: 1;
+  }
+  96%,
+  100% {
+    stroke-dashoffset: 0;
+    fill: rgba(242, 242, 242, 1);
+    opacity: 0;
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .orbit-spin {
+  .orbit-spin,
+  .orbit-word text {
     animation: none;
   }
+  .orbit-word text {
+    fill: #f2f2f2;
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Product spots: hovering a product or its label lights the product up in the artwork */
+.orbit-spot {
+  position: absolute;
+  z-index: 1;
+  width: 15%;
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(255, 170, 90, 0.3), rgba(247, 128, 28, 0.12) 55%, transparent 75%);
+  -webkit-backdrop-filter: brightness(1.7) saturate(1.35) contrast(1.08);
+  backdrop-filter: brightness(1.7) saturate(1.35) contrast(1.08);
+  -webkit-mask: radial-gradient(closest-side, #000 68%, transparent 100%);
+  mask: radial-gradient(closest-side, #000 68%, transparent 100%);
+  opacity: 0;
+  scale: 0.85;
+  transition: opacity 0.35s, scale 0.45s var(--ease);
+}
+.orbit-spot::after {
+  /* a ring that pulses outward while the product is highlighted */
+  content: "";
+  position: absolute;
+  inset: 20%;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 150, 60, 0.8);
+  box-shadow: 0 0 18px rgba(247, 128, 28, 0.6);
+  opacity: 0;
+}
+.orbit-spot:hover::after,
+.orbit-art:has(.label-a:hover) .spot-a::after,
+.orbit-art:has(.label-b:hover) .spot-b::after,
+.orbit-art:has(.label-c:hover) .spot-c::after,
+.orbit-art:has(.label-d:hover) .spot-d::after {
+  animation: spot-ring 1.4s ease-out infinite;
+}
+@keyframes spot-ring {
+  from {
+    opacity: 0.9;
+    transform: scale(0.7);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.18);
+  }
+}
+.spot-a { left: 72.5%; top: 19%; }
+.spot-b { left: 32.5%; top: 21%; }
+.spot-c { left: 29.5%; top: 64%; }
+.spot-d { left: 73%; top: 63%; }
+.orbit-spot:hover,
+.orbit-art:has(.label-a:hover, .label-a:focus-visible) .spot-a,
+.orbit-art:has(.label-b:hover, .label-b:focus-visible) .spot-b,
+.orbit-art:has(.label-c:hover, .label-c:focus-visible) .spot-c,
+.orbit-art:has(.label-d:hover, .label-d:focus-visible) .spot-d {
+  opacity: 1;
+  scale: 1;
+}
+/* …and the label reacts when the product itself is hovered */
+.orbit-art:has(.spot-a:hover) .label-a,
+.orbit-art:has(.spot-b:hover) .label-b,
+.orbit-art:has(.spot-c:hover) .label-c,
+.orbit-art:has(.spot-d:hover) .label-d {
+  border-color: #f7801c;
+  box-shadow: 0 0 22px -4px rgba(247, 128, 28, 0.6);
+  transform: translateY(-3px);
+}
+.orbit-label {
+  z-index: 2;
+}
+.orbit-label small .ico {
+  transition: translate 0.3s var(--ease);
+}
+.orbit-label:hover small .ico {
+  translate: -3px 0;
 }
 /* HTML labels laid exactly over the label cards painted in the artwork */
 .orbit-label {
@@ -258,8 +377,9 @@
 }
 .orbit-label:hover {
   border-color: #f7801c;
-  box-shadow: 0 0 22px -4px rgba(247, 128, 28, 0.6);
-  transform: translateY(-2px);
+  background: #1c1610;
+  box-shadow: 0 0 26px -4px rgba(247, 128, 28, 0.7);
+  transform: translateY(-3px);
 }
 .label-b {
   left: calc(116 / 860 * 100%);

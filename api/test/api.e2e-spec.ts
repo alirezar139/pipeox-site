@@ -1,5 +1,5 @@
 /**
- * End-to-end API tests against the compiled app (dist/) and a throwaway database.
+ * End-to-end API tests against the compiled app (dist-test/) and a throwaway database.
  * Run: npm run test:e2e   (needs MongoDB on MONGODB_URI_TEST or localhost)
  */
 import express from 'express';
@@ -39,7 +39,8 @@ beforeAll(async () => {
   await mongoose.connect(DB);
   await mongoose.connection.dropDatabase();
   await mongoose.disconnect();
-  const { mountApi } = await import('../dist/bootstrap.js');
+  // Own build folder (dist-test/), so running the tests never disturbs a running dev server (dist/)
+  const { mountApi } = await import('../dist-test/bootstrap.js');
   host = express();
   const app = await mountApi(host);
   close = () => app.close();

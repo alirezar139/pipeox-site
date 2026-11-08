@@ -42,12 +42,15 @@ import { CountUpDirective, GlowDirective, RevealDirective } from '../../shared/m
         <div class="orbit-art">
           <img src="/assets/img/home/orbit-art.jpg" alt="" width="1720" height="596" loading="lazy">
           <div class="orbit-glint" aria-hidden="true"></div>
+          <!-- Centre: the P mark turns while the wordmark writes itself, then both hold -->
           <div class="orbit-core" aria-hidden="true">
-            <div class="orbit-spin">
-              <div class="orbit-face"><svg viewBox="0 0 46 39"><path fill="currentColor" fill-rule="evenodd" d="M6 1H33a12 12 0 0 1 0 24H18.4L14 36.4a3 3 0 0 1-2.8 2H3.4a2 2 0 0 1-1.9-2.7L4 3a2.6 2.6 0 0 1 2-2ZM3.42 10.6H31a2.2 2.2 0 0 1 0 4.4H3.08Z" /></svg><b>PIPEOX</b></div>
-              <div class="orbit-face orbit-back"><svg viewBox="0 0 46 39"><path fill="currentColor" fill-rule="evenodd" d="M6 1H33a12 12 0 0 1 0 24H18.4L14 36.4a3 3 0 0 1-2.8 2H3.4a2 2 0 0 1-1.9-2.7L4 3a2.6 2.6 0 0 1 2-2ZM3.42 10.6H31a2.2 2.2 0 0 1 0 4.4H3.08Z" /></svg><b>PIPEOX</b></div>
-            </div>
+            <div class="orbit-mark"><svg class="orbit-spin" viewBox="0 0 46 39"><path fill="currentColor" fill-rule="evenodd" d="M6 1H33a12 12 0 0 1 0 24H18.4L14 36.4a3 3 0 0 1-2.8 2H3.4a2 2 0 0 1-1.9-2.7L4 3a2.6 2.6 0 0 1 2-2ZM3.42 10.6H31a2.2 2.2 0 0 1 0 4.4H3.08Z" /></svg></div>
+            <svg class="orbit-word" viewBox="0 0 320 64"><text x="160" y="48" text-anchor="middle">PIPEOX</text></svg>
           </div>
+          <!-- Hover a product (or its label): the product lights up in the artwork -->
+          @for (p of orbit(); track p._id) {
+            <a class="orbit-spot" [class]="'spot-' + p.orbit" [routerLink]="'/products/' + p.slug | link" tabindex="-1" [attr.aria-label]="p.title"></a>
+          }
           @for (p of orbit(); track p._id) {
             <a class="orbit-label" [class]="'label-' + p.orbit" [routerLink]="'/products/' + p.slug | link">
               <b>{{ p.shortTitle || p.title }}</b>
