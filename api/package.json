@@ -1,6 +1,6 @@
 {
   "name": "pipeox-api",
-  "version": "2.5.1",
+  "version": "2.5.2",
   "description": "PIPEOX API — NestJS + MongoDB",
   "author": "",
   "private": true,

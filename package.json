@@ -1,6 +1,6 @@
 {
   "name": "pipeox",
-  "version": "2.5.1",
+  "version": "2.5.2",
   "private": true,
   "description": "PIPEOX — industrial steel pipe supplier website: Angular (SSR) + NestJS + MongoDB",
   "type": "module",

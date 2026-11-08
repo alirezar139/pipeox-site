@@ -70,11 +70,26 @@ import { ToastService } from '../ui/toast.service';
                 <td class="adm-actions">
                   @if (u.id !== api.current()?.id) {
                     <button type="button" class="adm-btn adm-btn-ghost adm-btn-sm" (click)="toggle(u)">{{ u.active ? 'غیرفعال‌سازی' : 'فعال‌سازی' }}</button>
-                    <button type="button" class="adm-btn adm-btn-ghost adm-btn-sm" (click)="setPassword(u)"><app-icon name="lock" /> رمز جدید</button>
+                    <button type="button" class="adm-btn adm-btn-ghost adm-btn-sm" [class.on]="pwFor() === u.id" (click)="openPassword(u)"><app-icon name="lock" /> رمز جدید</button>
                     <button type="button" class="adm-icon-btn danger" (click)="remove(u)" aria-label="حذف"><app-icon name="trash" /></button>
                   }
                 </td>
               </tr>
+              @if (pwFor() === u.id) {
+                <tr class="adm-pw-row">
+                  <td colspan="7">
+                    <form class="adm-pw-form" (ngSubmit)="savePassword(u)">
+                      <label class="adm-field"><span class="adm-label">رمز جدید {{ u.username }} (حداقل ۱۰ کاراکتر)</span>
+                        <input class="adm-input" name="newpw" [(ngModel)]="newPw" dir="ltr" autocomplete="off" spellcheck="false" minlength="10" maxlength="200"></label>
+                      <button type="button" class="adm-btn adm-btn-ghost adm-btn-sm" (click)="newPw = randomPassword()"><app-icon name="refresh" /> رمز تصادفی</button>
+                      <button type="button" class="adm-btn adm-btn-ghost adm-btn-sm" (click)="copy()" [disabled]="!newPw"><app-icon name="doc" /> کپی</button>
+                      <button type="submit" class="adm-btn adm-btn-sm" [disabled]="busy() || newPw.length < 10">ذخیره رمز</button>
+                      <button type="button" class="adm-btn adm-btn-ghost adm-btn-sm" (click)="pwFor.set(null)">بستن</button>
+                    </form>
+                    <p class="adm-hint">رمز فقط همین حالا دیده می‌شود؛ پس از ذخیره، به‌صورت رمزنگاری‌شده نگهداری می‌شود و دیگر قابل نمایش نیست. آن را از راه امن به کاربر بدهید. نشست‌های فعلی این کاربر بسته می‌شوند.</p>
+                  </td>
+                </tr>
+              }
             }
           </tbody>
         </table>
@@ -145,10 +160,38 @@ export class AdminUsersPage {
     await this.load();
   }
 
-  async setPassword(u: AdminUser) {
-    const pw = prompt(`رمز جدید برای ${u.username} (حداقل ۱۰ کاراکتر):`);
-    if (!pw) return;
-    await this.api.setUserPassword(u.id, pw).then(() => this.toast.show('رمز جدید ثبت شد؛ آن را از راه امن اعلام کنید.'), (e) => this.toast.error(e));
+  /** The user whose new-password form is open. */
+  protected readonly pwFor = signal<string | null>(null);
+  protected newPw = '';
+
+  /** 16 characters without look-alikes (0/O, 1/l/I). */
+  protected randomPassword() {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789';
+    const bytes = crypto.getRandomValues(new Uint8Array(16));
+    return Array.from(bytes, (b) => chars[b % chars.length]).join('');
+  }
+
+  protected openPassword(u: AdminUser) {
+    this.newPw = this.randomPassword();
+    this.pwFor.set(this.pwFor() === u.id ? null : u.id);
+  }
+
+  protected async copy() {
+    await navigator.clipboard.writeText(this.newPw).then(() => this.toast.show('رمز کپی شد.'), () => this.toast.show('کپی انجام نشد؛ رمز را دستی انتخاب و کپی کنید.'));
+  }
+
+  async savePassword(u: AdminUser) {
+    this.busy.set(true);
+    try {
+      await this.api.setUserPassword(u.id, this.newPw);
+      this.toast.show(`رمز جدید ${u.username} ثبت شد؛ آن را از راه امن اعلام کنید.`);
+      this.pwFor.set(null);
+      this.newPw = '';
+    } catch (e) {
+      this.toast.error(e);
+    } finally {
+      this.busy.set(false);
+    }
   }
 
   async remove(u: AdminUser) {

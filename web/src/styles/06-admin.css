@@ -372,3 +372,8 @@ input.adm-input[dir="ltr"]::placeholder, textarea.adm-input[dir="ltr"]::placehol
 .adm-variant { display: grid; grid-template-columns: 150px minmax(200px, 1fr) 96px 120px 90px 70px 36px 40px; gap: 8px; align-items: center; min-width: 860px; }
 .adm-variant-head { font-size: 12px; color: #9a9ea2; }
 .adm-variant input[type="checkbox"] { width: 18px; height: 18px; accent-color: #f7861e; }
+.adm-pw-row td { background: rgba(247, 128, 28, 0.05); }
+.adm-pw-form { display: flex; flex-wrap: wrap; align-items: end; gap: 8px; }
+.adm-pw-form .adm-field { flex: 1 1 260px; margin: 0; }
+.adm-pw-form .adm-input { font-family: Consolas, monospace; letter-spacing: 0.04em; }
+.adm-btn.on { border-color: var(--a-orange); color: var(--a-orange); }
