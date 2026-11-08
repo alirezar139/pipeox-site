@@ -31,15 +31,15 @@ const resetSchema = z.object({ token: z.string().regex(/^[a-f0-9]{64}$/, 'پیو
 const RESET_MAIL: Record<Lang, (name: string, link: string) => { subject: string; text: string }> = {
   fa: (name, link) => ({
     subject: 'بازیابی رمز عبور PIPEOX',
-    text: `سلام ${name}،\n\nبرای تعیین رمز عبور جدید روی پیوند زیر بزنید (تا یک ساعت معتبر است):\n${link}\n\nاگر این درخواست را شما نداده‌اید، این ایمیل را نادیده بگیرید.`,
+    text: `${name} گرامی، با سلام\n\nبرای تعیین رمز عبور جدید حساب کاربری خود در پایپ‌اکس، پیوند زیر را باز کنید. این پیوند تا یک ساعت معتبر است:\n${link}\n\nچنانچه این درخواست از سوی شما ثبت نشده است، این ایمیل را نادیده بگیرید؛ رمز عبور فعلی شما تغییری نخواهد کرد.\n\nبا احترام\nپایپ‌اکس`,
   }),
   en: (name, link) => ({
     subject: 'PIPEOX password reset',
-    text: `Hello ${name},\n\nTo set a new password, open the link below (valid for one hour):\n${link}\n\nIf you did not request this, you can ignore this email.`,
+    text: `Dear ${name},\n\nTo set a new password for your PIPEOX account, please open the link below. The link is valid for one hour:\n${link}\n\nIf you did not request this, please ignore this email; your current password will remain unchanged.\n\nKind regards\nPIPEOX`,
   }),
   de: (name, link) => ({
     subject: 'PIPEOX – Passwort zurücksetzen',
-    text: `Hallo ${name},\n\num ein neues Passwort festzulegen, öffnen Sie den folgenden Link (eine Stunde gültig):\n${link}\n\nWenn Sie dies nicht angefordert haben, können Sie diese E-Mail ignorieren.`,
+    text: `Guten Tag ${name},\n\num ein neues Passwort für Ihr PIPEOX-Konto festzulegen, öffnen Sie bitte den folgenden Link. Der Link ist eine Stunde gültig:\n${link}\n\nFalls Sie dies nicht angefordert haben, ignorieren Sie diese E-Mail bitte; Ihr bisheriges Passwort bleibt unverändert.\n\nMit freundlichen Grüßen\nPIPEOX`,
   }),
 };
 

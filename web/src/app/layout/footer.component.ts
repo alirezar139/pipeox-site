@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { ApiService } from '../core/http/api.service';
 import { SiteStore } from '../core/site.store';
+import { FaNumPipe } from '../core/format';
 import { I18n, LinkPipe, TPipe } from '../core/i18n';
 import { CaptchaComponent } from '../shared/captcha.component';
 import { LogoComponent } from './logo.component';
@@ -11,7 +12,7 @@ import { NAV } from './nav';
 @Component({
   selector: 'app-footer',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, FormsModule, LogoComponent, CaptchaComponent, TPipe, LinkPipe],
+  imports: [RouterLink, FormsModule, LogoComponent, CaptchaComponent, TPipe, LinkPipe, FaNumPipe],
   host: { class: 'site-footer' },
   template: `
     <div class="footer-glow" aria-hidden="true"></div>
@@ -43,7 +44,7 @@ import { NAV } from './nav';
       </div>
     }
     <div class="copyright">
-      <div class="wrap-footer"><span dir="ltr">© {{ year }} Pipeox. All rights reserved.</span></div>
+      <div class="wrap-footer"><span>© {{ '' + year | faNum }} — {{ 'footer.rights' | t }}</span></div>
     </div>
   `,
 })
