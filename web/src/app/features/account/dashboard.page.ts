@@ -2,9 +2,10 @@ import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/cor
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthStore } from '../../core/auth.store';
-import { FaDatePipe } from '../../core/format';
-import { ApiService } from '../../core/http/api.service';
+import { FaDatePipe, FaNumPipe, TomanPipe } from '../../core/format';
+import { ApiService, type OrderSummary } from '../../core/http/api.service';
 import { I18n, LinkPipe, TPipe } from '../../core/i18n';
+import type { MessageKey } from '../../core/messages';
 import type { Account, ApiError, InquiryStatus } from '../../core/models';
 import { SeoService } from '../../core/seo.service';
 import { IconComponent } from '../../shared/icon.component';
@@ -32,13 +33,30 @@ const CUSTOMER_STATUS = {
 @Component({
   selector: 'app-dashboard-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, RouterLink, IconComponent, PageHeroComponent, FaDatePipe, PasswordToggleComponent, TPipe, LinkPipe],
+  imports: [FormsModule, RouterLink, IconComponent, PageHeroComponent, FaDatePipe, FaNumPipe, TomanPipe, PasswordToggleComponent, TPipe, LinkPipe],
   template: `
     <app-page-hero [heading]="'acc.mine' | t" [eyebrow]="'eb.account' | t" [crumbs]="[{ label: 'nav.home' | t, url: '/' }, { label: 'acc.mine' | t, url: '/account' }]" />
     <section class="section section-tight">
       <div class="wrap account-grid">
         <div class="account-main">
           @if (welcome) { <p class="notice notice-ok">{{ 'acc.welcome' | t }}</p> }
+          @if (orders().length) {
+            <h2 class="sub-title">{{ 'acc.orders' | t }}</h2>
+            <ol class="inq-list order-list">
+              @for (o of orders(); track o._id) {
+                <li class="inq" [class]="'o-' + o.status">
+                  <a class="order-link" [routerLink]="('/account/orders/' + o._id) | link">
+                    <div class="inq-top">
+                      <span class="inq-id">#{{ o.number | faNum }}</span>
+                      <span class="inq-status">{{ stKey(o.status) | t }}</span>
+                    </div>
+                    <b>{{ (o.total ?? o.subtotal) | toman }}</b>
+                    <small>{{ o.createdAt | faDate }} · {{ 'acc.itemsCount' | t: { n: (o.count | faNum) } }} · {{ 'acc.details2' | t }} ←</small>
+                  </a>
+                </li>
+              }
+            </ol>
+          }
           <div class="account-head">
             <h2 class="sub-title">{{ 'acc.requests' | t }}</h2>
             <a class="pill pill-orange" [routerLink]="'/contact' | link"><app-icon name="plus" /><span>{{ 'acc.newRequest' | t }}</span></a>
@@ -103,6 +121,8 @@ export class DashboardPage {
   protected readonly statusLabel = CUSTOMER_STATUS;
   protected readonly welcome = !!this.router.currentNavigation()?.extras.state?.['welcome'];
   protected readonly inquiries = signal<MyInquiry[]>([]);
+  protected readonly orders = signal<OrderSummary[]>([]);
+  protected stKey = (s: string) => `order.st.${s}` as MessageKey;
   protected readonly loading = signal(true);
   protected readonly busy = signal(false);
   protected readonly profileMsg = signal<{ ok: boolean; text: string } | null>(null);
@@ -120,7 +140,9 @@ export class DashboardPage {
 
   private async load() {
     try {
-      this.inquiries.set(await this.api.get<MyInquiry[]>('/api/account/inquiries'));
+      const [inquiries, orders] = await Promise.all([this.api.get<MyInquiry[]>('/api/account/inquiries'), this.api.myOrders().catch(() => [])]);
+      this.inquiries.set(inquiries);
+      this.orders.set(orders);
     } finally {
       this.loading.set(false);
     }

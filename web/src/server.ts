@@ -27,7 +27,8 @@ function csp(nonce: string): string {
     "frame-src 'none'",
     "object-src 'none'",
     "base-uri 'self'",
-    "form-action 'self'",
+    // Bank Mellat's payment page is opened with a form POST (the other gateways use links)
+    "form-action 'self' https://bpm.shaparak.ir",
     "frame-ancestors 'none'",
     ...(isProd ? ['upgrade-insecure-requests'] : []),
   ].join('; ');

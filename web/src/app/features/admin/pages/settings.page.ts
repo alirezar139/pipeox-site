@@ -134,6 +134,28 @@ const ICON_LABELS: Record<string, string> = {
           <label class="adm-field"><span class="adm-label">عنوان خبرنامه (فوتر)</span><input class="adm-input" name="ntitle" [(ngModel)]="s.newsletter.title"></label>
           <label class="adm-field"><span class="adm-label">متن خبرنامه</span><input class="adm-input" name="ntext" [(ngModel)]="s.newsletter.text"></label>
         </fieldset>
+
+        @if (s.shop; as shop) {
+        <fieldset class="adm-card">
+          <legend>فروشگاه — فاکتور و پرداخت</legend>
+          <label class="adm-field"><span class="adm-label">نرخ مالیات بر ارزش افزوده (٪)</span><input class="adm-input" type="number" min="0" max="30" step="0.5" name="vat" [(ngModel)]="shop.vatPercent" dir="ltr"><small>روی جمع کالا و هزینه ارسال محاسبه می‌شود؛ برای سفارش‌های بعدی اعمال می‌شود.</small></label>
+          <p class="adm-hint adm-wide"><b>اطلاعات فروشنده</b> — روی پیش‌فاکتور و فاکتور چاپ می‌شود.</p>
+          <label class="adm-field"><span class="adm-label">نام حقوقی شرکت</span><input class="adm-input" name="slegal" [(ngModel)]="shop.seller.legalName"></label>
+          <label class="adm-field"><span class="adm-label">شناسه ملی</span><input class="adm-input" name="snid" [(ngModel)]="shop.seller.nationalId" dir="ltr"></label>
+          <label class="adm-field"><span class="adm-label">کد اقتصادی</span><input class="adm-input" name="seco" [(ngModel)]="shop.seller.economicCode" dir="ltr"></label>
+          <label class="adm-field"><span class="adm-label">شماره ثبت</span><input class="adm-input" name="sreg" [(ngModel)]="shop.seller.regNo" dir="ltr"></label>
+          <label class="adm-field"><span class="adm-label">تلفن</span><input class="adm-input" name="sphone" [(ngModel)]="shop.seller.phone" dir="ltr"></label>
+          <label class="adm-field"><span class="adm-label">کد پستی</span><input class="adm-input" name="spost" [(ngModel)]="shop.seller.postalCode" dir="ltr"></label>
+          <label class="adm-field adm-wide"><span class="adm-label">نشانی</span><input class="adm-input" name="saddr" [(ngModel)]="shop.seller.address"></label>
+          <p class="adm-hint adm-wide"><b>حساب بانکی برای واریز</b> — به مشتریانی که روش «واریز به حساب» را انتخاب کرده‌اند نمایش داده می‌شود.</p>
+          <label class="adm-field"><span class="adm-label">نام بانک</span><input class="adm-input" name="bname" [(ngModel)]="shop.bank.name"></label>
+          <label class="adm-field"><span class="adm-label">صاحب حساب</span><input class="adm-input" name="bholder" [(ngModel)]="shop.bank.holder"></label>
+          <label class="adm-field"><span class="adm-label">شماره حساب</span><input class="adm-input" name="bacc" [(ngModel)]="shop.bank.account" dir="ltr"></label>
+          <label class="adm-field"><span class="adm-label">شماره شبا</span><input class="adm-input" name="bsheba" [(ngModel)]="shop.bank.sheba" dir="ltr" placeholder="IR000000000000000000000000"></label>
+          <label class="adm-field"><span class="adm-label">شماره کارت (اختیاری)</span><input class="adm-input" name="bcard" [(ngModel)]="shop.bank.card" dir="ltr"></label>
+          <p class="adm-hint adm-wide">درگاه‌های پرداخت اینترنتی (ملت، سامان، ملی) با اطلاعات قرارداد بانک در فایل <code>.env</code> سرور فعال می‌شوند؛ راهنما در مستند فنی.</p>
+        </fieldset>
+        }
         }
 
         <div class="adm-savebar adm-sticky">
@@ -176,6 +198,7 @@ export class AdminSettingsPage {
       r.settings.stats = pad(r.settings.stats, () => ({ value: 0, label: '', icon: 'check-circle' }));
       r.settings.features = pad(r.settings.features, () => ({ title: '', text: '', icon: 'shield' }));
       this.icons.set(r.icons);
+      r.settings.shop ??= { vatPercent: 10, seller: { legalName: '', nationalId: '', economicCode: '', regNo: '', address: '', postalCode: '', phone: '' }, bank: { name: '', holder: '', account: '', sheba: '', card: '' } };
       this.s.set(r.settings);
     }, (e) => this.toast.error(e));
   }
@@ -197,6 +220,7 @@ export class AdminSettingsPage {
         i18n,
         stats: keepStats.map((i) => ({ ...s.stats[i], value: Number(s.stats[i].value) || 0 })),
         features: keepFeatures.map((i) => s.features[i]),
+        ...(s.shop ? { shop: { ...s.shop, vatPercent: Number(s.shop.vatPercent) || 0, bank: { ...s.shop.bank, sheba: s.shop.bank.sheba.replace(/\s/g, '').toUpperCase() } } } : {}),
       });
       this.site.set(saved);
       this.toast.show('تنظیمات ذخیره شد و روی سایت اعمال شد.');

@@ -58,3 +58,14 @@ export class FaNumPipe implements PipeTransform {
 
 /** Persian/Arabic digits → ASCII (form input). */
 export const toAsciiDigits = (s: string) => s.replace(/[۰-۹]/g, (d) => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d))).replace(/[٠-٩]/g, (d) => String('٠١٢٣٤٥٦٧٨٩'.indexOf(d)));
+
+/** Amount in Toman in the site language: «۱۲٬۵۰۰٬۰۰۰ تومان» · «12,500,000 Toman». */
+@Pipe({ name: 'toman', pure: false })
+export class TomanPipe implements PipeTransform {
+  private readonly i18n = inject(I18n);
+  transform(value: number | null | undefined): string {
+    if (value === null || value === undefined) return '—';
+    const lang = this.i18n.lang();
+    return `${formatNumber(value, lang)} ${lang === 'fa' ? 'تومان' : 'Toman'}`;
+  }
+}

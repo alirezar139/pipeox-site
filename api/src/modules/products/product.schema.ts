@@ -18,6 +18,29 @@ class ProductSpec {
   @Prop({ default: '' }) value: string;
 }
 
+/** Sale units of a shop variant (labels live in the website's messages). */
+export const UNITS = ['piece', 'meter', 'length', 'kg', 'set'] as const;
+export type Unit = (typeof UNITS)[number];
+
+/**
+ * A size/grade of the product that is sold online at a fixed price.
+ * Products without active variants stay inquiry-only.
+ */
+@Schema({ _id: false })
+export class ProductVariant {
+  /** Stock-keeping code, unique within the product (e.g. API5L-B-6-SCH40). */
+  @Prop({ required: true }) sku: string;
+  /** Technical description shown to buyers (sizes and grades read the same in every language). */
+  @Prop({ required: true }) title: string;
+  @Prop({ required: true, enum: UNITS, default: 'piece' }) unit: Unit;
+  /** Unit price in Toman, before VAT. */
+  @Prop({ required: true, min: 0 }) price: number;
+  /** Units on hand; null = made to order / not tracked. */
+  @Prop({ type: Number, default: null }) stock: number | null;
+  @Prop({ default: 1, min: 1 }) minQty: number;
+  @Prop({ default: true }) active: boolean;
+}
+
 @Schema({ timestamps: true, collection: 'products' })
 export class Product {
   @Prop({ required: true, unique: true }) slug: string;
@@ -33,6 +56,7 @@ export class Product {
   @Prop({ type: [SchemaFactory.createForClass(ProductType)], default: [] }) types: ProductType[];
   @Prop({ type: [SchemaFactory.createForClass(ProductSpec)], default: [] }) specs: ProductSpec[];
   @Prop({ type: [String], default: [] }) applications: string[];
+  @Prop({ type: [SchemaFactory.createForClass(ProductVariant)], default: [] }) variants: ProductVariant[];
   @Prop({ default: 0, index: true }) sort: number;
   @Prop({ default: true, index: true }) published: boolean;
   /** Translations: { en: {...}, de: {...} } with the same text fields (see productTranslation). */
@@ -56,6 +80,21 @@ export const productInput = z.object({
   types: z.array(z.object({ name: text(120).pipe(z.string().min(1)), desc: text(300).default('') })).max(30).default([]),
   specs: z.array(z.object({ label: text(120).pipe(z.string().min(1)), value: text(400).default('') })).max(40).default([]),
   applications: z.array(text(150).pipe(z.string().min(1))).max(40).default([]),
+  variants: z
+    .array(
+      z.object({
+        sku: z.string().trim().max(40).regex(/^[A-Za-z0-9][A-Za-z0-9._/-]*$/, 'کد کالا (SKU) فقط حروف انگلیسی، عدد و . _ / - است.'),
+        title: text(150).pipe(z.string().min(1, 'عنوان هر ردیف فروش را وارد کنید.')),
+        unit: z.enum(UNITS).default('piece'),
+        price: z.coerce.number().int().min(1000, 'قیمت باید دست‌کم ۱٬۰۰۰ تومان باشد.').max(100_000_000_000),
+        stock: z.coerce.number().int().min(0).max(10_000_000).nullable().default(null),
+        minQty: z.coerce.number().int().min(1).max(100_000).default(1),
+        active: z.boolean().default(true),
+      }),
+    )
+    .max(100)
+    .default([])
+    .refine((v) => new Set(v.map((x) => x.sku.toUpperCase())).size === v.length, 'کد کالا (SKU) در هر محصول باید یکتا باشد.'),
   sort: z.coerce.number().int().min(-9999).max(9999).default(0),
   published: z.boolean().default(true),
   i18n: i18nInput(

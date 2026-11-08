@@ -30,6 +30,8 @@ export const ADMIN_ROUTES: Routes = [
     children: [
       { path: '', canActivate: [managers], loadComponent: () => import('./pages/dashboard.page').then((m) => m.AdminDashboardPage) },
       { path: 'inquiries', loadComponent: () => import('./pages/inquiries.page').then((m) => m.AdminInquiriesPage) },
+      { path: 'orders', loadComponent: () => import('./pages/orders.page').then((m) => m.AdminOrdersPage) },
+      { path: 'orders/:id', loadComponent: () => import('./pages/order-edit.page').then((m) => m.AdminOrderEditPage) },
       { path: 'chats', loadComponent: () => import('./pages/chats.page').then((m) => m.AdminChatsPage) },
       { path: 'products', canActivate: [managers], loadComponent: () => import('./pages/products.page').then((m) => m.AdminProductsPage) },
       { path: 'products/:id', canActivate: [managers], loadComponent: () => import('./pages/product-edit.page').then((m) => m.AdminProductEditPage) },

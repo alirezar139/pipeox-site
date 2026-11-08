@@ -9,6 +9,9 @@ import { Product, productInput, type ProductInput } from './product.schema.js';
 
 const PUBLIC_FIELDS = '-__v -published -createdAt';
 
+/** Visitors see only the variants on sale. */
+const forSale = <T extends { variants?: { active: boolean }[] }>(p: T): T => ({ ...p, variants: (p.variants ?? []).filter((v) => v.active) });
+
 @Controller()
 export class ProductsController {
   constructor(@InjectModel(Product.name) private readonly products: Model<Product>) {}
@@ -18,14 +21,14 @@ export class ProductsController {
   @Get('products')
   async list(@Req() req: Request) {
     const lang = langOf(req);
-    return (await this.products.find({ published: true }).sort({ sort: 1, _id: 1 }).select(PUBLIC_FIELDS).lean()).map((p) => localize(p, lang));
+    return (await this.products.find({ published: true }).sort({ sort: 1, _id: 1 }).select(PUBLIC_FIELDS).lean()).map((p) => localize(forSale(p), lang));
   }
 
   @Get('products/:slug')
   async one(@Param('slug', { schema: slug }) s: string, @Req() req: Request) {
     const p = await this.products.findOne({ slug: s, published: true }).select(PUBLIC_FIELDS).lean();
     if (!p) throw new NotFoundException('محصول پیدا نشد.');
-    return localize(p, langOf(req));
+    return localize(forSale(p), langOf(req));
   }
 
   /* ───────── Admin ───────── */

@@ -11,6 +11,8 @@ export const serverRoutes: ServerRoute[] = [
     { path: `${p}/**`, renderMode: RenderMode.Client } as ServerRoute,
     { path: p, renderMode: RenderMode.Client } as ServerRoute,
   ]),
+  // Cart and checkout live in the visitor's browser (localStorage) — no server rendering
+  ...['cart', 'en/cart', 'de/cart', 'checkout', 'en/checkout', 'de/checkout'].map((path) => ({ path, renderMode: RenderMode.Client }) as ServerRoute),
   ...['404', 'en/404', 'de/404'].map((path) => ({ path, renderMode: RenderMode.Server, status: 404 }) as ServerRoute),
   { path: '**', renderMode: RenderMode.Server },
 ];

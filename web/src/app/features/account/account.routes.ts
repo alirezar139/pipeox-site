@@ -17,6 +17,7 @@ const signedOut: CanActivateFn = async () => {
 
 export const ACCOUNT_ROUTES: Routes = [
   { path: '', canActivate: [signedIn], loadComponent: () => import('./dashboard.page').then((m) => m.DashboardPage) },
+  { path: 'orders/:id', canActivate: [signedIn], loadComponent: () => import('../shop/order.page').then((m) => m.OrderPage) },
   { path: 'login', canActivate: [signedOut], loadComponent: () => import('./auth.pages').then((m) => m.LoginPage) },
   { path: 'register', canActivate: [signedOut], loadComponent: () => import('./auth.pages').then((m) => m.RegisterPage) },
   { path: 'forgot', loadComponent: () => import('./auth.pages').then((m) => m.ForgotPage) },

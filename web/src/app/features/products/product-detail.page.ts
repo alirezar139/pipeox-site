@@ -6,11 +6,12 @@ import { ProductCardComponent } from '../../shared/cards';
 import { PageHeroComponent } from '../../shared/page-hero.component';
 import { NotFoundPage } from '../pages/not-found.page';
 import { QuoteFormComponent } from '../../shared/quote/quote-form.component';
+import { BuyTableComponent } from '../shop/buy-table.component';
 
 @Component({
   selector: 'app-product-detail-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [PageHeroComponent, QuoteFormComponent, ProductCardComponent, NotFoundPage, TPipe],
+  imports: [PageHeroComponent, QuoteFormComponent, ProductCardComponent, NotFoundPage, TPipe, BuyTableComponent],
   template: `
     @if (product(); as p) {
     <app-page-hero [heading]="p.title" [eyebrow]="p.code" [lead]="p.summary" [crumbs]="crumbs()" />
@@ -23,6 +24,8 @@ import { QuoteFormComponent } from '../../shared/quote/quote-form.component';
             }
             <p>{{ p.intro }}</p>
           </div>
+
+          @if (p.variants.length) { <app-buy-table [product]="p" /> }
 
           @if (p.types.length) {
             <h2 class="sub-title">{{ 'product.types' | t }}</h2>
@@ -97,6 +100,17 @@ export class ProductDetailPage {
             category: p.code,
             ...(p.image ? { image: seo.origin() + p.image } : {}),
             brand: { '@type': 'Brand', name: 'PIPEOX' },
+            ...(p.variants.length
+              ? {
+                  offers: {
+                    '@type': 'AggregateOffer',
+                    priceCurrency: 'IRR',
+                    lowPrice: Math.min(...p.variants.map((v) => v.price)) * 10,
+                    highPrice: Math.max(...p.variants.map((v) => v.price)) * 10,
+                    offerCount: p.variants.length,
+                  },
+                }
+              : {}),
           },
         ],
       });

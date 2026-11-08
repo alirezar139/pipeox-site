@@ -1,6 +1,8 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthStore } from '../core/auth.store';
+import { CartStore } from '../core/cart.store';
+import { FaNumPipe } from '../core/format';
 import { I18n, LANG_LIST, LANG_META, LinkPipe, TPipe, type Lang } from '../core/i18n';
 import { IconComponent } from '../shared/icon.component';
 import { LogoComponent } from './logo.component';
@@ -9,7 +11,7 @@ import { HEADER_NAV } from './nav';
 @Component({
   selector: 'app-header',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, RouterLinkActive, IconComponent, LogoComponent, TPipe, LinkPipe],
+  imports: [RouterLink, RouterLinkActive, IconComponent, LogoComponent, TPipe, LinkPipe, FaNumPipe],
   host: {
     class: 'site-header',
     '[class.scrolled]': 'scrolled() || menuOpen()',
@@ -54,6 +56,11 @@ import { HEADER_NAV } from './nav';
           [attr.title]="auth.user()?.email ?? null">
           <app-icon name="user" /><span>{{ (auth.user() ? 'nav.myAccount' : 'nav.login') | t }}</span>
         </a>
+        @if (cart.count()) {
+          <a class="pill pill-ghost nav-cart" routerLinkActive="is-active" [routerLink]="'/cart' | link" [attr.aria-label]="('nav.cart' | t) + ' (' + cart.count() + ')'">
+            <app-icon name="cart" /><em>{{ cart.count() | faNum }}</em>
+          </a>
+        }
         <span class="nav-sep" aria-hidden="true"></span>
         <a class="btn-cta" [routerLink]="'/contact' | link" routerLinkActive="is-active" ariaCurrentWhenActive="page">
           <span class="cta-full">{{ 'nav.cta' | t }}</span><span class="cta-short">{{ 'nav.ctaShort' | t }}</span><i class="btn-dot"><app-icon name="arrow" /></i>
@@ -71,6 +78,7 @@ export class HeaderComponent {
   protected readonly langs = LANG_LIST;
   protected readonly meta = LANG_META;
   protected readonly auth = inject(AuthStore);
+  protected readonly cart = inject(CartStore);
   protected readonly i18n = inject(I18n);
   protected readonly router = inject(Router);
   protected readonly scrolled = signal(false);

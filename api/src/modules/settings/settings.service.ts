@@ -19,7 +19,9 @@ export class SettingsService {
     if (!this.cache) {
       const doc = await this.col.findOne({ _id: DOC_ID });
       if (!doc) throw new Error('Site settings missing — the seed did not run.');
-      this.cache = doc.value;
+      // Fill in sections added in later versions (e.g. shop) with their defaults
+      const parsed = settingsSchema.safeParse(doc.value);
+      this.cache = parsed.success ? parsed.data : doc.value;
     }
     return this.cache;
   }

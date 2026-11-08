@@ -34,6 +34,32 @@ export const settingsSchema = z.object({
     video: z.string().max(500).regex(/^$|^https:\/\//, 'لینک ویدیو باید با https:// شروع شود.'),
   }),
   newsletter: z.object({ title: text(80), text: text(300) }),
+  /** Online shop: VAT, the seller block printed on invoices, and the account for bank transfers. */
+  shop: z
+    .object({
+      vatPercent: z.coerce.number().min(0).max(30).default(10),
+      seller: z
+        .object({
+          legalName: text(150).default(''),
+          nationalId: text(20).default(''),
+          economicCode: text(20).default(''),
+          regNo: text(20).default(''),
+          address: text(300).default(''),
+          postalCode: text(20).default(''),
+          phone: text(40).default(''),
+        })
+        .prefault({}),
+      bank: z
+        .object({
+          name: text(80).default(''),
+          holder: text(150).default(''),
+          account: text(40).default(''),
+          sheba: z.string().trim().max(40).regex(/^$|^IR\d{24}$/, 'شماره شبا باید با IR و ۲۴ رقم باشد.').default(''),
+          card: text(30).default(''),
+        })
+        .prefault({}),
+    })
+    .prefault({}),
   /** Translations of the text fields (numbers, icons, links and contact details are shared). */
   i18n: i18nInput(
     z

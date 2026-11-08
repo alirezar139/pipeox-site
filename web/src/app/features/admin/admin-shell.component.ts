@@ -9,6 +9,7 @@ import { ToastService } from './ui/toast.service';
 /** staff: also shown to support accounts (supportLabel replaces the label for them). */
 const SECTIONS: { path: string; label: string; icon: IconName; exact?: boolean; developer?: boolean; staff?: boolean; supportLabel?: string }[] = [
   { path: '/admin', label: 'داشبورد', icon: 'home', exact: true },
+  { path: '/admin/orders', label: 'سفارش‌ها', icon: 'cart', staff: true },
   { path: '/admin/inquiries', label: 'استعلام‌ها', icon: 'inbox', staff: true },
   { path: '/admin/chats', label: 'گفت‌وگوها', icon: 'headset', staff: true },
   { path: '/admin/products', label: 'محصولات', icon: 'box' },
@@ -38,6 +39,7 @@ const SECTIONS: { path: string; label: string; icon: IconName; exact?: boolean; 
             <app-icon [name]="s.icon" /><span>{{ (api.isSupport() && s.supportLabel) || s.label }}</span>
             @if (s.path === '/admin/inquiries' && api.newCount()) { <em>{{ api.newCount() }}</em> }
             @if (s.path === '/admin/chats' && api.chatUnread()) { <em>{{ api.chatUnread() }}</em> }
+            @if (s.path === '/admin/orders' && api.orderTodo()) { <em>{{ api.orderTodo() }}</em> }
           </a>
         }
       </nav>
@@ -97,6 +99,7 @@ export class AdminShellComponent {
           known = n;
         }, () => {});
       void pollChats();
+      void this.api.orders().catch(() => undefined);
       const chatTimer = setInterval(pollChats, 20_000);
       destroy.onDestroy(() => clearInterval(chatTimer));
     });

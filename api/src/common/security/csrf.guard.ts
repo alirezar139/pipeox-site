@@ -1,5 +1,13 @@
-import { CanActivate, ExecutionContext, ForbiddenException, Injectable } from '@nestjs/common';
+import { CanActivate, ExecutionContext, ForbiddenException, Injectable, SetMetadata } from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
 import type { Request } from 'express';
+
+const SKIP = 'csrf:skip';
+/**
+ * For endpoints that other sites legitimately post to with a plain HTML form — the bank
+ * payment callbacks. They carry no session and trust nothing until verified with the bank.
+ */
+export const SkipCsrf = () => SetMetadata(SKIP, true);
 
 /**
  * CSRF defence for cookie-authenticated requests:
@@ -10,9 +18,12 @@ import type { Request } from 'express';
  */
 @Injectable()
 export class CsrfGuard implements CanActivate {
+  constructor(private readonly reflector: Reflector) {}
+
   canActivate(ctx: ExecutionContext): boolean {
     const req = ctx.switchToHttp().getRequest<Request>();
     if (['GET', 'HEAD', 'OPTIONS'].includes(req.method)) return true;
+    if (this.reflector.getAllAndOverride<boolean>(SKIP, [ctx.getHandler(), ctx.getClass()])) return true;
 
     if (req.get('x-requested-with') !== 'pipeox') {
       throw new ForbiddenException('Missing request header');

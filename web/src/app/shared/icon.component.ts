@@ -4,7 +4,7 @@ export type IconName =
   | 'search' | 'arrow' | 'arrow-right' | 'chevron' | 'play' | 'play-solid' | 'send' | 'user' | 'phone' | 'doc' | 'clip'
   | 'list' | 'trophy' | 'check-circle' | 'users' | 'users-solid' | 'headset' | 'gear' | 'shield' | 'calendar' | 'mail'
   | 'menu' | 'close' | 'logout' | 'edit' | 'trash' | 'plus' | 'eye' | 'download' | 'image' | 'home' | 'box' | 'news'
-  | 'folder' | 'settings' | 'inbox' | 'lock' | 'eye-off' | 'refresh' | 'code';
+  | 'folder' | 'settings' | 'inbox' | 'lock' | 'eye-off' | 'refresh' | 'code' | 'cart' | 'card';
 
 /** Line icons, 24×24, stroke = currentColor. Decorative unless given a label by the parent. */
 @Component({
@@ -48,6 +48,8 @@ export type IconName =
         @case ('download') { <path d="M12 4v11m-5-5 5 5 5-5M4 20h16"/> }
         @case ('image') { <rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="m21 16-5-5-9 9"/> }
         @case ('home') { <path d="M4 11 12 4l8 7v9H4z"/><path d="M10 20v-5h4v5"/> }
+        @case ('cart') { <circle cx="9" cy="20" r="1.4"/><circle cx="18" cy="20" r="1.4"/><path d="M2.5 3.5h2.6l2.4 11.2a1.6 1.6 0 0 0 1.6 1.3h8.7a1.6 1.6 0 0 0 1.6-1.2l1.6-6.8H6.2"/> }
+        @case ('card') { <rect x="2.5" y="5" width="19" height="14" rx="2"/><path d="M2.5 10h19M6.5 15h4"/> }
         @case ('box') { <path d="M3 7.5 12 3l9 4.5v9L12 21l-9-4.5z"/><path d="m3 7.5 9 4.5 9-4.5M12 12v9"/> }
         @case ('news') { <rect x="3" y="4" width="15" height="16" rx="2"/><path d="M18 8h3v10a2 2 0 0 1-2 2M7 8h7M7 12h7M7 16h4"/> }
         @case ('folder') { <path d="M3 6a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/> }

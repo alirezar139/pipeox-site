@@ -25,6 +25,7 @@ Object.assign(process.env, {
   ADMIN_PASSWORD_HASH: ['scrypt', 1 << 15, 8, 1, salt.toString('base64'), key.toString('base64')].join('$'),
   DATA_DIR: dataDir,
   SMTP_HOST: '',
+  PAYMENT_SANDBOX: 'true',
   BALE_BOT_TOKEN: '',
   TELEGRAM_BOT_TOKEN: '',
 });
@@ -407,3 +408,156 @@ describe('support chat', () => {
   });
 });
 
+
+describe('online shop', () => {
+  /** Registration is limited to 5 per hour per IP (used up above): shop customers go straight into the database. */
+  async function customer(email: string, password: string) {
+    const salt = randomBytes(16);
+    const hash = scryptSync(password, salt, 64, { N: 1 << 15, r: 8, p: 1, maxmem: 128 * (1 << 15) * 8 * 2 });
+    // A separate connection: mongoose.disconnect() would also close the app's connection
+    const conn = await mongoose.createConnection(DB).asPromise();
+    await conn.collection('users').insertOne({
+      email, name: 'خریدار', phone: '09121112233', company: '', active: true, tokenVersion: 0, createdAt: new Date(), updatedAt: new Date(),
+      passwordHash: ['scrypt', 1 << 15, 8, 1, salt.toString('base64'), hash.toString('base64')].join('$'),
+    });
+    await conn.close();
+    const ag = agent();
+    await ag.post('/api/auth/login').set(H).send({ email, password, ...(await cap()) }).expect(200);
+    return ag;
+  }
+  let buyer: ReturnType<typeof agent>;
+
+  it('prices the cart, takes stock, finalises shipping and VAT, and accepts a sandbox payment', async () => {
+    const a = await adminAgent();
+    const settings = (await a.get('/api/admin/settings').expect(200)).body.settings;
+    await a.put('/api/admin/settings').set(H).send({ ...settings, shop: { vatPercent: 10 } }).expect(200);
+    const product = (
+      await a
+        .post('/api/admin/products')
+        .set(H)
+        .send({
+          slug: 'shop-pipe',
+          title: 'لوله آزمایشی',
+          variants: [
+            { sku: 'P-6-40', title: '6" SCH40', unit: 'length', price: 2_500_000, stock: 10 },
+            { sku: 'P-8-80', title: '8" SCH80', unit: 'meter', price: 900_000, stock: null, minQty: 2 },
+            { sku: 'OLD', title: 'retired', unit: 'piece', price: 5000, active: false },
+          ],
+        })
+        .expect(201)
+    ).body as { _id: string };
+    await a
+      .post('/api/admin/products')
+      .set(H)
+      .send({ slug: 'dup-sku', title: 'تکراری', variants: [{ sku: 'X', title: 'a', price: 5000 }, { sku: 'x', title: 'b', price: 5000 }] })
+      .expect(400);
+
+    // Visitors see the variants on sale only
+    const pub = (await request(host).get('/api/products/shop-pipe').expect(200)).body as { variants: { sku: string }[] };
+    expect(pub.variants.map((v) => v.sku)).toEqual(['P-6-40', 'P-8-80']);
+
+    // Cart pricing explains what cannot be ordered
+    const priced = (
+      await request(host)
+        .post('/api/cart/price')
+        .set(H)
+        .set('x-lang', 'en')
+        .send({ items: [{ slug: 'shop-pipe', sku: 'P-6-40', qty: 11 }, { slug: 'shop-pipe', sku: 'P-8-80', qty: 1 }, { slug: 'shop-pipe', sku: 'OLD', qty: 1 }] })
+        .expect(200)
+    ).body as { lines: { sku: string; error: string }[]; gateways: { id: string }[] };
+    expect(priced.lines.map((l) => l.error)).toEqual([
+      'The quantity exceeds the available stock.',
+      'The quantity is below the minimum order.',
+      'This item is no longer available online.',
+    ]);
+    expect(priced.gateways.map((g) => g.id)).toEqual(['sandbox']);
+
+    const checkout = {
+      items: [{ slug: 'shop-pipe', sku: 'P-6-40', qty: 4 }, { slug: 'shop-pipe', sku: 'P-8-80', qty: 3 }],
+      payMethod: 'online',
+      address: { name: 'خریدار', phone: '09121112233', province: 'تهران', city: 'تهران', address: 'خیابان آزمایش، پلاک ۱', postalCode: '۱۲۳۴۵۶۷۸۹۰' },
+      invoice: { type: 'company', name: 'شرکت آزمون', nationalId: '10101010101', economicCode: '411111111111' },
+    };
+    await request(host).post('/api/orders').set(H).send(checkout).expect(401);
+
+    const c = (buyer = await customer('shop-buyer@example.com', 'goodpass123'));
+    await c.post('/api/orders').set(H).send({ ...checkout, invoice: { ...checkout.invoice, nationalId: '123' } }).expect(400);
+    const order = (await c.post('/api/orders').set(H).send(checkout).expect(201)).body as { _id: string; number: number; status: string; subtotal: number; total: null };
+    const subtotal = 4 * 2_500_000 + 3 * 900_000;
+    expect(order).toMatchObject({ status: 'review', subtotal, total: null });
+    expect(order.number).toBeGreaterThan(1000);
+    const stockOf = async () =>
+      ((await a.get(`/api/admin/products/${product._id}`).expect(200)).body.variants as { sku: string; stock: number | null }[]).find((v) => v.sku === 'P-6-40')!.stock;
+    expect(await stockOf()).toBe(6);
+
+    // No payment before the team sets the shipping cost
+    await c.post(`/api/orders/${order._id}/pay`).set(H).send({ gateway: 'sandbox' }).expect(400);
+
+    const updated = (await a.patch(`/api/admin/orders/${order._id}`).set(H).send({ shipping: 500_000, shippingNote: 'باربری' }).expect(200)).body;
+    const vat = Math.round(((subtotal + 500_000) * 10) / 100);
+    expect(updated).toMatchObject({ status: 'awaiting_payment', shipping: 500_000, vat, total: subtotal + 500_000 + vat });
+
+    // Pay through the sandbox "bank"
+    const redirect = (await c.post(`/api/orders/${order._id}/pay`).set(H).send({ gateway: 'sandbox' }).expect(200)).body as { url: string; fields: { token: string } };
+    const page = await request(host).get(redirect.url).query(redirect.fields).expect(200);
+    const action = /action="([^"]+)"/.exec(page.text)![1].replace(/&#(\d+);/g, (_m, d: string) => String.fromCharCode(Number(d)));
+    const payNo = /name="payNo" value="(\d+)"/.exec(page.text)![1];
+    const callback = new URL(action).pathname;
+    // The bank posts a plain form: no CSRF header, no session
+    const cb = await request(host).post(callback).type('form').send({ payNo, token: redirect.fields.token, result: 'ok' }).expect(303);
+    expect(cb.headers['location']).toBe(`/account/orders/${order._id}?pay=ok`);
+    const again = await request(host).post(callback).type('form').send({ payNo, token: redirect.fields.token, result: 'ok' }).expect(303);
+    expect(again.headers['location']).toContain('pay=ok');
+
+    const mine = (await c.get(`/api/account/orders/${order._id}`).expect(200)).body as { status: string; payments: { status: string; rrn: string }[]; staffNote?: string };
+    expect(mine.status).toBe('paid');
+    expect(mine.payments[0].status).toBe('paid');
+    expect(mine.payments[0].rrn).toBeTruthy();
+    expect(mine.staffNote).toBeUndefined();
+    await c.post(`/api/orders/${order._id}/cancel`).set(H).expect(400); // paid orders are cancelled by the team
+
+    // Orders of other customers stay invisible
+    const conn = await mongoose.createConnection(DB).asPromise();
+    const foreign = await conn.collection('orders').insertOne({
+      number: 99999, user: new mongoose.Types.ObjectId(), status: 'review', payMethod: 'online', items: [], subtotal: 1, vatPercent: 10,
+      address: { name: 'x', phone: '0', province: 'x', city: 'x', address: 'x' }, invoice: { type: 'personal', name: 'x' }, payments: [], history: [],
+    });
+    await conn.close();
+    await c.get(`/api/account/orders/${String(foreign.insertedId)}`).expect(404);
+    await c.post(`/api/orders/${String(foreign.insertedId)}/cancel`).set(H).expect(404);
+    const list = (await c.get('/api/account/orders').expect(200)).body as { number: number }[];
+    expect(list.map((o) => o.number)).toEqual([order.number]);
+  });
+
+  it('bank transfer: customer reports it, the team confirms; cancelling gives stock back', async () => {
+    const a = await adminAgent();
+    const c = buyer;
+    const base = {
+      payMethod: 'transfer',
+      address: { name: 'خریدار', phone: '09121112233', province: 'اصفهان', city: 'اصفهان', address: 'نشانی کامل آزمایشی' },
+      invoice: { type: 'personal', name: 'خریدار', nationalId: '0012345678' },
+    };
+    const o = (await c.post('/api/orders').set(H).send({ ...base, items: [{ slug: 'shop-pipe', sku: 'P-6-40', qty: 2 }] }).expect(201)).body as { _id: string };
+    await c.post(`/api/orders/${o._id}/transfer`).set(H).send({ ref: '123456' }).expect(400); // not priced yet
+    await a.patch(`/api/admin/orders/${o._id}`).set(H).send({ shipping: 0 }).expect(200);
+    const reported = (await c.post(`/api/orders/${o._id}/transfer`).set(H).send({ ref: '987654', paidOn: '1405/08/17' }).expect(200)).body;
+    expect(reported.transfer.ref).toBe('987654');
+    const list = (await a.get('/api/admin/orders?status=awaiting_payment').expect(200)).body as { items: { _id: string }[] };
+    expect(list.items.some((x) => x._id === o._id)).toBe(true);
+    expect((await a.patch(`/api/admin/orders/${o._id}`).set(H).send({ status: 'paid' }).expect(200)).body.status).toBe('paid');
+
+    // Cancelling an unpaid order returns its stock
+    const stock = async () =>
+      ((await a.get('/api/admin/products').expect(200)).body as { slug: string; variants: { sku: string; stock: number }[] }[]).find((p) => p.slug === 'shop-pipe')!.variants[0].stock;
+    const before = await stock();
+    const o2 = (await c.post('/api/orders').set(H).send({ ...base, items: [{ slug: 'shop-pipe', sku: 'P-6-40', qty: 3 }] }).expect(201)).body as { _id: string };
+    expect(await stock()).toBe(before - 3);
+    expect((await c.post(`/api/orders/${o2._id}/cancel`).set(H).expect(200)).body.status).toBe('cancelled');
+    expect(await stock()).toBe(before);
+    await a.patch(`/api/admin/orders/${o2._id}`).set(H).send({ status: 'paid' }).expect(400);
+
+    // Visitors cannot reach the panel side; the export is for managers
+    await request(host).get('/api/admin/orders').expect(401);
+    await a.get('/api/admin/orders/export.csv').expect(200);
+  });
+});

@@ -62,6 +62,21 @@ export const envSchema = z.object({
   BALE_CHAT_ID: z.string().default(''),
   TELEGRAM_BOT_TOKEN: z.string().default(''),
   TELEGRAM_CHAT_ID: z.string().default(''),
+
+  /* Online payment (Shaparak). A bank gateway is offered once its credentials are set. */
+  MELLAT_TERMINAL_ID: z.string().default(''),
+  MELLAT_USERNAME: z.string().default(''),
+  MELLAT_PASSWORD: z.string().default(''),
+  SAMAN_TERMINAL_ID: z.string().default(''),
+  SADAD_MERCHANT_ID: z.string().default(''),
+  SADAD_TERMINAL_ID: z.string().default(''),
+  /** Base64 merchant key from Bank Melli (Sadad). */
+  SADAD_KEY: z.string().default(''),
+  /** Test gateway that approves or cancels without a bank. Never available in production. */
+  PAYMENT_SANDBOX: bool,
+}).refine((e) => !(e.PAYMENT_SANDBOX && e.NODE_ENV === 'production'), {
+  message: 'PAYMENT_SANDBOX must be off in production',
+  path: ['PAYMENT_SANDBOX'],
 });
 
 export type Env = z.infer<typeof envSchema>;

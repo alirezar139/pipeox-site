@@ -25,10 +25,72 @@ export interface SiteSettings {
   features: { title: string; text: string; icon: string }[];
   projects: { title: string; text: string; video: string };
   newsletter: { title: string; text: string };
+  shop?: ShopSettings;
   i18n?: I18nOf<SettingsTranslation>;
 }
 
 export type OrbitSlot = '' | 'a' | 'b' | 'c' | 'd';
+
+export type Unit = 'piece' | 'meter' | 'length' | 'kg' | 'set';
+
+/** A size/grade sold online at a fixed price (Toman, before VAT). stock null = supplied to order. */
+export interface ProductVariant {
+  sku: string;
+  title: string;
+  unit: Unit;
+  price: number;
+  stock: number | null;
+  minQty: number;
+  active: boolean;
+}
+
+export interface ShopSettings {
+  vatPercent: number;
+  seller: { legalName: string; nationalId: string; economicCode: string; regNo: string; address: string; postalCode: string; phone: string };
+  bank: { name: string; holder: string; account: string; sheba: string; card: string };
+}
+
+export type OrderStatus = 'review' | 'awaiting_payment' | 'paid' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+export type PayMethod = 'online' | 'transfer';
+
+export interface OrderItem {
+  slug: string;
+  productTitle: string;
+  sku: string;
+  title: string;
+  unit: Unit;
+  price: number;
+  qty: number;
+  total: number;
+}
+
+export interface Order {
+  _id: string;
+  number: number;
+  status: OrderStatus;
+  payMethod: PayMethod;
+  items: OrderItem[];
+  subtotal: number;
+  shipping: number | null;
+  vatPercent: number;
+  vat: number | null;
+  total: number | null;
+  address: { name: string; phone: string; province: string; city: string; address: string; postalCode: string };
+  invoice: { type: 'personal' | 'company'; name: string; nationalId: string; economicCode: string; regNo: string };
+  customerNote: string;
+  shippingNote: string;
+  trackingCode: string;
+  payments: { gateway: string; amountRial: number; status: 'pending' | 'paid' | 'failed'; rrn: string; card: string; startedAt: string; doneAt?: string }[];
+  transfer: { ref: string; paidOn: string; note: string; at: string } | null;
+  paidAt: string | null;
+  history: { status: string; at: string; by: string }[];
+  createdAt: string;
+}
+
+export interface Gateway {
+  id: string;
+  label: { fa: string; en: string; de: string };
+}
 
 export interface Product {
   _id: string;
@@ -45,6 +107,7 @@ export interface Product {
   types: { name: string; desc: string }[];
   specs: { label: string; value: string }[];
   applications: string[];
+  variants: ProductVariant[];
   sort: number;
   published?: boolean;
   updatedAt: string;

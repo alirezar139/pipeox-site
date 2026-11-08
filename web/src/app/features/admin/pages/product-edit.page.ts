@@ -18,7 +18,7 @@ export const ORBIT_LABELS: Record<Exclude<OrbitSlot, ''>, string> = {
 
 const EMPTY: Partial<Product> = {
   slug: '', title: '', shortTitle: '', code: '', summary: '', intro: '', image: '', alt: '', keywords: '',
-  orbit: '', types: [], specs: [], applications: [], sort: 0, published: true,
+  orbit: '', types: [], specs: [], applications: [], variants: [], sort: 0, published: true,
 };
 
 @Component({
@@ -118,6 +118,31 @@ const EMPTY: Partial<Product> = {
       </fieldset>
 
       <fieldset class="adm-card">
+        <legend>فروش آنلاین (قیمت و موجودی)</legend>
+        <p class="adm-hint">هر ردیف یک سایز یا گرید با قیمت ثابت است که مشتری می‌تواند آن را به سبد خرید اضافه کند. اگر ردیفی نباشد، محصول فقط با استعلام قیمت عرضه می‌شود. قیمت به تومان و بدون مالیات است؛ موجودی خالی یعنی «تأمین طبق سفارش» (بدون کنترل موجودی).</p>
+        @if (p.variants?.length) {
+          <div class="adm-variants">
+            <div class="adm-variant adm-variant-head"><span>کد کالا (SKU)</span><span>مشخصات (سایز، گرید، استاندارد)</span><span>واحد</span><span>قیمت (تومان)</span><span>موجودی</span><span>حداقل</span><span>فعال</span><span></span></div>
+            @for (v of p.variants; track $index; let i = $index) {
+              <div class="adm-variant">
+                <input class="adm-input" [name]="'vs' + i" [(ngModel)]="v.sku" dir="ltr" placeholder="API5L-B-6-SCH40" maxlength="40" aria-label="کد کالا">
+                <input class="adm-input" [name]="'vt' + i" [(ngModel)]="v.title" dir="auto" placeholder='6" SCH40 — API 5L Gr.B' maxlength="150" aria-label="مشخصات">
+                <select class="adm-input" [name]="'vu' + i" [(ngModel)]="v.unit" aria-label="واحد">
+                  @for (u of units; track u[0]) { <option [value]="u[0]">{{ u[1] }}</option> }
+                </select>
+                <input class="adm-input" type="number" min="1000" step="1000" [name]="'vp' + i" [(ngModel)]="v.price" dir="ltr" aria-label="قیمت">
+                <input class="adm-input" type="number" min="0" [name]="'vk' + i" [(ngModel)]="v.stock" dir="ltr" placeholder="—" aria-label="موجودی">
+                <input class="adm-input" type="number" min="1" [name]="'vm' + i" [(ngModel)]="v.minQty" dir="ltr" aria-label="حداقل سفارش">
+                <input type="checkbox" [name]="'va' + i" [(ngModel)]="v.active" aria-label="فعال">
+                <button type="button" class="adm-icon-btn" (click)="p.variants!.splice(i, 1)" aria-label="حذف"><app-icon name="trash" /></button>
+              </div>
+            }
+          </div>
+        }
+        <button type="button" class="adm-btn adm-btn-ghost adm-btn-sm" (click)="addVariant()"><app-icon name="plus" /> افزودن ردیف فروش</button>
+      </fieldset>
+
+      <fieldset class="adm-card">
         <legend>کاربردها و نمایش</legend>
         <label class="adm-field adm-wide"><span class="adm-label">کاربردها</span>
           <textarea class="adm-input" name="applications" rows="4" [(ngModel)]="applications"></textarea><small>هر خط یک کاربرد</small></label>
@@ -145,6 +170,7 @@ export class AdminProductEditPage {
   private readonly toast = inject(ToastService);
   private readonly router = inject(Router);
 
+  protected readonly units = [['piece', 'عدد'], ['meter', 'متر'], ['length', 'شاخه'], ['kg', 'کیلوگرم'], ['set', 'دست']] as const;
   protected readonly orbitLabels = ORBIT_LABELS;
   protected readonly orbitKeys = Object.keys(ORBIT_LABELS) as (keyof typeof ORBIT_LABELS)[];
   protected p: Partial<Product> = structuredClone(EMPTY);
@@ -174,13 +200,17 @@ export class AdminProductEditPage {
     effect(() => {
       if (this.isNew()) return this.loaded.set(true);
       this.api.product(this.id()).then((p) => {
-        this.p = p;
+        this.p = { ...p, variants: p.variants ?? [] };
         this.image = p.image;
         this.applications = p.applications.join('\n');
         this.trApps = { en: (p.i18n?.en?.applications ?? []).join('\n'), de: (p.i18n?.de?.applications ?? []).join('\n') };
         this.loaded.set(true);
       }, (e) => this.toast.error(e));
     });
+  }
+
+  protected addVariant() {
+    (this.p.variants ??= []).push({ sku: '', title: '', unit: 'piece', price: 0, stock: null, minQty: 1, active: true });
   }
 
   async save() {
@@ -207,6 +237,15 @@ export class AdminProductEditPage {
       specs: keepSpecs.map((i) => this.p.specs![i]),
       applications: this.applications.split('\n').map((s) => s.trim()).filter(Boolean),
       sort: Number(this.p.sort) || 0,
+      variants: (this.p.variants ?? [])
+        .filter((v) => v.sku.trim() || v.title.trim())
+        .map((v) => ({
+          ...v,
+          sku: v.sku.trim(),
+          price: Number(v.price) || 0,
+          stock: v.stock === null || (v.stock as unknown) === '' ? null : Number(v.stock),
+          minQty: Number(v.minQty) || 1,
+        })),
     };
     for (const k of ['_id', 'createdAt', 'updatedAt', '__v'] as const) delete (body as Record<string, unknown>)[k];
     try {

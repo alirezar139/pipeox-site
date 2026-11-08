@@ -18,6 +18,7 @@ import { ProductsModule } from './modules/products/products.module.js';
 import { ProjectsModule } from './modules/projects/projects.module.js';
 import { SeoModule } from './modules/seo/seo.module.js';
 import { SettingsModule } from './modules/settings/settings.module.js';
+import { ShopModule } from './modules/shop/shop.module.js';
 import { SubscribersModule } from './modules/subscribers/subscribers.module.js';
 
 // The project's .env wins over machine-wide variables (see loadEnvFile)
@@ -47,6 +48,7 @@ loadEnvFile();
     ProjectsModule,
     InquiriesModule,
     ChatModule,
+    ShopModule,
     SubscribersModule,
     DashboardModule,
     SeoModule,

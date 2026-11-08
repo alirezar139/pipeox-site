@@ -1,5 +1,6 @@
 import { inject } from '@angular/core';
-import { CanActivateFn, Routes } from '@angular/router';
+import { CanActivateFn, Router, Routes } from '@angular/router';
+import { AuthStore } from './core/auth.store';
 import { I18n, type Lang } from './core/i18n';
 import { SiteStore } from './core/site.store';
 import {
@@ -18,6 +19,13 @@ const enterLang: CanActivateFn = async (route) => {
   const site = inject(SiteStore);
   if (site.loadedLang !== lang) await site.load();
   return true;
+};
+
+/** Checkout needs a signed-in customer; others sign in and come back. */
+const customer: CanActivateFn = async (_route, state) => {
+  const user = await inject(AuthStore).refresh();
+  const i18n = inject(I18n);
+  return user ? true : inject(Router).createUrlTree([i18n.link('/account/login')], { queryParams: { next: state.url } });
 };
 
 const SITE_PAGES: Routes = [
@@ -53,6 +61,8 @@ const SITE_PAGES: Routes = [
     loadComponent: () => import('./features/pages/contact.page').then((m) => m.ContactPage),
     resolve: { products: productsResolver },
   },
+  { path: 'cart', loadComponent: () => import('./features/shop/cart.page').then((m) => m.CartPage) },
+  { path: 'checkout', canActivate: [customer], loadComponent: () => import('./features/shop/checkout.page').then((m) => m.CheckoutPage) },
   { path: 'account', loadChildren: () => import('./features/account/account.routes').then((m) => m.ACCOUNT_ROUTES) },
   { path: '404', loadComponent: () => import('./features/pages/not-found.page').then((m) => m.NotFoundPage) },
   { path: '**', loadComponent: () => import('./features/pages/not-found.page').then((m) => m.NotFoundPage) },

@@ -1,6 +1,6 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { ApiService } from '../../core/http/api.service';
-import type { ArticleSummary, Article, Inquiry, InquiryStatus, Product, Project, SiteSettings } from '../../core/models';
+import type { ArticleSummary, Article, Inquiry, InquiryStatus, Product, Project, SiteSettings, Order, OrderStatus } from '../../core/models';
 
 export interface Dashboard {
   newInquiries: number;
@@ -44,6 +44,36 @@ export interface SystemInfo {
   database: { name: string; version: string; collections: { name: string; count: number }[] };
   config: { siteUrl: string; dataDir: string; trustProxy: string; idleMinutes: number; email: boolean; bale: boolean; telegram: boolean };
 }
+
+export interface AdminOrderRow {
+  _id: string;
+  number: number;
+  status: OrderStatus;
+  payMethod: 'online' | 'transfer';
+  subtotal: number;
+  total: number | null;
+  createdAt: string;
+  invoice: { name: string };
+  address: { phone: string; city: string };
+  user: { _id: string; email: string; name: string } | null;
+  transfer: { ref: string } | null;
+  items: { qty: number }[];
+}
+export interface AdminOrder extends Omit<Order, 'user' | 'payments'> {
+  user: { _id: string; email: string; name: string; phone: string; company: string } | null;
+  staffNote: string;
+  payments: (Order['payments'][number] & { payNo: number; trace: string; message: string })[];
+}
+export const ORDER_STATUS_LABELS: Record<OrderStatus, string> = {
+  review: 'در انتظار بررسی',
+  awaiting_payment: 'در انتظار پرداخت',
+  paid: 'پرداخت‌شده',
+  processing: 'در حال آماده‌سازی',
+  shipped: 'ارسال‌شده',
+  delivered: 'تحویل‌شده',
+  cancelled: 'لغوشده',
+};
+export const ORDER_STATUSES = Object.keys(ORDER_STATUS_LABELS) as OrderStatus[];
 
 export interface ChatMsg {
   from: 'visitor' | 'staff';
@@ -147,6 +177,17 @@ export class AdminApi {
   setCustomerActive = (id: string, active: boolean) => this.api.patch(`/api/admin/customers/${id}`, { active });
   setCustomerPassword = (id: string, password: string) => this.api.post(`/api/admin/customers/${id}/password`, { password });
   deleteCustomer = (id: string) => this.api.delete(`/api/admin/customers/${id}`);
+
+  /** Orders waiting for the team (review + transfer to confirm): sidebar badge. */
+  readonly orderTodo = signal(0);
+  orders = async (status?: OrderStatus) => {
+    const r = await this.api.get<{ items: AdminOrderRow[]; counts: Partial<Record<OrderStatus, number>> }>('/api/admin/orders', { status });
+    this.orderTodo.set(r.counts.review ?? 0);
+    return r;
+  };
+  order = (id: string) => this.api.get<AdminOrder>(`/api/admin/orders/${id}`);
+  updateOrder = (id: string, body: Partial<{ status: OrderStatus; shipping: number; shippingNote: string; staffNote: string; trackingCode: string }>) =>
+    this.api.patch<AdminOrder>(`/api/admin/orders/${id}`, body);
 
   chats = async () => {
     const r = await this.api.get<{ items: ChatSummary[]; unread: number }>('/api/admin/chats');
