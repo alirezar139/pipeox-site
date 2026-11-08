@@ -56,7 +56,7 @@ const SHARED = [FormsModule, RouterLink, IconComponent, PageHeroComponent, Captc
           <h2>{{ 'acc.login' | t }}</h2>
           @if (reason() === 'idle' && !error()) { <p class="notice notice-ok" role="status">{{ 'acc.idle' | t }}</p> }
           @if (error(); as e) { <p class="notice notice-error" role="alert">{{ e.message }}</p> }
-          <label class="field"><app-icon name="mail" /><input type="email" name="email" [(ngModel)]="email" dir="ltr" [placeholder]="'acc.email' | t" [attr.aria-label]="'acc.email' | t" autocomplete="email" required></label>
+          <label class="field"><app-icon name="user" /><input name="login" [(ngModel)]="login" dir="ltr" [placeholder]="'acc.emailOrUser' | t" [attr.aria-label]="'acc.emailOrUser' | t" autocomplete="username" autocapitalize="off" spellcheck="false" maxlength="190" required></label>
           <label class="field"><app-icon name="lock" /><input #pw type="password" name="password" [(ngModel)]="password" [placeholder]="'acc.password' | t" [attr.aria-label]="'acc.password' | t" autocomplete="current-password" required><app-pw-toggle [for]="pw" /></label>
           <app-captcha [invalid]="!!bad('captcha')" />
           <button class="btn btn-block" type="submit" [disabled]="busy()"><span>{{ (busy() ? 'acc.loggingIn' : 'acc.login') | t }}</span></button>
@@ -72,7 +72,8 @@ const SHARED = [FormsModule, RouterLink, IconComponent, PageHeroComponent, Captc
 export class LoginPage extends FormPage {
   readonly next = input<string>();
   readonly reason = input<string>();
-  protected email = '';
+  /** Email (customers) or username (panel staff: admin, support, developer). */
+  protected login = '';
   protected password = '';
 
   constructor() {
@@ -82,9 +83,17 @@ export class LoginPage extends FormPage {
 
   submit() {
     return this.run(async () => {
-      const r = await this.api.post<{ user: Account }>('/api/auth/login', { email: this.email, password: this.password, ...this.cap() });
-      this.auth.set(r.user);
-      await this.router.navigateByUrl(safeNext(this.next(), this.i18n.link('/account')));
+      const id = this.login.trim();
+      if (id.includes('@')) {
+        const r = await this.api.post<{ user: Account }>('/api/auth/login', { email: id, password: this.password, ...this.cap() });
+        this.auth.set(r.user);
+        await this.router.navigateByUrl(safeNext(this.next(), this.i18n.link('/account')));
+      } else {
+        // Panel staff: their own session, then into the admin panel
+        await this.api.post('/api/admin/login', { username: id, password: this.password, ...this.cap() });
+        const next = this.next();
+        await this.router.navigateByUrl(next?.startsWith('/admin') ? next : '/admin');
+      }
     });
   }
 }

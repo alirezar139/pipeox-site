@@ -107,6 +107,8 @@ const MESSAGES: Record<string, { en: string; de: string }> = {
   'ارتباط با درگاه پرداخت برقرار نشد. لطفاً چند دقیقه بعد دوباره تلاش کنید یا درگاه دیگری را انتخاب کنید.': { en: 'Could not connect to the payment gateway. Please try again in a few minutes or choose another gateway.', de: 'Keine Verbindung zum Zahlungsportal. Bitte versuchen Sie es in einigen Minuten erneut oder wählen Sie ein anderes Portal.' },
   'سفارش پیدا نشد.': { en: 'Order not found.', de: 'Bestellung nicht gefunden.' },
   'پرداخت پیدا نشد.': { en: 'Payment not found.', de: 'Zahlung nicht gefunden.' },
+  'نام کاربری یا رمز عبور اشتباه است.': { en: 'Incorrect username or password.', de: 'Benutzername oder Passwort ist falsch.' },
+  'این حساب غیرفعال شده است.': { en: 'This account has been disabled.', de: 'Dieses Konto wurde deaktiviert.' },
   'پیدا نشد.': { en: 'Not found.', de: 'Nicht gefunden.' },
   'پیوند نامعتبر است.': { en: 'Invalid link.', de: 'Ungültiger Link.' },
   'کد امنیتی درست نیست. کد جدید را وارد کنید.': { en: 'The security code is not correct. Please enter the new code.', de: 'Der Sicherheitscode ist falsch. Bitte geben Sie den neuen Code ein.' },

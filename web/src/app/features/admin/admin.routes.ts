@@ -6,7 +6,7 @@ import { AdminApi } from './admin-api.service';
 /** The real check is server-side (every /api/admin call); this only routes to the login screen. */
 const adminOnly: CanActivateFn = async () => {
   const admin = await inject(AdminApi).me().catch(() => null);
-  return !!admin || inject(Router).createUrlTree(['/admin/login']);
+  return !!admin || inject(Router).createUrlTree(['/account/login'], { queryParams: { next: '/admin' } });
 };
 
 /** Support accounts only reach inquiries, chats and their own password (the API enforces it too). */
@@ -22,7 +22,8 @@ const persian: CanActivateFn = () => {
 };
 
 export const ADMIN_ROUTES: Routes = [
-  { path: 'login', canActivate: [persian], loadComponent: () => import('./admin-login.page').then((m) => m.AdminLoginPage) },
+  // Everyone signs in on the site's login page (old bookmarks still work)
+  { path: 'login', redirectTo: '/account/login?next=/admin' },
   {
     path: '',
     canActivate: [persian, adminOnly],

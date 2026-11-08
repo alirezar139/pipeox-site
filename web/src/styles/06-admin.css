@@ -256,30 +256,13 @@ select.adm-input { cursor: pointer; }
 .adm-toast.err { background: #2a1a10; border-color: rgba(247, 128, 28, 0.45); color: #ffc08a; }
 @keyframes toast-in { from { opacity: 0; transform: translateY(10px); } }
 
-/* Login screen */
-.admin-login { display: grid; place-items: center; grid-template-columns: 1fr; padding: 20px; }
-.adm-login-card {
-  width: min(400px, 100%); display: grid; gap: 14px; padding: 36px 32px; text-align: center;
-  background: linear-gradient(180deg, #141518, #101113); border: 1px solid var(--a-line-2); border-radius: 22px;
-  box-shadow: 0 40px 90px -30px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(247, 128, 28, 0.04);
-}
-.adm-login-mark { justify-self: center; display: grid; place-items: center; width: 70px; height: 70px; border-radius: 20px; background: rgba(247, 128, 28, 0.1); box-shadow: 0 0 40px -10px rgba(247, 128, 28, 0.5); }
-.adm-login-mark svg { width: 40px; height: 34px; color: var(--a-orange); }
-.adm-login-card h1 { margin: 6px 0 0; font-size: 20px; }
-.adm-login-card > p { margin: -6px 0 6px; color: var(--a-muted); font: 500 12px Montserrat, sans-serif; }
-.adm-input-icon { display: flex; align-items: center; gap: 10px; padding: 0 14px; background: var(--a-input); border: 1px solid var(--a-line); border-radius: 12px; color: var(--a-muted); }
-.adm-input-icon:focus-within { border-color: var(--a-orange); color: var(--a-orange); }
-.adm-input-icon .ico { width: 18px; height: 18px; }
-.adm-input-icon input { flex: 1; min-height: 48px; border: 0; outline: 0; background: none; color: var(--a-ink); font: inherit; }
-.adm-login-card .adm-btn { height: 48px; font-size: 15px; }
-
 /* Responsive */
 @media (max-width: 1000px) {
   .adm-form-article { grid-template-columns: 1fr; }
   .adm-article-side { position: static; }
 }
 @media (max-width: 860px) {
-  .admin-app:not(.admin-login) { grid-template-columns: 1fr; }
+  .admin-app { grid-template-columns: 1fr; }
   .adm-side { position: fixed; inset-block: 0; inset-inline-start: 0; z-index: 60; width: 260px; transform: translateX(100%); transition: transform 0.3s ease; }
   .adm-side.open { transform: none; box-shadow: -30px 0 60px rgba(0, 0, 0, 0.6); }
   .adm-topbar { display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 50; padding: 12px 16px; background: rgba(10, 11, 12, 0.92); backdrop-filter: blur(12px); border-bottom: 1px solid var(--a-line); }
@@ -307,13 +290,11 @@ select.adm-input { cursor: pointer; }
 .adm-dl { display: grid; grid-template-columns: auto 1fr; gap: 8px 18px; margin: 0; font-size: 13.5px; }
 .adm-dl dt { color: var(--a-muted); }
 .adm-dl dd { margin: 0; font-weight: 600; overflow-wrap: anywhere; }
-.adm-note { padding: 11px 15px; border-radius: 10px; background: rgba(120, 200, 140, 0.08); border: 1px solid rgba(120, 200, 140, 0.3); color: #bfe6c8; margin: 0 0 16px; font-size: 13.5px; }
 .adm-me { display: flex; align-items: center; gap: 10px; padding: 12px; margin-top: auto; border-top: 1px solid var(--a-line); }
 .adm-me + .adm-side-foot { margin-top: 0; border-top: 0; padding-top: 0; }
 .adm-me-avatar { display: grid; place-items: center; width: 34px; height: 34px; flex: none; border-radius: 50%; background: rgba(247, 128, 28, 0.15); color: var(--a-orange); font-weight: 800; }
 .adm-me b { display: block; font-size: 13.5px; }
 .adm-me small { color: var(--a-muted); font-size: 11.5px; }
-.adm-login-card .captcha { width: 100%; }
 @media (max-width: 860px) { .adm-grid-2 { grid-template-columns: 1fr; } }
 
 /* Content language tabs (فارسی / English / Deutsch) */
@@ -380,9 +361,7 @@ input.adm-input[dir="ltr"]::placeholder, textarea.adm-input[dir="ltr"]::placehol
 .adm-badge.o-delivered { background: rgba(111, 207, 143, 0.14); color: #9fe0b4; }
 .adm-badge.o-cancelled { background: rgba(255, 255, 255, 0.06); color: #9a9ea2; }
 .adm-card > h2 { font-size: 15.5px; font-weight: 800; margin: 0 0 10px; }
-.adm-dl { display: grid; grid-template-columns: max-content 1fr; gap: 6px 16px; margin: 12px 0 0; font-size: 13.5px; }
-.adm-dl dt { color: #9a9ea2; }
-.adm-dl dd { margin: 0; }
+.adm-card > .adm-dl { margin-top: 12px; }
 .adm-alert { border-color: rgba(247, 128, 28, 0.55); background: rgba(247, 128, 28, 0.06); }
 .adm-pay { margin: 0 0 8px; padding: 8px 12px; border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px; font-size: 13px; }
 .adm-pay.p-paid b { color: #9fe0b4; }

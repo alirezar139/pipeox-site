@@ -107,7 +107,7 @@ export class AdminShellComponent {
 
   private async signOut(reason?: 'idle') {
     await this.api.logout().catch(() => {});
-    await this.router.navigate(['/admin/login'], { queryParams: reason ? { reason } : {} });
+    await this.router.navigate(['/account/login'], { queryParams: { next: '/admin', ...(reason ? { reason } : {}) } });
   }
 
   logout() {

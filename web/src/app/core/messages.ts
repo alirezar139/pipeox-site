@@ -259,6 +259,7 @@ export const MESSAGES = {
   'acc.loggingIn': { fa: 'در حال ورود…', en: 'Signing in…', de: 'Anmeldung läuft…' },
   'acc.idle': { fa: 'به دلیل ۳۰ دقیقه عدم فعالیت، از حساب کاربری خارج شدید. لطفاً دوباره وارد شوید.', en: 'You were signed out after 30 minutes of inactivity. Please sign in again.', de: 'Sie wurden nach 30 Minuten Inaktivität abgemeldet. Bitte melden Sie sich erneut an.' },
   'acc.email': { fa: 'ایمیل', en: 'Email', de: 'E-Mail' },
+  'acc.emailOrUser': { fa: 'ایمیل یا نام کاربری', en: 'Email or username', de: 'E-Mail oder Benutzername' },
   'acc.password': { fa: 'رمز عبور', en: 'Password', de: 'Passwort' },
   'acc.forgotLink': { fa: 'رمز عبور را فراموش کرده‌ام', en: 'I forgot my password', de: 'Passwort vergessen' },
   'acc.noAccount': { fa: 'حساب کاربری ندارید؟', en: 'No account yet?', de: 'Noch kein Konto?' },
