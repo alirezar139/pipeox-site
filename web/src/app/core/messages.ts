@@ -34,6 +34,7 @@ export const MESSAGES = {
   'support.title': { fa: 'چطور کمکتان کنیم؟', en: 'How can we help?', de: 'Wie können wir helfen?' },
   'support.text': { fa: 'کارشناسان فنی ما پاسخ‌گوی شما هستند.', en: 'Our technical team is here to help.', de: 'Unser technisches Team hilft Ihnen gerne.' },
   'support.form': { fa: 'ارسال استعلام / پیام', en: 'Send an inquiry', de: 'Anfrage senden' },
+  'support.formHint': { fa: 'دریافت قیمت و زمان تحویل', en: 'Get price and lead time', de: 'Preis und Lieferzeit erhalten' },
 
   /* ───── Shared ───── */
   'common.captcha': { fa: 'کد امنیتی', en: 'Security code', de: 'Sicherheitscode' },
