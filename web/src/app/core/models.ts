@@ -1,5 +1,21 @@
 /** API data shapes (mirror api/src/modules/*). */
 
+/** Translated languages (Persian is the base content). */
+export type TrLang = 'en' | 'de';
+/** Translations as stored by the API: { en: {...}, de: {...} } — the admin reads/writes them; the site receives content already translated. */
+export type I18nOf<T> = Partial<Record<TrLang, Partial<T>>>;
+
+export interface SettingsTranslation {
+  site: Partial<{ name: string; title: string; description: string }>;
+  contact: Partial<{ address: string; hours: string }>;
+  hero: Partial<{ kicker: string; title: string; titleAccent: string; text: string }>;
+  showcase: Partial<{ title: string; text: string }>;
+  stats: { label?: string }[];
+  features: { title?: string; text?: string }[];
+  projects: Partial<{ title: string; text: string }>;
+  newsletter: Partial<{ title: string; text: string }>;
+}
+
 export interface SiteSettings {
   site: { name: string; nameFa: string; url: string; title: string; description: string };
   contact: { phone: string; email: string; whatsapp: string; address: string; hours: string };
@@ -9,6 +25,7 @@ export interface SiteSettings {
   features: { title: string; text: string; icon: string }[];
   projects: { title: string; text: string; video: string };
   newsletter: { title: string; text: string };
+  i18n?: I18nOf<SettingsTranslation>;
 }
 
 export type OrbitSlot = '' | 'a' | 'b' | 'c' | 'd';
@@ -31,6 +48,7 @@ export interface Product {
   sort: number;
   published?: boolean;
   updatedAt: string;
+  i18n?: I18nOf<Pick<Product, 'title' | 'shortTitle' | 'summary' | 'intro' | 'alt' | 'keywords' | 'applications'> & { types: Partial<Product['types'][number]>[]; specs: Partial<Product['specs'][number]>[] }>;
 }
 
 export interface ArticleSummary {
@@ -50,6 +68,7 @@ export interface Article extends ArticleSummary {
   body: string;
   showCover: boolean;
   readingMinutes: number;
+  i18n?: I18nOf<Pick<Article, 'title' | 'description' | 'category' | 'imageAlt' | 'body'>>;
 }
 
 export interface Project {
@@ -62,6 +81,7 @@ export interface Project {
   image: string;
   sort: number;
   published?: boolean;
+  i18n?: I18nOf<Pick<Project, 'title' | 'client' | 'industry' | 'scope'>>;
 }
 
 export interface Account {

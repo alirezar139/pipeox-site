@@ -287,3 +287,57 @@ describe('customer accounts and inquiries', () => {
     expect(list.some((i: { name: string }) => i.name === 'ربات')).toBe(false);
   });
 });
+
+describe('languages (fa / en / de)', () => {
+  it('serves seeded translations, falls back to Persian, and localizes errors', async () => {
+    const fa = (await request(host).get('/api/products/steel-pipes').expect(200)).body;
+    const en = (await request(host).get('/api/products/steel-pipes?lang=en').expect(200)).body;
+    const de = (await request(host).get('/api/products/steel-pipes').set('X-Lang', 'de').expect(200)).body;
+    expect(fa.title).toBe('لوله‌های فولادی');
+    expect(en.title).toBe('Steel Pipes');
+    expect(de.title).toBe('Stahlrohre');
+    expect(en.specs[0].label).toBe('Common standards');
+    expect(en.i18n).toBeUndefined(); // the public API never leaks the translation block
+    expect(en.image).toBe(fa.image); // shared fields stay
+
+    const article = (await request(host).get('/api/articles/flange-class-vs-pressure?lang=de').expect(200)).body;
+    expect(article.title).toMatch(/Flanschklasse/);
+    expect(article.body).toContain('<h2>');
+
+    const site = (await request(host).get('/api/site?lang=en').expect(200)).body;
+    expect(site.hero.title).toBe('Sustainable Solutions');
+    expect(site.stats[0].value).toBe(25); // number from the Persian base, label from the translation
+    expect(site.stats[0].label).toBe('Years of experience');
+
+    const missing = await request(host).get('/api/products/nope?lang=de').expect(404);
+    expect(missing.body.message).toBe('Produkt nicht gefunden.');
+  });
+
+  it('saves translations from the panel (sanitized) without touching the Persian text', async () => {
+    const a = await adminAgent();
+    const p = (await a.get('/api/admin/products').expect(200)).body.find((x: { slug: string }) => x.slug === 'fittings');
+    const { _id, createdAt, updatedAt, __v, ...rest } = p;
+    void createdAt; void updatedAt; void __v;
+    await a.put(`/api/admin/products/${_id}`).set(H).send({ ...rest, i18n: { ...rest.i18n, en: { ...rest.i18n.en, title: 'Fittings (edited)', summary: '' } } }).expect(200);
+    const en = (await request(host).get('/api/products/fittings?lang=en').expect(200)).body;
+    expect(en.title).toBe('Fittings (edited)');
+    expect(en.summary).toBe(rest.summary); // empty translation → Persian text
+    expect((await request(host).get('/api/products/fittings').expect(200)).body.title).toBe(rest.title);
+
+    const created = (await a.post('/api/admin/articles').set(H).send({
+      slug: 'i18n-xss', title: 'آزمون', body: '<p>متن</p>',
+      i18n: { en: { title: 'Test', body: '<p onclick="x()">Hi</p><script>alert(1)</script>' } },
+    }).expect(201)).body;
+    const art = (await request(host).get('/api/articles/i18n-xss?lang=en').expect(200)).body;
+    expect(art.title).toBe('Test');
+    expect(art.body).toBe('<p>Hi</p>');
+    await a.delete(`/api/admin/articles/${created._id}`).set(H).expect(200);
+  });
+
+  it('lists every language in the sitemap', async () => {
+    const map = (await request(host).get('/sitemap.xml').expect(200)).text;
+    expect(map).toContain('/en/products/steel-pipes</loc>');
+    expect(map).toContain('/de/products/steel-pipes</loc>');
+    expect(map).toContain('hreflang="x-default"');
+  });
+});

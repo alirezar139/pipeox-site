@@ -1,10 +1,12 @@
 import { ChangeDetectionStrategy, Component, effect, inject, input, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import type { ApiError, OrbitSlot, Product } from '../../../core/models';
+import type { Lang } from '../../../core/i18n';
+import type { ApiError, OrbitSlot, Product, TrLang } from '../../../core/models';
 import { IconComponent } from '../../../shared/icon.component';
 import { AdminApi } from '../admin-api.service';
 import { ImageFieldComponent } from '../ui/image-field.component';
+import { LangTabsComponent } from '../ui/lang-tabs.component';
 import { ToastService } from '../ui/toast.service';
 
 export const ORBIT_LABELS: Record<Exclude<OrbitSlot, ''>, string> = {
@@ -22,7 +24,7 @@ const EMPTY: Partial<Product> = {
 @Component({
   selector: 'app-admin-product-edit-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, RouterLink, IconComponent, ImageFieldComponent],
+  imports: [FormsModule, RouterLink, IconComponent, ImageFieldComponent, LangTabsComponent],
   template: `
     <div class="adm-head">
       <div><h1>{{ isNew() ? 'محصول جدید' : 'ویرایش محصول' }}</h1><p>{{ p.title }}</p></div>
@@ -35,7 +37,47 @@ const EMPTY: Partial<Product> = {
     @if (error(); as e) { <p class="adm-error" role="alert">{{ e.message }}</p> }
 
     @if (!loaded()) { <div class="adm-skeleton"></div> } @else {
+    <adm-lang-tabs [(lang)]="lang" />
     <form class="adm-form" (ngSubmit)="save()">
+      @if (lang() !== 'fa') {
+        @let t = tr(trLang());
+        <fieldset class="adm-card">
+          <legend>متن‌ها — {{ langName() }}</legend>
+          <label class="adm-field"><span class="adm-label">عنوان</span><input class="adm-input" dir="ltr" name="tr-title" [(ngModel)]="t.title" [placeholder]="p.title"></label>
+          <label class="adm-field"><span class="adm-label">عنوان کوتاه</span><input class="adm-input" dir="ltr" name="tr-short" [(ngModel)]="t.shortTitle" [placeholder]="p.shortTitle"></label>
+          <label class="adm-field adm-wide"><span class="adm-label">خلاصه (کارت محصول)</span><textarea class="adm-input" dir="ltr" name="tr-summary" rows="2" [(ngModel)]="t.summary" [placeholder]="p.summary"></textarea></label>
+          <label class="adm-field adm-wide"><span class="adm-label">معرفی (صفحه محصول)</span><textarea class="adm-input" dir="ltr" name="tr-intro" rows="4" [(ngModel)]="t.intro" [placeholder]="p.intro"></textarea></label>
+          <label class="adm-field"><span class="adm-label">متن جایگزین تصویر</span><input class="adm-input" dir="ltr" name="tr-alt" [(ngModel)]="t.alt" [placeholder]="p.alt"></label>
+          <label class="adm-field"><span class="adm-label">کلیدواژه‌های جستجو</span><input class="adm-input" dir="ltr" name="tr-kw" [(ngModel)]="t.keywords" [placeholder]="p.keywords"></label>
+        </fieldset>
+        @if (p.types?.length) {
+          <fieldset class="adm-card">
+            <legend>انواع رایج — {{ langName() }}</legend>
+            @for (row of t.types; track $index; let i = $index) {
+              <div class="adm-row">
+                <input class="adm-input" dir="ltr" [name]="'tr-tn' + i" [(ngModel)]="row.name" [placeholder]="p.types![i].name">
+                <input class="adm-input adm-grow" dir="ltr" [name]="'tr-td' + i" [(ngModel)]="row.desc" [placeholder]="p.types![i].desc">
+              </div>
+            }
+          </fieldset>
+        }
+        @if (p.specs?.length) {
+          <fieldset class="adm-card">
+            <legend>جدول مشخصات فنی — {{ langName() }}</legend>
+            @for (row of t.specs; track $index; let i = $index) {
+              <div class="adm-row">
+                <input class="adm-input" dir="ltr" [name]="'tr-sl' + i" [(ngModel)]="row.label" [placeholder]="p.specs![i].label">
+                <input class="adm-input adm-grow" dir="ltr" [name]="'tr-sv' + i" [(ngModel)]="row.value" [placeholder]="p.specs![i].value">
+              </div>
+            }
+          </fieldset>
+        }
+        <fieldset class="adm-card">
+          <legend>کاربردها — {{ langName() }}</legend>
+          <label class="adm-field adm-wide"><span class="adm-label">کاربردها</span>
+            <textarea class="adm-input" dir="ltr" name="tr-apps" rows="4" [(ngModel)]="trApps[trLang()]" [placeholder]="applications"></textarea><small>هر خط یک کاربرد؛ خالی = همان فهرست فارسی</small></label>
+        </fieldset>
+      } @else {
       <fieldset class="adm-card">
         <legend>اطلاعات اصلی</legend>
         <label class="adm-field"><span class="adm-label">عنوان</span><input class="adm-input" name="title" [(ngModel)]="p.title" required></label>
@@ -87,6 +129,7 @@ const EMPTY: Partial<Product> = {
         <label class="adm-field"><span class="adm-label">ترتیب نمایش</span><input class="adm-input" type="number" name="sort" [(ngModel)]="p.sort"><small>عدد کمتر = جلوتر</small></label>
         <label class="adm-check"><input type="checkbox" name="published" [(ngModel)]="p.published"> منتشر شود</label>
       </fieldset>
+      }
 
       <div class="adm-savebar">
         <button class="adm-btn" type="submit" [disabled]="busy()">{{ busy() ? 'در حال ذخیره...' : 'ذخیره محصول' }}</button>
@@ -112,6 +155,21 @@ export class AdminProductEditPage {
   protected readonly isNew = () => this.id() === 'new';
   protected readonly loaded = signal(false);
 
+  /* ───── Translations ───── */
+  protected readonly lang = signal<Lang>('fa');
+  protected readonly trLang = () => this.lang() as TrLang;
+  protected readonly langName = () => (this.lang() === 'en' ? 'English' : 'Deutsch');
+  protected trApps: Record<TrLang, string> = { en: '', de: '' };
+
+  /** The translation being edited, with one type/spec row per Persian row. */
+  protected tr(l: TrLang) {
+    const i18n = (this.p.i18n ??= {});
+    const t = (i18n[l] ??= {});
+    t.types = (this.p.types ?? []).map((_, i) => t.types?.[i] ?? { name: '', desc: '' });
+    t.specs = (this.p.specs ?? []).map((_, i) => t.specs?.[i] ?? { label: '', value: '' });
+    return t;
+  }
+
   constructor() {
     effect(() => {
       if (this.isNew()) return this.loaded.set(true);
@@ -119,6 +177,7 @@ export class AdminProductEditPage {
         this.p = p;
         this.image = p.image;
         this.applications = p.applications.join('\n');
+        this.trApps = { en: (p.i18n?.en?.applications ?? []).join('\n'), de: (p.i18n?.de?.applications ?? []).join('\n') };
         this.loaded.set(true);
       }, (e) => this.toast.error(e));
     });
@@ -127,11 +186,25 @@ export class AdminProductEditPage {
   async save() {
     this.busy.set(true);
     this.error.set(null);
+    // Rows without a Persian name are dropped — drop the same rows from the translations so they stay aligned
+    const keepTypes = (this.p.types ?? []).map((t, i) => (t.name.trim() ? i : -1)).filter((i) => i >= 0);
+    const keepSpecs = (this.p.specs ?? []).map((sp, i) => (sp.label.trim() ? i : -1)).filter((i) => i >= 0);
+    const i18n: Product['i18n'] = {};
+    for (const l of ['en', 'de'] as const) {
+      const t = this.tr(l);
+      i18n[l] = {
+        ...t,
+        types: keepTypes.map((i) => t.types![i]),
+        specs: keepSpecs.map((i) => t.specs![i]),
+        applications: this.trApps[l].split('\n').map((x) => x.trim()).filter(Boolean),
+      };
+    }
     const body: Partial<Product> = {
       ...this.p,
+      i18n,
       image: this.image,
-      types: (this.p.types ?? []).filter((t) => t.name.trim()),
-      specs: (this.p.specs ?? []).filter((s) => s.label.trim()),
+      types: keepTypes.map((i) => this.p.types![i]),
+      specs: keepSpecs.map((i) => this.p.specs![i]),
       applications: this.applications.split('\n').map((s) => s.trim()).filter(Boolean),
       sort: Number(this.p.sort) || 0,
     };

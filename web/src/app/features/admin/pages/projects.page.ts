@@ -1,10 +1,12 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FaNumPipe } from '../../../core/format';
-import type { ApiError, Project } from '../../../core/models';
+import type { Lang } from '../../../core/i18n';
+import type { ApiError, Project, TrLang } from '../../../core/models';
 import { IconComponent } from '../../../shared/icon.component';
 import { AdminApi } from '../admin-api.service';
 import { ImageFieldComponent } from '../ui/image-field.component';
+import { LangTabsComponent } from '../ui/lang-tabs.component';
 import { ToastService } from '../ui/toast.service';
 
 type Draft = Omit<Project, '_id'> & { _id?: string };
@@ -14,7 +16,7 @@ const blank = (): Draft => ({ title: '', client: '', year: '', industry: '', sco
 @Component({
   selector: 'app-admin-projects-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, IconComponent, ImageFieldComponent, FaNumPipe],
+  imports: [FormsModule, IconComponent, ImageFieldComponent, FaNumPipe, LangTabsComponent],
   template: `
     <div class="adm-head">
       <div><h1>پروژه‌ها</h1><p>بخش «پروژه‌های شاخص» صفحه پروژه‌ها با اولین پروژه منتشرشده نمایش داده می‌شود.</p></div>
@@ -25,6 +27,14 @@ const blank = (): Draft => ({ title: '', client: '', year: '', industry: '', sco
       <form class="adm-form adm-card" (ngSubmit)="save(d)">
         <h2 class="adm-card-title">{{ d._id ? 'ویرایش پروژه' : 'پروژه جدید' }}</h2>
         @if (error(); as e) { <p class="adm-error adm-wide">{{ e.message }}</p> }
+        <adm-lang-tabs class="adm-wide" [(lang)]="lang" />
+        @if (lang() !== 'fa') {
+          @let t = tr(d, trLang());
+          <label class="adm-field adm-wide"><span class="adm-label">عنوان پروژه</span><input class="adm-input" dir="ltr" name="tr-title" [(ngModel)]="t.title" [placeholder]="d.title"></label>
+          <label class="adm-field"><span class="adm-label">کارفرما</span><input class="adm-input" dir="ltr" name="tr-client" [(ngModel)]="t.client" [placeholder]="d.client"></label>
+          <label class="adm-field"><span class="adm-label">صنعت</span><input class="adm-input" dir="ltr" name="tr-industry" [(ngModel)]="t.industry" [placeholder]="d.industry"></label>
+          <label class="adm-field adm-wide"><span class="adm-label">شرح کار و اقلام تأمین‌شده</span><textarea class="adm-input" dir="ltr" name="tr-scope" rows="3" [(ngModel)]="t.scope" [placeholder]="d.scope"></textarea></label>
+        } @else {
         <label class="adm-field adm-wide"><span class="adm-label">عنوان پروژه</span><input class="adm-input" name="title" [(ngModel)]="d.title" required></label>
         <label class="adm-field"><span class="adm-label">کارفرما</span><input class="adm-input" name="client" [(ngModel)]="d.client"></label>
         <label class="adm-field"><span class="adm-label">صنعت</span><input class="adm-input" name="industry" [(ngModel)]="d.industry" placeholder="مثلاً نفت و گاز"></label>
@@ -33,6 +43,7 @@ const blank = (): Draft => ({ title: '', client: '', year: '', industry: '', sco
         <label class="adm-field adm-wide"><span class="adm-label">شرح کار و اقلام تأمین‌شده</span><textarea class="adm-input" name="scope" rows="3" [(ngModel)]="d.scope"></textarea></label>
         <adm-image-field label="تصویر" [(value)]="d.image" />
         <label class="adm-check"><input type="checkbox" name="published" [(ngModel)]="d.published"> در سایت نمایش داده شود</label>
+        }
         <div class="adm-savebar adm-wide">
           <button class="adm-btn" type="submit" [disabled]="busy()">ذخیره پروژه</button>
           <button type="button" class="adm-btn adm-btn-ghost" (click)="draft.set(null)">انصراف</button>
@@ -69,6 +80,12 @@ export class AdminProjectsPage {
   protected readonly draft = signal<Draft | null>(null);
   protected readonly busy = signal(false);
   protected readonly error = signal<ApiError | null>(null);
+  protected readonly lang = signal<Lang>('fa');
+  protected readonly trLang = () => this.lang() as TrLang;
+  protected tr(d: Draft, l: TrLang) {
+    const i18n = (d.i18n ??= {});
+    return (i18n[l] ??= {});
+  }
 
   constructor() {
     void this.load();
@@ -80,7 +97,8 @@ export class AdminProjectsPage {
 
   edit(p: Project | null) {
     this.error.set(null);
-    this.draft.set(p ? { ...p } : blank());
+    this.lang.set('fa');
+    this.draft.set(p ? structuredClone(p) : blank());
     scrollTo({ top: 0, behavior: 'smooth' });
   }
 
